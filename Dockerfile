@@ -47,5 +47,5 @@ HEALTHCHECK --interval=30s --timeout=5s --retries=5 CMD curl -fsS http://localho
 
 USER node
 
-# Bind explicitly to 0.0.0.0 and use env PORT
-CMD ["sh", "-c", "next start -p ${PORT:-3000} -H 0.0.0.0"]
+# Bind explícitamente a 0.0.0.0 y usa PORT vía npm
+CMD ["sh", "-c", "npm run start -- -p ${PORT:-3000} -H 0.0.0.0"]

@@ -15,9 +15,8 @@ export async function middleware(req: NextRequest) {
   // En el dominio base (landing), sólo permitir home y estáticos; redirigir el resto al subdominio app
   const isStatic = pathname.startsWith("/_next") || pathname === "/favicon.ico" || pathname === "/robots.txt" || pathname === "/sitemap.xml";
   if (isLandingHost && pathname !== "/" && !isStatic) {
-    const dest = new URL(req.url);
-    dest.protocol = "https:";
-    dest.hostname = APP_HOST;
+    // Construir destino sin heredar puerto del request interno
+    const dest = new URL(req.nextUrl.pathname + req.nextUrl.search, `https://${APP_HOST}`);
     return NextResponse.redirect(dest);
   }
 
@@ -29,7 +28,8 @@ export async function middleware(req: NextRequest) {
 
   // Only enforce cookie check when the frontend shares base domain. If not, skip and let client-side fetch handle auth.
   if (sameBaseDomain && isProtected && !token) {
-    const url = new URL("/login", req.url);
+    // Redirigir dentro del mismo dominio, sin puerto
+    const url = new URL("/login", `https://${host}`);
     return NextResponse.redirect(url);
   }
 
@@ -41,16 +41,16 @@ export async function middleware(req: NextRequest) {
         headers: token ? { cookie: `session=${token}` } : undefined,
       });
       if (!res.ok) {
-        const url = new URL("/login", req.url);
+        const url = new URL("/login", `https://${host}`);
         return NextResponse.redirect(url);
       }
       const data = await res.json();
       if (data?.user?.role !== "ADMIN") {
-        const url = new URL("/dashboard", req.url);
+        const url = new URL("/dashboard", `https://${host}`);
         return NextResponse.redirect(url);
       }
     } catch {
-      const url = new URL("/login", req.url);
+      const url = new URL("/login", `https://${host}`);
       return NextResponse.redirect(url);
     }
   }

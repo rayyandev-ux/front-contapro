@@ -20,7 +20,7 @@ FROM node:20-bullseye-slim AS runtime
 WORKDIR /app
 
 ARG NEXT_PUBLIC_API_BASE
-ENV NODE_ENV=production \
+ENV NODE_ENV=development \
     PORT=3000 \
     HOST=0.0.0.0 \
     NEXT_TELEMETRY_DISABLED=1 \
@@ -47,5 +47,5 @@ HEALTHCHECK --interval=30s --timeout=5s --retries=5 CMD curl -fsS http://localho
 
 USER node
 
-# Bind explícitamente a 0.0.0.0 y usa PORT vía npm
-CMD ["sh", "-c", "npm run start -- -p ${PORT:-3000} -H 0.0.0.0"]
+# Ejecutar en modo desarrollo, vinculando a 0.0.0.0 y puerto configurable
+CMD ["sh", "-c", "npm run dev -- -p ${PORT:-3000} -H 0.0.0.0"]

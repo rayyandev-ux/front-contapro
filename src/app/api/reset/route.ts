@@ -10,7 +10,7 @@ export async function POST(req: Request) {
     return new Response(JSON.stringify({ error: "Cuerpo JSON requerido" }), { status: 400, headers: { "content-type": "application/json" } });
   }
   try {
-    const upstream = await fetch(`${BASE}/api/auth/forgot`, {
+    const upstream = await fetch(`${BASE}/api/auth/reset`, {
       method: "POST",
       headers: { "content-type": "application/json", "accept-language": req.headers.get("accept-language") || "es" },
       body: JSON.stringify(body),

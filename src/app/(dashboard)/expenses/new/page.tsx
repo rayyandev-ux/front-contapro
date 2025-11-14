@@ -14,7 +14,6 @@ export default function Page() {
     provider: "",
     description: "",
     amount: "",
-    currency: "PEN",
     categoryId: "",
   });
   const [saving, setSaving] = useState(false);
@@ -37,7 +36,7 @@ export default function Page() {
       provider: form.provider,
       description: form.description || undefined,
       amount: Number(form.amount),
-      currency: form.currency,
+      currency: 'USD',
       categoryId: form.categoryId || undefined,
     };
     const res = await apiJson(`/api/expenses`, { method: "POST", body: JSON.stringify(payload) });
@@ -87,13 +86,6 @@ export default function Page() {
           <div>
             <label className="block text-sm">Monto</label>
             <input type="number" step="0.01" className="border rounded-md p-2 w-full" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} />
-          </div>
-          <div>
-            <label className="block text-sm">Moneda</label>
-            <select className="border rounded-md p-2 w-full" value={form.currency} onChange={e => setForm(f => ({ ...f, currency: e.target.value }))}>
-              <option value="PEN">PEN</option>
-              <option value="USD">USD</option>
-            </select>
           </div>
         </div>
 

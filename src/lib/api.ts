@@ -12,7 +12,8 @@ export async function apiJson<T = any>(path: string, init: RequestInit = {}): Pr
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok || (data && data.ok === false)) {
-      return { ok: false, error: data?.error || `Error ${res.status}` };
+      const msg = (data && (data.message || data.error)) || `Error ${res.status}`;
+      return { ok: false, error: msg };
     }
     return { ok: true, data };
   } catch (e) {
@@ -29,7 +30,8 @@ export async function apiMultipart<T = any>(path: string, formData: FormData): P
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok || (data && data.ok === false)) {
-      return { ok: false, error: data?.error || `Error ${res.status}` };
+      const msg = (data && (data.message || data.error)) || `Error ${res.status}`;
+      return { ok: false, error: msg };
     }
     return { ok: true, data };
   } catch (e) {

@@ -1,12 +1,31 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { apiMultipart } from "@/lib/api";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { UploadCloud, FileText, Image as ImageIcon, AlertTriangle, Loader2, X } from "lucide-react";
 
 export default function Page() {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [dragActive, setDragActive] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (file && file.type.startsWith("image/")) {
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+      return () => URL.revokeObjectURL(url);
+    }
+    setPreviewUrl(null);
+  }, [file]);
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  };
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -14,6 +33,10 @@ export default function Page() {
     setResult(null);
     if (!file) {
       setError("Selecciona un archivo");
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      setError("El archivo supera 10 MB");
       return;
     }
     setLoading(true);
@@ -38,30 +61,138 @@ export default function Page() {
     }
   };
 
+  const onDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      setFile(e.dataTransfer.files[0]);
+    }
+  };
+
+  const onDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(true);
+  };
+
+  const onDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+  };
+
   return (
     <section>
-      <h1 className="text-2xl font-semibold mb-4">Subir documento</h1>
-      <p className="text-sm text-gray-600 mb-6">Adjunta una foto o PDF de tu factura/boleta para analizarla con IA.</p>
-      <form className="space-y-4" onSubmit={onSubmit}>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Archivo</label>
-          <input
-            type="file"
-            className="mt-1 block w-full rounded-md border px-3 py-2"
-            accept="image/*,application/pdf"
-            onChange={(e) => setFile(e.target.files?.[0] || null)}
-          />
-        </div>
-        <div className="flex items-center gap-3">
-          <button type="submit" disabled={loading} className="rounded-md bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700">
-            {loading ? "Subiendo..." : "Subir y analizar"}
-          </button>
-          {error && <span className="text-xs text-red-600">{error}</span>}
-        </div>
-        {result && (
-          <div className="rounded-md border bg-white p-4 text-sm text-gray-700">{result}</div>
-        )}
-      </form>
+      <Card className="overflow-hidden">
+        <CardHeader>
+          <CardTitle>Subir documento</CardTitle>
+          <CardDescription>
+            Adjunta una foto o PDF de tu factura/boleta para analizarla con IA.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form className="space-y-6" onSubmit={onSubmit}>
+            {/* Tipos permitidos */}
+            <div className="flex flex-wrap items-center gap-2 text-xs">
+              <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2 py-1 text-indigo-700 ring-1 ring-indigo-200">
+                <ImageIcon className="h-3 w-3" /> JPG/PNG
+              </span>
+              <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2 py-1 text-indigo-700 ring-1 ring-indigo-200">
+                <FileText className="h-3 w-3" /> PDF
+              </span>
+              <span className="text-gray-500">Máx. 10 MB</span>
+            </div>
+
+            {/* Área de dropzone */}
+            <div
+              onDrop={onDrop}
+              onDragOver={onDragOver}
+              onDragLeave={onDragLeave}
+              className={`relative rounded-xl border-2 border-dashed p-6 transition-colors ${
+                dragActive ? "border-indigo-400 bg-indigo-50" : "border-gray-200 bg-white"
+              }`}
+            >
+              <div className="flex flex-col items-center justify-center text-center">
+                <UploadCloud className="mb-2 h-8 w-8 text-indigo-600" />
+                <p className="text-sm text-gray-700">
+                  Arrastra tu archivo aquí o
+                  <label className="mx-1 cursor-pointer font-medium text-indigo-600 underline">
+                    <input
+                      type="file"
+                      className="sr-only"
+                      accept="image/*,application/pdf"
+                      onChange={(e) => setFile(e.target.files?.[0] || null)}
+                    />
+                    selecciónalo
+                  </label>
+                </p>
+                <p className="text-xs text-gray-500">Acepta imágenes y PDF</p>
+              </div>
+            </div>
+
+            {/* Resumen del archivo seleccionado */}
+            {file && (
+              <div className="rounded-lg border bg-white p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    {file.type.startsWith("image/") ? (
+                      <ImageIcon className="h-5 w-5 text-gray-600" />
+                    ) : (
+                      <FileText className="h-5 w-5 text-gray-600" />
+                    )}
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">{file.name}</p>
+                      <p className="text-xs text-gray-500">
+                        {file.type || "desconocido"} · {formatFileSize(file.size)}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setFile(null)}
+                    className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs text-gray-700 hover:bg-gray-100"
+                  >
+                    <X className="h-3 w-3" /> Quitar
+                  </button>
+                </div>
+
+                {previewUrl && (
+                  <div className="mt-3 overflow-hidden rounded-md border">
+                    {/* Vista previa imagen */}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={previewUrl} alt="Vista previa" className="max-h-56 w-full object-contain" />
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Acciones */}
+            <div className="flex items-center gap-3">
+              <button
+                type="submit"
+                disabled={loading}
+                className="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700 disabled:opacity-60"
+              >
+                {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+                {loading ? "Subiendo..." : "Subir y analizar"}
+              </button>
+              {error && (
+                <span className="inline-flex items-center gap-1 text-xs text-red-600">
+                  <AlertTriangle className="h-3 w-3" /> {error}
+                </span>
+              )}
+            </div>
+
+            {/* Resultado */}
+            {result && (
+              <div className="rounded-md border bg-white p-4 text-sm text-gray-700" aria-live="polite">
+                {result}
+              </div>
+            )}
+          </form>
+        </CardContent>
+      </Card>
     </section>
   );
 }

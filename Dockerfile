@@ -42,8 +42,8 @@ RUN chown -R node:node /app
 
 EXPOSE 3000
 
-# Healthcheck against API health endpoint
-HEALTHCHECK --interval=30s --timeout=5s --retries=5 CMD curl -fsS http://localhost:${PORT}/api/health || exit 1
+# Healthcheck against a public route that always exists
+HEALTHCHECK --interval=30s --timeout=5s --retries=5 CMD curl -fsS http://localhost:${PORT}/login || exit 1
 
 USER node
 

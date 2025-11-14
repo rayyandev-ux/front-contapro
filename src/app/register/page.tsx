@@ -12,6 +12,7 @@ import { motion } from "framer-motion";
 
 export default function Page() {
   const router = useRouter();
+  const LANDING_URL = `https://${process.env.NEXT_PUBLIC_LANDING_HOST || "contapro.lat"}`;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [nameError, setNameError] = useState<string | null>(null);
@@ -89,7 +90,7 @@ export default function Page() {
       </div>
       <section className="mx-auto max-w-md px-6 py-16">
         <div className="fixed top-6 left-6 z-10">
-          <Link href="/" aria-label="Volver a la landing">
+          <Link href={LANDING_URL} aria-label="Volver a la landing">
             <Button variant="outline" size="icon" className="rounded-full bg-white/80 backdrop-blur-sm shadow-md ring-1 ring-black/5 hover:bg-white">
               <Home className="h-4 w-4" />
             </Button>

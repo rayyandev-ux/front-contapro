@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 
 function ResetForm() {
   const router = useRouter();
+  const LANDING_URL = `https://${process.env.NEXT_PUBLIC_LANDING_HOST || "contapro.lat"}`;
   const params = useSearchParams();
   const presetEmail = params?.get("email") || "";
   const [loading, setLoading] = useState(false);
@@ -63,7 +64,7 @@ function ResetForm() {
         <div className="absolute -bottom-28 -right-28 h-96 w-96 rounded-full bg-fuchsia-400/25 blur-3xl" />
       </div>
       <div className="fixed top-6 left-6 z-10">
-        <Link href="/dashboard" aria-label="Volver al dashboard">
+        <Link href={LANDING_URL} aria-label="Ir a la landing">
           <Button variant="outline" size="icon" className="rounded-full bg-white/80 backdrop-blur-sm shadow-md ring-1 ring-black/5 hover:bg-white">
             <Home className="h-4 w-4" />
           </Button>

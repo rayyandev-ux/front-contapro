@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
 export default function ForgotPasswordPage() {
+  const LANDING_URL = `https://${process.env.NEXT_PUBLIC_LANDING_HOST || "contapro.lat"}`;
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [emailError, setEmailError] = useState<string | null>(null);
@@ -59,7 +60,7 @@ export default function ForgotPasswordPage() {
 
       {/* Botón icónico de volver al dashboard */}
       <div className="fixed left-4 top-4 z-20">
-        <Link href="/dashboard" aria-label="Volver al dashboard">
+        <Link href={LANDING_URL} aria-label="Ir a la landing">
           <Button
             variant="outline"
             size="icon"

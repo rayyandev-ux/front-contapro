@@ -36,8 +36,7 @@ export default async function ExpenseDetail({ params }: { params: Promise<{ id: 
         <div className="mb-3">
           <div className="text-sm text-gray-500">Editar gasto</div>
         </div>
-        {/* Cliente-side form for editing */}
-        {/* @ts-expect-error Async Server Component passing to client component */}
+        {/* Formulario cliente para edición */}
         <ExpenseEditForm item={{
           id: it.id,
           type: it.type,

@@ -31,19 +31,18 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends curl && \
     rm -rf /var/lib/apt/lists/*
 
-# Install production deps (Next is in dependencies)
+# Install full deps for dev mode (incl. TypeScript, eslint, etc.)
 COPY package.json package-lock.json ./
-RUN npm ci --omit=dev
+RUN npm ci
 
-# Copy build output and public assets
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
+# Copy entire source for dev server (not using .next build output)
+COPY . .
 RUN chown -R node:node /app
 
 EXPOSE 3000
 
-# Healthcheck against a public route that always exists
-HEALTHCHECK --interval=30s --timeout=5s --retries=5 CMD curl -fsS http://localhost:${PORT}/login || exit 1
+# Healthcheck against landing route
+HEALTHCHECK --interval=30s --timeout=5s --retries=5 CMD curl -fsS http://localhost:${PORT}/ || exit 1
 
 USER node
 

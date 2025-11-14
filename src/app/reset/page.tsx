@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
-export default function ResetPasswordPage() {
+function ResetForm() {
   const router = useRouter();
   const params = useSearchParams();
   const presetEmail = params?.get("email") || "";
@@ -125,5 +125,13 @@ export default function ResetPasswordPage() {
         </motion.div>
       </section>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-center text-gray-600">Cargando…</div>}>
+      <ResetForm />
+    </Suspense>
   );
 }

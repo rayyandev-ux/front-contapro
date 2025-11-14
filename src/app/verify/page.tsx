@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { apiJson } from "@/lib/api";
@@ -10,7 +10,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Home, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 
-export default function Page() {
+function VerifyForm() {
   const router = useRouter();
   const qp = useSearchParams();
   const [email, setEmail] = useState("");
@@ -144,5 +144,13 @@ export default function Page() {
         </motion.div>
       </section>
     </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div className="p-8 text-center text-gray-600">Cargando…</div>}>
+      <VerifyForm />
+    </Suspense>
   );
 }

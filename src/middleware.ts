@@ -3,7 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 export async function middleware(req: NextRequest) {
   const token = req.cookies.get("session")?.value;
   const { pathname } = req.nextUrl;
-  const host = req.nextUrl.hostname;
+  const forwardedHost = req.headers.get("x-forwarded-host") || req.headers.get("host") || undefined;
+  const host = (forwardedHost ? forwardedHost.split(":")[0] : req.nextUrl.hostname);
   // Dominios y subdominios
   const cookieDomainEnv = (process.env.NEXT_PUBLIC_COOKIE_DOMAIN || process.env.COOKIE_DOMAIN || "").trim();
   const baseDomain = cookieDomainEnv.startsWith(".") ? cookieDomainEnv.slice(1) : cookieDomainEnv;
@@ -58,5 +59,6 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/upload", "/history", "/admin", "/expenses/:path*", "/budget"],
+  // Ejecutar middleware en todas las rutas para poder redirigir dominios base
+  matcher: ["/:path*"],
 };

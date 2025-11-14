@@ -1,10 +1,27 @@
 'use client';
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, UploadCloud, Receipt, BarChart3, ShieldCheck } from "lucide-react";
 import { motion } from "framer-motion";
 export default function Home() {
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8080";
+  const [dashboardHref, setDashboardHref] = useState("/dashboard");
+
+  useEffect(() => {
+    let cancelled = false;
+    const check = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/auth/me`, { credentials: "include" });
+        if (!cancelled) setDashboardHref(res.ok ? "/dashboard" : "/login");
+      } catch {
+        if (!cancelled) setDashboardHref("/login");
+      }
+    };
+    check();
+    return () => { cancelled = true; };
+  }, [API_BASE]);
   return (
     <div className="relative min-h-svh w-full overflow-hidden">
       {/* Fondo con gradientes vibrantes y acentos orgánicos */}
@@ -40,8 +57,8 @@ export default function Home() {
         <div className="absolute -bottom-36 -right-36 h-[420px] w-[420px] rounded-[70%] bg-fuchsia-400/30 blur-3xl opacity-70" />
         <div className="absolute top-1/4 left-3/4 h-48 w-48 rounded-full bg-cyan-300/25 blur-2xl opacity-60" />
       </div>
-      <header className="mx-auto max-w-7xl px-6 pt-6">
-        <div className="flex items-center justify-between rounded-2xl bg-white/70 backdrop-blur-md px-4 py-3 shadow-sm ring-1 ring-black/5">
+      <header className="sticky top-0 z-50 mx-auto max-w-7xl px-6 pt-4">
+        <div className="flex items-center justify-between rounded-2xl bg-white/80 backdrop-blur-md px-4 py-3 shadow-sm ring-1 ring-black/5">
           <div className="flex items-center gap-3">
             <span className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-indigo-600 via-fuchsia-600 to-cyan-500 text-white text-xs shadow-sm">CP</span>
             <span className="font-semibold bg-gradient-to-r from-black via-gray-900 to-black bg-clip-text text-transparent">ContaPRO</span>
@@ -50,6 +67,7 @@ export default function Home() {
             <a href="#features" className="hover:text-gray-900 hover:underline underline-offset-4 decoration-indigo-400">Características</a>
             <a href="#how" className="hover:text-gray-900 hover:underline underline-offset-4 decoration-fuchsia-400">Cómo funciona</a>
             <a href="#pricing" className="hover:text-gray-900 hover:underline underline-offset-4 decoration-cyan-400">Precios</a>
+            <Link href={dashboardHref} className="hover:text-gray-900">Dashboard</Link>
             <Link href="/login" className="hover:text-gray-900">Acceder</Link>
             <Link href="/register" className="rounded-md bg-gradient-to-r from-gray-900 via-black to-gray-900 px-3 py-1.5 text-white shadow-sm hover:opacity-95">Crear cuenta</Link>
           </nav>
@@ -136,7 +154,7 @@ export default function Home() {
       </section>
 
       {/* Features */}
-      <section id="features" className="mx-auto max-w-7xl px-6 py-12">
+      <section id="features" className="mx-auto max-w-7xl px-6 py-12 scroll-mt-24">
         <h2 className="text-2xl font-semibold">Características claves</h2>
         <p className="mt-2 text-sm text-gray-600">Todo lo que necesitas para dominar tus finanzas empresariales.</p>
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -168,7 +186,7 @@ export default function Home() {
       </section>
 
       {/* How it works */}
-      <section id="how" className="mx-auto max-w-7xl px-6 py-12">
+      <section id="how" className="mx-auto max-w-7xl px-6 py-12 scroll-mt-24">
         <h2 className="text-2xl font-semibold">Cómo funciona</h2>
         <div className="mt-6 grid gap-4 sm:grid-cols-3">
           <Card className="overflow-hidden">
@@ -196,7 +214,7 @@ export default function Home() {
       </section>
 
       {/* Pricing / CTA */}
-      <section id="pricing" className="mx-auto max-w-7xl px-6 py-12">
+      <section id="pricing" className="mx-auto max-w-7xl px-6 py-12 scroll-mt-24">
         <div className="rounded-2xl border bg-white p-6 shadow-sm">
           <div className="grid gap-6 md:grid-cols-2">
             <div>

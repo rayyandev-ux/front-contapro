@@ -18,6 +18,8 @@ export default function Page() {
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [newCatName, setNewCatName] = useState("");
+  const [creatingCat, setCreatingCat] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -46,6 +48,21 @@ export default function Page() {
       return;
     }
     router.push(`/expenses`);
+  }
+
+  async function createCategory() {
+    if (!newCatName.trim()) return;
+    setCreatingCat(true);
+    const res = await apiJson(`/api/categories`, { method: "POST", body: JSON.stringify({ name: newCatName.trim() }) });
+    setCreatingCat(false);
+    if (!res.ok) {
+      setError(res.error || "No se pudo crear la categoría");
+      return;
+    }
+    const cat = (res.data as any)?.item as Category;
+    setCategories(prev => [...prev, cat].sort((a, b) => a.name.localeCompare(b.name)));
+    setForm(f => ({ ...f, categoryId: cat.id }));
+    setNewCatName("");
   }
 
   return (
@@ -79,6 +96,16 @@ export default function Page() {
                 <option key={c.id} value={c.id}>{c.name}</option>
               ))}
             </select>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="sm:col-span-2">
+            <label className="block text-sm">Crear categoría</label>
+            <div className="flex gap-2">
+              <input className="border rounded-md p-2 w-full" placeholder="Nueva categoría" value={newCatName} onChange={e => setNewCatName(e.target.value)} />
+              <button type="button" disabled={creatingCat} onClick={createCategory} className="rounded-md border px-4 py-2 hover:bg-gray-50 disabled:opacity-60">Crear</button>
+            </div>
           </div>
         </div>
 

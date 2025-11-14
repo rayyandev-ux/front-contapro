@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import ImagePreview from "@/components/ImagePreview";
 import AnalysisSummaryEditor from "@/components/AnalysisSummaryEditor";
+import ExpenseEditForm from "@/components/ExpenseEditForm";
 
 export default async function ExpenseDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -29,6 +30,24 @@ export default async function ExpenseDetail({ params }: { params: Promise<{ id: 
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Detalle de gasto</h1>
         <Link href="/expenses" className="rounded border px-3 py-1 text-sm hover:bg-gray-50">Volver</Link>
+      </div>
+
+      <div className="rounded-md border bg-white p-4">
+        <div className="mb-3">
+          <div className="text-sm text-gray-500">Editar gasto</div>
+        </div>
+        {/* Cliente-side form for editing */}
+        {/* @ts-expect-error Async Server Component passing to client component */}
+        <ExpenseEditForm item={{
+          id: it.id,
+          type: it.type,
+          issuedAt: it.issuedAt,
+          provider: it.provider,
+          description: it.description,
+          amount: it.amount,
+          currency: it.currency,
+          category: it.category || null,
+        }} />
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

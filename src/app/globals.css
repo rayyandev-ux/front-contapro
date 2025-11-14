@@ -115,6 +115,11 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    /* Suaviza el scroll y asegura que las anclas respeten el alto del header */
+    scroll-behavior: smooth;
+    scroll-padding-top: 88px; /* ~altura del header */
+  }
   body {
     @apply bg-background text-foreground;
   }

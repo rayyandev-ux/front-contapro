@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { apiJson } from "@/lib/api";
 
-export default function LogoutButton() {
+export default function LogoutButton({ className }: { className?: string }) {
   const [loading, setLoading] = useState(false);
 
   const onClick = async () => {
@@ -20,9 +20,9 @@ export default function LogoutButton() {
     <button
       onClick={onClick}
       disabled={loading}
-      className="rounded-md border px-3 py-1 text-sm hover:bg-muted"
+      className={className ?? "rounded-md border px-3 py-1 text-sm hover:bg-muted"}
     >
-      {loading ? "Saliendo..." : "Salir"}
+      {loading ? "Cerrando sesión..." : "Cerrar sesión"}
     </button>
   );
 }

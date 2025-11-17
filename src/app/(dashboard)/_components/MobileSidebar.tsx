@@ -1,8 +1,11 @@
 'use client';
 import { useState } from 'react';
+import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
 import SidebarNav from './SidebarNav';
 import Portal from '@/components/Portal';
+import ThemeToggle from '@/components/ThemeToggle';
+import LogoutButton from '@/components/logout-button';
 
 export default function MobileSidebar({ isAdmin }: { isAdmin?: boolean }) {
   const [open, setOpen] = useState(false);
@@ -23,13 +26,13 @@ export default function MobileSidebar({ isAdmin }: { isAdmin?: boolean }) {
         <Portal>
           <>
             <div
-              className="fixed inset-0 z-40 bg-black/40"
+              className="fixed inset-0 z-40 bg-black/50"
               aria-hidden="true"
               onClick={() => setOpen(false)}
             />
-            <div className="fixed inset-0 z-50 h-full w-full overflow-y-auto border-0 bg-card p-3 shadow-xl" role="dialog" aria-modal="true">
+            <div className="fixed inset-0 z-50 h-full w-full overflow-y-auto border-0 bg-card/95 p-3 shadow-xl ring-1 ring-border backdrop-blur" role="dialog" aria-modal="true">
               <div className="mb-2 flex items-center justify-between">
-                <span className="text-sm font-medium">Navegación</span>
+                <span className="text-sm font-medium text-foreground">Navegación</span>
                 <button
                   type="button"
                   aria-label="Cerrar menú"
@@ -41,6 +44,15 @@ export default function MobileSidebar({ isAdmin }: { isAdmin?: boolean }) {
                 </button>
               </div>
               <SidebarNav isAdmin={isAdmin} />
+              <div className="my-3 h-px bg-border" />
+              <div className="flex items-center justify-between px-1 mb-2">
+                <span className="text-xs text-muted-foreground">Acciones</span>
+                <ThemeToggle />
+              </div>
+              <div className="space-y-2">
+                <Link href="/account" className="block rounded-md px-3 py-2 text-sm hover:bg-muted">Cuenta</Link>
+                <LogoutButton className="w-full rounded-md bg-gradient-to-r from-indigo-700 via-orange-600 to-blue-700 px-3 py-2 text-white shadow-sm hover:opacity-95" />
+              </div>
             </div>
           </>
         </Portal>

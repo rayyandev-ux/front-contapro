@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { Menu, X, ChevronRight } from 'lucide-react';
 import Portal from '@/components/Portal';
+import ThemeToggle from '@/components/ThemeToggle';
 
 export default function MobileNav({ dashboardHref }: { dashboardHref: string }) {
   const [open, setOpen] = useState(false);
@@ -20,10 +21,10 @@ export default function MobileNav({ dashboardHref }: { dashboardHref: string }) 
       {open && (
         <Portal>
           <>
-            <div className="fixed inset-0 z-40 bg-black/40" onClick={() => setOpen(false)} aria-hidden="true" />
-            <div className="fixed inset-0 z-50 h-full w-full overflow-y-auto border-0 bg-card p-4 shadow-xl" role="dialog" aria-modal="true">
+            <div className="fixed inset-0 z-40 bg-black/50" onClick={() => setOpen(false)} aria-hidden="true" />
+            <div className="fixed inset-0 z-50 h-full w-full overflow-y-auto border-0 bg-card/95 p-4 shadow-xl ring-1 ring-border backdrop-blur" role="dialog" aria-modal="true">
               <div className="mb-2 flex items-center justify-between">
-                <span className="text-sm font-medium">Menú</span>
+                <span className="text-sm font-medium text-foreground">Menú</span>
                 <button
                   type="button"
                   aria-label="Cerrar menú"
@@ -33,6 +34,11 @@ export default function MobileNav({ dashboardHref }: { dashboardHref: string }) 
                   <X className="h-4 w-4" />
                   Cerrar
                 </button>
+              </div>
+              <div className="my-3 h-px bg-border" />
+              <div className="flex items-center justify-between px-1 mb-2">
+                <span className="text-xs text-muted-foreground">Acciones</span>
+                <ThemeToggle />
               </div>
               <nav className="text-sm">
                 <ul className="space-y-1">

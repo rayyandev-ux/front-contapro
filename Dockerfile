@@ -33,10 +33,14 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends curl && \
     rm -rf /var/lib/apt/lists/*
 
-# Copy standalone build (no node_modules required at runtime)
+# Copy app (standalone) and static assets
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
+
+# Optional fallback: install prod deps to allow `next start` if needed
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev || true
 
 EXPOSE 3000
 
@@ -45,5 +49,5 @@ HEALTHCHECK --interval=30s --timeout=5s --retries=5 CMD curl -fsS http://localho
 
 USER node
 
-# Run Next.js server (standalone)
-CMD ["node", "server.js"]
+# Start: prefer standalone `server.js`; fallback to `next start`
+CMD ["sh", "-c", "if [ -f server.js ]; then node server.js; else npm run start -- -p ${PORT:-3000} -H 0.0.0.0; fi"]

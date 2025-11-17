@@ -38,10 +38,6 @@ COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
 
-# Optional fallback: install prod deps to allow `next start` if needed
-COPY package.json package-lock.json ./
-RUN npm ci --omit=dev || true
-
 EXPOSE 3000
 
 # Healthcheck against root
@@ -49,5 +45,5 @@ HEALTHCHECK --interval=30s --timeout=5s --retries=5 CMD curl -fsS http://localho
 
 USER node
 
-# Start: prefer standalone `server.js`; fallback to `next start`
-CMD ["sh", "-c", "if [ -f server.js ]; then node server.js; else npm run start -- -p ${PORT:-3000} -H 0.0.0.0; fi"]
+# Start: standalone server
+CMD ["node", "server.js"]

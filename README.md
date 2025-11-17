@@ -48,6 +48,20 @@ Run container:
 docker run --rm -p 3000:3000 --name contapro-frontend contapro-frontend:latest
 ```
 
+### EasyPanel
+
+Configura el servicio Docker así:
+
+- Imagen: `contapro-frontend:latest` (o la de tu registro)
+- Puerto interno: `3000` (publica como necesites)
+- Comando de inicio: deja el predeterminado de la imagen (no pongas nada) o usa `node server.js`
+- Variables (opcional):
+  - `NEXT_PUBLIC_API_BASE` (si quieres sobreescribir en build, usa `--build-arg`)
+  - `PORT=3000`, `HOST=0.0.0.0`
+- Healthcheck: `/` (ya incluido en Dockerfile con `curl`)
+
+Si cambias el comando de inicio en EasyPanel, asegúrate de usar `node server.js` (con build `standalone`) o `npm run start -p 3000 -H 0.0.0.0` (si preferiste no usar `standalone`).
+
 Environment variables at runtime:
 
 - `PORT` (default `3000`)

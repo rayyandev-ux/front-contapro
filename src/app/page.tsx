@@ -282,20 +282,20 @@ export default function Home() {
               </ul>
             </div>
           </div>
-          <div className="mt-6 flex items-center justify-between rounded-lg bg-gradient-to-r from-indigo-50 via-orange-50 to-blue-50 p-4">
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-lg bg-gradient-to-r from-indigo-50 via-orange-50 to-blue-50 p-4">
             <div>
               <div className="font-medium">Empieza hoy mismo</div>
               <div className="text-sm text-gray-600">Sin tarjeta. Cancela cuando quieras.</div>
             </div>
-            <Link href="/register">
-              <Button className="bg-gradient-to-r from-gray-900 via-black to-gray-900 text-white hover:opacity-95">Crear cuenta</Button>
+            <Link href="/register" className="w-full sm:w-auto">
+              <Button className="w-full sm:w-auto bg-gradient-to-r from-gray-900 via-black to-gray-900 text-white hover:opacity-95">Crear cuenta</Button>
             </Link>
           </div>
         </div>
       </section>
 
       {/* Testimonials & Footer */}
-      <section className="mx-auto max-w-7xl px-6 pb-12">
+      <section className="mx-auto max-w-7xl px-6 pb-24">
         <div className="rounded-2xl border bg-white/85 p-6">
           <div className="grid gap-6 md:grid-cols-3">
             <blockquote className="text-sm text-gray-700">
@@ -311,9 +311,9 @@ export default function Home() {
               <div className="mt-2 text-xs text-gray-500">Emprendimiento</div>
             </blockquote>
           </div>
-          <div className="mt-8 flex items-center justify-between border-t pt-4 text-sm text-gray-700">
+          <div className="mt-8 flex flex-col items-center gap-3 border-t pt-4 text-sm text-gray-700 sm:flex-row sm:items-center sm:justify-between">
             <div>© {new Date().getFullYear()} ContaPRO</div>
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center justify-center gap-4">
               <a href="#" className="hover:text-gray-900">Privacidad</a>
               <a href="#" className="hover:text-gray-900">Términos</a>
               <Link href="/login" className="hover:text-gray-900">Acceder</Link>

@@ -5,6 +5,7 @@ import LogoutButton from "@/components/logout-button";
 import { ReactNode } from "react";
 import SidebarNav from "./_components/SidebarNav";
 import MobileSidebar from "./_components/MobileSidebar";
+import MobileActionBar from "./_components/MobileActionBar";
 
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
   const cookieStore = await cookies();
@@ -68,10 +69,12 @@ export default async function DashboardLayout({ children }: { children: ReactNod
         </aside>
 
         {/* Main content */}
-        <main className="rounded-xl border border-black/5 bg-white p-6 shadow-lg ring-1 ring-black/5 backdrop-blur-sm">
+        <main className="rounded-xl border border-black/5 bg-white p-6 shadow-lg ring-1 ring-black/5 backdrop-blur-sm pb-20 md:pb-0">
           {children}
         </main>
       </div>
+      {/* Mobile quick actions */}
+      <MobileActionBar />
     </div>
   );
 }

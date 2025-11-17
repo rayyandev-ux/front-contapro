@@ -84,9 +84,9 @@ export default async function Page() {
               <CardTitle>Actualizar presupuesto</CardTitle>
             </CardHeader>
             <CardContent>
-              <form action={saveBudget} className="flex items-center gap-2">
-                <input type="number" name="amount" step="0.01" className="border rounded-md p-2" defaultValue={String(amount)} />
-                <button type="submit" className="rounded-md bg-black px-4 py-2 text-white hover:bg-gray-900">Guardar</button>
+              <form action={saveBudget} className="grid grid-cols-1 gap-3 sm:flex sm:items-center sm:gap-2">
+                <input type="number" name="amount" step="0.01" className="w-full border rounded-md p-2" defaultValue={String(amount)} />
+                <button type="submit" className="w-full sm:w-auto rounded-md bg-black px-4 py-2 text-white hover:bg-gray-900">Guardar</button>
               </form>
             </CardContent>
           </Card>

@@ -105,14 +105,14 @@ export default async function Page() {
       {/* Encabezado con acciones rápidas (paleta nueva) */}
       <Card className="bg-gradient-to-r from-white via-gray-50 to-blue-100 border border-black/5">
         <CardContent className="p-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="text-2xl font-semibold tracking-tight">Resumen</h1>
               <p className="text-sm text-gray-600">Tu actividad y gastos recientes</p>
             </div>
             <Link
               href="/upload"
-              className="inline-flex items-center gap-2 rounded-md bg-black px-4 py-2 text-white shadow-sm transition-colors hover:bg-gray-900"
+              className="inline-flex w-full sm:w-auto items-center gap-2 rounded-md bg-black px-4 py-2 text-white shadow-sm transition-colors hover:bg-gray-900"
             >
               <Upload className="h-4 w-4" /> Subir documento
             </Link>

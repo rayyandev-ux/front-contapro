@@ -6,7 +6,7 @@ export default async function IntegrationsPage() {
     <section className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Integraciones</h1>
-        <Link href="/upload" className="rounded-md bg-black px-4 py-2 text-white hover:bg-gray-900">Subir documento</Link>
+        <Link href="/upload" className="rounded-md bg-primary px-4 py-2 text-primary-foreground hover:bg-primary/90">Subir documento</Link>
       </div>
       <TelegramLinkCard />
     </section>

@@ -45,7 +45,7 @@ export default function ForgotPasswordPage() {
   return (
     <div className="relative min-h-svh w-full overflow-hidden">
       {/* Fondo con gradientes elegantes y halos orgánicos (paleta nueva) */}
-      <div className="pointer-events-none absolute inset-0 -z-10">
+      <div className="pointer-events-none absolute inset-0 -z-10 dark:opacity-0">
         <div className="absolute inset-0 bg-gradient-to-br from-white via-gray-50 to-blue-50" />
         <div
           className="absolute inset-0"
@@ -64,9 +64,9 @@ export default function ForgotPasswordPage() {
           <Button
             variant="outline"
             size="icon"
-            className="rounded-full bg-white/80 backdrop-blur-sm shadow-md ring-1 ring-black/5 hover:bg-white"
+            className="rounded-full bg-card/80 backdrop-blur-sm shadow-md ring-1 ring-border hover:bg-card"
           >
-            <Home className="h-4 w-4 text-gray-700" />
+            <Home className="h-4 w-4" />
           </Button>
         </Link>
       </div>
@@ -74,9 +74,9 @@ export default function ForgotPasswordPage() {
       {/* Contenedor centrado */}
       <div className="container relative mx-auto flex min-h-svh items-center justify-center px-4 py-12">
         {/* Halo suave detrás de la tarjeta */}
-        <div className="absolute left-1/2 -translate-x-1/2 top-[20%] -z-10 h-72 w-72 rounded-[60%] bg-indigo-300/20 blur-3xl" />
+        <div className="absolute left-1/2 -translate-x-1/2 top-[20%] -z-10 h-72 w-72 rounded-[60%] bg-indigo-300/20 blur-3xl dark:opacity-0" />
         <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-          <Card className="w-full max-w-md bg-white/90 backdrop-blur-sm shadow-lg ring-1 ring-black/5">
+          <Card className="w-full max-w-md bg-card/90 backdrop-blur-sm shadow-lg ring-1 ring-border">
           <CardHeader>
             <CardTitle className="bg-gradient-to-r from-indigo-800 via-orange-700 to-blue-600 bg-clip-text text-transparent">Recuperar contraseña</CardTitle>
             <CardDescription>
@@ -87,7 +87,7 @@ export default function ForgotPasswordPage() {
             <form className="grid gap-4" onSubmit={handleSubmit} aria-busy={loading}>
               <div className="grid gap-2">
                 <Label htmlFor="email" className="inline-flex items-center gap-2">
-                  <Mail className="h-4 w-4 text-gray-500" /> Correo electrónico
+                  <Mail className="h-4 w-4 text-muted-foreground" /> Correo electrónico
                 </Label>
                 <Input
                   id="email"
@@ -97,9 +97,9 @@ export default function ForgotPasswordPage() {
                   placeholder="tucorreo@ejemplo.com"
                   aria-invalid={!!emailError}
                   onChange={() => setEmailError(null)}
-                  className={`${emailError ? "ring-2 ring-red-500" : ""} focus-visible:ring-blue-600/60 focus-visible:ring-2 focus-visible:outline-none`}
+                  className={`${emailError ? "ring-2 ring-destructive" : ""} focus-visible:ring-primary/60 focus-visible:ring-2 focus-visible:outline-none`}
                 />
-                {emailError && <p className="text-xs text-red-600">{emailError}</p>}
+                {emailError && <p className="text-xs text-destructive">{emailError}</p>}
               </div>
 
               <motion.button
@@ -107,7 +107,7 @@ export default function ForgotPasswordPage() {
                 disabled={loading}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-gradient-to-r from-indigo-700 via-orange-600 to-blue-700 px-4 py-2.5 text-white shadow-md hover:shadow-lg disabled:opacity-60"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-primary px-4 py-2.5 text-primary-foreground shadow-md hover:bg-primary/90 disabled:opacity-60"
               >
                 {loading ? (
                   <>
@@ -122,7 +122,7 @@ export default function ForgotPasswordPage() {
               </motion.button>
 
               {sent && (
-                <div role="status" aria-live="polite" className="mt-2 flex items-center gap-2 rounded-md bg-green-50 px-3 py-2 text-green-700 ring-1 ring-green-200">
+                <div role="status" aria-live="polite" className="mt-2 flex items-center gap-2 rounded-md bg-muted px-3 py-2 text-foreground ring-1 ring-border">
                   <CheckCircle2 className="h-4 w-4" />
                   <span>
                     Si el correo está registrado, te enviaremos un enlace para restablecer tu contraseña.
@@ -130,9 +130,9 @@ export default function ForgotPasswordPage() {
                 </div>
               )}
 
-              <div className="mt-2 text-center text-xs text-gray-600">
+              <div className="mt-2 text-center text-xs text-muted-foreground">
                 ¿Recordaste tu contraseña? {" "}
-                <Link href="/login" className="font-medium text-gray-700 hover:text-gray-900">
+                <Link href="/login" className="font-medium hover:text-foreground">
                   Inicia sesión
                 </Link>
               </div>

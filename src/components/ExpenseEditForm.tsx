@@ -83,20 +83,21 @@ export default function ExpenseEditForm({ item }: { item: Expense }) {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div>
           <label className="block text-sm">Tipo</label>
-          <select className="border rounded-md p-2 w-full" value={form.type} onChange={e => setForm(f => ({ ...f, type: e.target.value as any }))}>
+          <select className="border border-border rounded-md p-2 w-full bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" value={form.type} onChange={e => setForm(f => ({ ...f, type: e.target.value as any }))}>
             <option value="FACTURA">Factura</option>
             <option value="BOLETA">Boleta</option>
           </select>
         </div>
         <div>
           <label className="block text-sm">Fecha</label>
-          <input type="date" className="border rounded-md p-2 w-full" value={form.issuedAt} onChange={e => setForm(f => ({ ...f, issuedAt: e.target.value }))} />
+          <input type="date" className="border border-border rounded-md p-2 w-full bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" value={form.issuedAt} onChange={e => setForm(f => ({ ...f, issuedAt: e.target.value }))} />
         </div>
         <div>
           <label className="block text-sm">Moneda</label>
-          <select className="border rounded-md p-2 w-full" value={form.currency} onChange={e => setForm(f => ({ ...f, currency: e.target.value }))}>
+          <select className="border border-border rounded-md p-2 w-full bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" value={form.currency} onChange={e => setForm(f => ({ ...f, currency: e.target.value }))}>
             <option value="PEN">PEN</option>
             <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
           </select>
         </div>
       </div>
@@ -104,18 +105,18 @@ export default function ExpenseEditForm({ item }: { item: Expense }) {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div className="sm:col-span-2">
           <label className="block text-sm">Proveedor</label>
-          <input className="border rounded-md p-2 w-full" value={form.provider} onChange={e => setForm(f => ({ ...f, provider: e.target.value }))} />
+          <input className="border border-border rounded-md p-2 w-full bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" value={form.provider} onChange={e => setForm(f => ({ ...f, provider: e.target.value }))} />
         </div>
         <div>
           <label className="block text-sm">Monto</label>
-          <input type="number" step="0.01" className="border rounded-md p-2 w-full" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} />
+          <input type="number" step="0.01" className="border border-border rounded-md p-2 w-full bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} />
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div>
           <label className="block text-sm">Categoría</label>
-          <select className="border rounded-md p-2 w-full" value={form.categoryId} onChange={e => setForm(f => ({ ...f, categoryId: e.target.value }))}>
+          <select className="border border-border rounded-md p-2 w-full bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" value={form.categoryId} onChange={e => setForm(f => ({ ...f, categoryId: e.target.value }))}>
             <option value="">—</option>
             {categories.map(c => (
               <option key={c.id} value={c.id}>{c.name}</option>
@@ -125,22 +126,22 @@ export default function ExpenseEditForm({ item }: { item: Expense }) {
         <div className="sm:col-span-2">
           <label className="block text-sm">Crear categoría</label>
           <div className="flex gap-2">
-            <input className="border rounded-md p-2 w-full" placeholder="Nueva categoría" value={newCatName} onChange={e => setNewCatName(e.target.value)} />
-            <button type="button" disabled={creatingCat} onClick={createCategory} className="rounded-md border px-4 py-2 hover:bg-gray-50 disabled:opacity-60">Crear</button>
+            <input className="border border-border rounded-md p-2 w-full bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="Nueva categoría" value={newCatName} onChange={e => setNewCatName(e.target.value)} />
+            <button type="button" disabled={creatingCat} onClick={createCategory} className="rounded-md border border-border px-4 py-2 hover:bg-muted/50 disabled:opacity-60">Crear</button>
           </div>
         </div>
       </div>
 
       <div>
         <label className="block text-sm">Descripción</label>
-        <input className="border rounded-md p-2 w-full" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
+        <input className="border border-border rounded-md p-2 w-full bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
       </div>
 
       {error && <p className="text-red-600 text-sm">{error}</p>}
       {success && <p className="text-green-700 text-sm">{success}</p>}
 
       <div className="flex gap-2">
-        <button type="submit" disabled={saving} className="rounded-md bg-black px-4 py-2 text-white hover:bg-gray-900 disabled:opacity-60">Guardar cambios</button>
+        <button type="submit" disabled={saving} className="rounded-md bg-gradient-to-r from-indigo-700 via-orange-600 to-blue-700 px-4 py-2 text-white hover:opacity-95 shadow-sm disabled:opacity-60">Guardar cambios</button>
       </div>
     </form>
   );

@@ -12,7 +12,7 @@ export default function MobileSidebar({ isAdmin }: { isAdmin?: boolean }) {
       <button
         type="button"
         aria-label="Abrir menú"
-        className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm text-gray-700 hover:bg-gray-100"
+        className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm hover:bg-muted"
         onClick={() => setOpen(true)}
       >
         <Menu className="h-4 w-4" />
@@ -27,13 +27,13 @@ export default function MobileSidebar({ isAdmin }: { isAdmin?: boolean }) {
               aria-hidden="true"
               onClick={() => setOpen(false)}
             />
-            <div className="fixed inset-0 z-50 h-full w-full overflow-y-auto border-0 bg-white p-3 shadow-xl" role="dialog" aria-modal="true">
+            <div className="fixed inset-0 z-50 h-full w-full overflow-y-auto border-0 bg-card p-3 shadow-xl" role="dialog" aria-modal="true">
               <div className="mb-2 flex items-center justify-between">
                 <span className="text-sm font-medium">Navegación</span>
                 <button
                   type="button"
                   aria-label="Cerrar menú"
-                  className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm text-gray-700 hover:bg-gray-100"
+                  className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm hover:bg-muted"
                   onClick={() => setOpen(false)}
                 >
                   <X className="h-4 w-4" />

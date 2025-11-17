@@ -9,10 +9,10 @@ import { Button } from "@/components/ui/button";
 
 export default function NavBar() {
   return (
-    <header className="border-b bg-white">
+    <header className="border-b border-border bg-card">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
         <div className="flex items-center gap-6">
-          <Link href="/" className="font-semibold text-indigo-600">
+          <Link href="/" className="font-semibold text-primary">
             ContaPRO
           </Link>
           <nav className="hidden md:block">
@@ -35,7 +35,7 @@ export default function NavBar() {
           </nav>
         </div>
         <div className="flex items-center gap-3">
-          <Link className="text-sm hover:text-indigo-600" href="/login">Entrar</Link>
+          <Link className="text-sm text-muted-foreground hover:text-foreground" href="/login">Entrar</Link>
           <Link href="/register">
             <Button size="sm">Crear cuenta</Button>
           </Link>

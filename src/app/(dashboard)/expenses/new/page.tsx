@@ -14,6 +14,7 @@ export default function Page() {
     provider: "",
     description: "",
     amount: "",
+    currency: "PEN",
     categoryId: "",
   });
   const [saving, setSaving] = useState(false);
@@ -25,6 +26,12 @@ export default function Page() {
     (async () => {
       const res = await apiJson(`/api/categories`);
       if (res.ok) setCategories((res.data as any)?.items || []);
+      // Obtener moneda preferida del usuario para usarla por defecto
+      const me = await apiJson(`/api/auth/me`);
+      const pref = (me.ok && (me.data as any)?.user?.preferredCurrency) || null;
+      if (pref && (pref === 'PEN' || pref === 'USD' || pref === 'EUR')) {
+        setForm(f => ({ ...f, currency: pref }));
+      }
     })();
   }, []);
 
@@ -38,7 +45,7 @@ export default function Page() {
       provider: form.provider,
       description: form.description || undefined,
       amount: Number(form.amount),
-      currency: 'USD',
+      currency: form.currency,
       categoryId: form.categoryId || undefined,
     };
     const res = await apiJson(`/api/expenses`, { method: "POST", body: JSON.stringify(payload) });
@@ -113,6 +120,14 @@ export default function Page() {
           <div>
             <label className="block text-sm">Monto</label>
             <input type="number" step="0.01" className="border rounded-md p-2 w-full" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} />
+          </div>
+          <div>
+            <label className="block text-sm">Moneda</label>
+            <select className="border rounded-md p-2 w-full" value={form.currency} onChange={e => setForm(f => ({ ...f, currency: e.target.value }))}>
+              <option value="PEN">Soles (PEN)</option>
+              <option value="USD">Dólares (USD)</option>
+              <option value="EUR">Euros (EUR)</option>
+            </select>
           </div>
         </div>
 

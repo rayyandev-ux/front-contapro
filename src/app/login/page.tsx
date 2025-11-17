@@ -62,7 +62,7 @@ export default function Page() {
   return (
     <div className="relative min-h-svh w-full overflow-hidden">
       {/* Fondo con gradientes elegantes y halos orgánicos (paleta nueva) */}
-      <div className="pointer-events-none absolute inset-0 -z-10">
+      <div className="pointer-events-none absolute inset-0 -z-10 dark:opacity-0">
         <div className="absolute inset-0 bg-gradient-to-br from-white via-gray-50 to-blue-50" />
         <div
           className="absolute inset-0"
@@ -77,7 +77,7 @@ export default function Page() {
       <section className="mx-auto max-w-md px-6 py-16">
         <div className="fixed top-6 left-6 z-10">
           <Link href={LANDING_URL} aria-label="Ir a la landing">
-            <Button variant="outline" size="icon" className="rounded-full bg-white/80 backdrop-blur-sm shadow-md ring-1 ring-black/5 hover:bg-white">
+            <Button variant="outline" size="icon" className="rounded-full bg-card/80 backdrop-blur-sm shadow-md ring-1 ring-border hover:bg-card">
               <Home className="h-4 w-4" />
             </Button>
           </Link>
@@ -85,7 +85,7 @@ export default function Page() {
         {/* Halo suave detrás de la tarjeta */}
         <div className="absolute left-1/2 -translate-x-1/2 top-[10%] -z-10 h-72 w-72 rounded-[60%] bg-indigo-300/20 blur-3xl" />
         <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-          <Card className="bg-white/90 backdrop-blur-sm shadow-lg ring-1 ring-black/5">
+          <Card className="shadow-lg ring-1 ring-border">
             <CardHeader>
               <CardTitle className="bg-gradient-to-r from-indigo-800 via-orange-700 to-blue-600 bg-clip-text text-transparent">Bienvenido de nuevo a ContaPRO!</CardTitle>
               <CardDescription>Accede a tu cuenta</CardDescription>
@@ -109,7 +109,7 @@ export default function Page() {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="password">Contraseña</Label>
-                    <Link href="/forgot" className="text-xs text-gray-600 hover:text-gray-900">¿Olvidaste tu contraseña?</Link>
+                    <Link href="/forgot" className="text-xs text-muted-foreground hover:text-foreground">¿Olvidaste tu contraseña?</Link>
                   </div>
                   <div className="relative">
                     <Input
@@ -126,15 +126,15 @@ export default function Page() {
                       type="button"
                       onClick={() => setShowPassword((v) => !v)}
                       aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-gray-600 hover:text-gray-900"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:text-foreground"
                     >
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
                   {passwordError && <p className="text-xs text-red-600">{passwordError}</p>}
                   <div className="mt-2 flex items-center justify-between">
-                    <label className="flex items-center gap-2 text-xs text-gray-600">
-                      <input type="checkbox" name="remember" className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                    <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <input type="checkbox" name="remember" className="h-4 w-4 rounded border-input" />
                       Recordarme
                     </label>
                   </div>
@@ -160,16 +160,16 @@ export default function Page() {
                     <span className="w-full border-t" />
                   </div>
                   <div className="relative flex justify-center text-xs">
-                    <span className="bg-white/90 px-2 text-gray-600">o</span>
+                    <span className="bg-card/90 px-2 text-muted-foreground">o</span>
                   </div>
                 </div>
                 <a href={`${API_BASE}/api/auth/google`}>
-                  <Button variant="outline" className="w-full bg-white">Continuar con Google</Button>
+                  <Button variant="outline" className="w-full bg-background">Continuar con Google</Button>
                 </a>
               </div>
             </CardContent>
             <CardFooter>
-              <p className="w-full text-center text-sm text-gray-600">
+              <p className="w-full text-center text-sm text-muted-foreground">
                 ¿No tienes cuenta? <Link href="/register" className="underline">Crear cuenta</Link>
               </p>
             </CardFooter>

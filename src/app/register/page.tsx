@@ -76,7 +76,7 @@ export default function Page() {
   return (
     <div className="relative min-h-svh w-full overflow-hidden">
       {/* Fondo con gradientes elegantes y halos orgánicos (paleta nueva) */}
-      <div className="pointer-events-none absolute inset-0 -z-10">
+      <div className="pointer-events-none absolute inset-0 -z-10 dark:opacity-0">
         <div className="absolute inset-0 bg-gradient-to-br from-white via-gray-50 to-blue-50" />
         <div
           className="absolute inset-0"
@@ -91,15 +91,15 @@ export default function Page() {
       <section className="mx-auto max-w-md px-6 py-16">
         <div className="fixed top-6 left-6 z-10">
           <Link href={LANDING_URL} aria-label="Volver a la landing">
-            <Button variant="outline" size="icon" className="rounded-full bg-white/80 backdrop-blur-sm shadow-md ring-1 ring-black/5 hover:bg-white">
+            <Button variant="outline" size="icon" className="rounded-full bg-card/80 backdrop-blur-sm shadow-md ring-1 ring-border hover:bg-card">
               <Home className="h-4 w-4" />
             </Button>
           </Link>
         </div>
         {/* Halo suave detrás de la tarjeta */}
-        <div className="absolute left-1/2 -translate-x-1/2 top-[10%] -z-10 h-72 w-72 rounded-[60%] bg-indigo-300/20 blur-3xl" />
+        <div className="absolute left-1/2 -translate-x-1/2 top-[10%] -z-10 h-72 w-72 rounded-[60%] bg-indigo-300/20 blur-3xl dark:opacity-0" />
         <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-          <Card className="bg-white/90 backdrop-blur-sm shadow-lg ring-1 ring-black/5">
+          <Card className="bg-card/90 backdrop-blur-sm shadow-lg ring-1 ring-border">
             <CardHeader>
               <CardTitle className="bg-gradient-to-r from-indigo-800 via-orange-700 to-blue-600 bg-clip-text text-transparent">Crear cuenta</CardTitle>
               <CardDescription>Regístrate para gestionar tus gastos en ContaPRO!</CardDescription>
@@ -116,9 +116,9 @@ export default function Page() {
                     placeholder="Tu nombre"
                     aria-invalid={!!nameError}
                     onChange={() => setNameError(null)}
-                    className={`${nameError ? "ring-2 ring-red-500" : ""} focus-visible:ring-blue-600/60 focus-visible:ring-2 focus-visible:outline-none`}
+                    className={`${nameError ? "ring-2 ring-destructive" : ""} focus-visible:ring-primary/60 focus-visible:ring-2 focus-visible:outline-none`}
                   />
-                  {nameError && <p className="text-xs text-red-600">{nameError}</p>}
+                  {nameError && <p className="text-xs text-destructive">{nameError}</p>}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email">Correo</Label>
@@ -130,9 +130,9 @@ export default function Page() {
                     placeholder="tu@correo.com"
                     aria-invalid={!!emailError}
                     onChange={() => setEmailError(null)}
-                    className={`${emailError ? "ring-2 ring-red-500" : ""} focus-visible:ring-blue-600/60 focus-visible:ring-2 focus-visible:outline-none`}
+                    className={`${emailError ? "ring-2 ring-destructive" : ""} focus-visible:ring-primary/60 focus-visible:ring-2 focus-visible:outline-none`}
                   />
-                  {emailError && <p className="text-xs text-red-600">{emailError}</p>}
+                  {emailError && <p className="text-xs text-destructive">{emailError}</p>}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="password">Contraseña</Label>
@@ -145,18 +145,18 @@ export default function Page() {
                       placeholder="••••••••"
                       aria-invalid={!!passwordError}
                       onChange={() => setPasswordError(null)}
-                      className={`${passwordError ? "ring-2 ring-red-500" : ""} pr-10 focus-visible:ring-blue-600/60 focus-visible:ring-2 focus-visible:outline-none`}
+                      className={`${passwordError ? "ring-2 ring-destructive" : ""} pr-10 focus-visible:ring-primary/60 focus-visible:ring-2 focus-visible:outline-none`}
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword((v) => !v)}
                       aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-gray-600 hover:text-gray-900"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:text-foreground"
                     >
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
-                  {passwordError && <p className="text-xs text-red-600">{passwordError}</p>}
+                  {passwordError && <p className="text-xs text-destructive">{passwordError}</p>}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="confirm">Confirmar contraseña</Label>
@@ -169,41 +169,41 @@ export default function Page() {
                       placeholder="••••••••"
                       aria-invalid={!!confirmError}
                       onChange={() => setConfirmError(null)}
-                      className={`${confirmError ? "ring-2 ring-red-500" : ""} pr-10 focus-visible:ring-blue-600/60 focus-visible:ring-2 focus-visible:outline-none`}
+                      className={`${confirmError ? "ring-2 ring-destructive" : ""} pr-10 focus-visible:ring-primary/60 focus-visible:ring-2 focus-visible:outline-none`}
                     />
                     <button
                       type="button"
                       onClick={() => setShowConfirm((v) => !v)}
                       aria-label={showConfirm ? "Ocultar confirmación" : "Mostrar confirmación"}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-gray-600 hover:text-gray-900"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:text-foreground"
                     >
                       {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
-                  {confirmError && <p className="text-xs text-red-600">{confirmError}</p>}
+                  {confirmError && <p className="text-xs text-destructive">{confirmError}</p>}
                 </div>
                 <motion.button
                   type="submit"
                   disabled={loading}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="w-full rounded-md bg-gradient-to-r from-indigo-700 via-orange-600 to-blue-700 px-4 py-2.5 text-white shadow-md hover:shadow-lg disabled:opacity-60"
+                  className="w-full rounded-md bg-gradient-to-r from-indigo-700 via-orange-600 to-blue-700 px-4 py-2.5 text-white shadow-sm hover:opacity-95 disabled:opacity-60"
                 >
                   {loading ? "Creando..." : (
                     <span className="inline-flex items-center gap-2">Crear cuenta <ArrowRight className="h-4 w-4" /></span>
                   )}
                 </motion.button>
                 {error && (
-                  <p className="text-sm text-red-600" aria-live="polite">{error}</p>
+                  <p className="text-sm text-destructive" aria-live="polite">{error}</p>
                 )}
               </form>
             </CardContent>
             <CardFooter className="flex flex-col gap-2">
-              <p className="w-full text-center text-xs text-gray-600">
+              <p className="w-full text-center text-xs text-muted-foreground">
                 Al continuar aceptas nuestros <a href="#" className="underline">Términos y Privacidad</a>.
               </p>
-              <p className="w-full text-center text-sm text-gray-600">
-                ¿Ya tienes cuenta? <Link href="/login" className="underline">Accede</Link>
+              <p className="w-full text-center text-sm text-muted-foreground">
+                ¿Ya tienes cuenta? <Link href="/login" className="underline hover:text-foreground">Accede</Link>
               </p>
             </CardFooter>
           </Card>

@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { apiJson } from "@/lib/api";
 import { Button } from "@/components/ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 type User = { id: string; email: string; name?: string | null; plan: "FREE" | "PREMIUM"; role: "USER" | "ADMIN"; createdAt: string; planExpires?: string | null };
 
@@ -81,54 +82,64 @@ export default function Page() {
   return (
     <section>
       <h1 className="text-2xl font-semibold mb-4">Panel de administrador</h1>
-      <p className="text-sm text-gray-600 mb-6">Gestión de usuarios y suscripciones (Free/Premium).</p>
-      <div className="overflow-x-auto rounded-md border bg-white">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b">
-              <th className="p-2 text-left">Email</th>
-              <th className="p-2 text-left">Nombre</th>
-              <th className="p-2 text-left">Plan</th>
-              <th className="p-2 text-left">Rol</th>
-              <th className="p-2 text-left">Vence</th>
-              <th className="p-2 text-left">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading && <tr><td className="p-2" colSpan={5}>Cargando...</td></tr>}
-            {error && <tr><td className="p-2 text-red-600" colSpan={5}>{error}</td></tr>}
-            {!loading && !error && items.length === 0 && <tr><td className="p-2" colSpan={5}>Sin usuarios</td></tr>}
-            {items.map(u => (
-              <tr key={u.id} className="border-t">
-                <td className="p-2">{u.email}</td>
-                <td className="p-2">{u.name || "—"}</td>
-                <td className="p-2">{u.plan}</td>
-                <td className="p-2">{u.role}</td>
-                <td className="p-2">
-                  <input
-                    type="date"
-                    className="border rounded-md p-1 text-xs"
-                    value={expiresByUser[u.id] || ""}
-                    onChange={e => setExpiresByUser(prev => ({ ...prev, [u.id]: e.target.value }))}
-                    disabled={planByUser[u.id] !== 'PREMIUM'}
-                  />
-                </td>
-                <td className="p-2">
-                  <div className="flex items-center gap-2">
-                    <select className="border rounded-md p-1 text-xs" value={planByUser[u.id]}
-                      onChange={e => setPlanByUser(prev => ({ ...prev, [u.id]: e.target.value as any }))}>
-                      <option value="FREE">FREE</option>
-                      <option value="PREMIUM">PREMIUM</option>
-                    </select>
-                    <Button size="sm" variant="outline" onClick={() => applyUpdate(u.id)}>Aplicar</Button>
-                    <Button size="sm" variant="destructive" onClick={() => deleteUser(u.id)}>Eliminar</Button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <p className="text-sm text-muted-foreground mb-6">Gestión de usuarios y suscripciones (Free/Premium).</p>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Email</TableHead>
+            <TableHead>Nombre</TableHead>
+            <TableHead>Plan</TableHead>
+            <TableHead>Rol</TableHead>
+            <TableHead>Vence</TableHead>
+            <TableHead>Acciones</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {loading && (
+            <TableRow>
+              <TableCell colSpan={6}>Cargando...</TableCell>
+            </TableRow>
+          )}
+          {error && (
+            <TableRow>
+              <TableCell colSpan={6} className="text-destructive">{error}</TableCell>
+            </TableRow>
+          )}
+          {!loading && !error && items.length === 0 && (
+            <TableRow>
+              <TableCell colSpan={6}>Sin usuarios</TableCell>
+            </TableRow>
+          )}
+          {items.map(u => (
+            <TableRow key={u.id} className="hover:bg-muted/50">
+              <TableCell>{u.email}</TableCell>
+              <TableCell>{u.name || "—"}</TableCell>
+              <TableCell>{u.plan}</TableCell>
+              <TableCell>{u.role}</TableCell>
+              <TableCell>
+                <input
+                  type="date"
+                  className="border border-border rounded-md p-1 text-xs bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:bg-muted/50"
+                  value={expiresByUser[u.id] || ""}
+                  onChange={e => setExpiresByUser(prev => ({ ...prev, [u.id]: e.target.value }))}
+                  disabled={planByUser[u.id] !== 'PREMIUM'}
+                />
+              </TableCell>
+              <TableCell>
+                <div className="flex items-center gap-2">
+                  <select className="border border-border rounded-md p-1 text-xs bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" value={planByUser[u.id]}
+                    onChange={e => setPlanByUser(prev => ({ ...prev, [u.id]: e.target.value as any }))}>
+                    <option value="FREE">FREE</option>
+                    <option value="PREMIUM">PREMIUM</option>
+                  </select>
+                  <Button size="sm" variant="outline" onClick={() => applyUpdate(u.id)}>Aplicar</Button>
+                  <Button size="sm" variant="destructive" onClick={() => deleteUser(u.id)}>Eliminar</Button>
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </section>
   );
 }

@@ -71,41 +71,41 @@ export default function TelegramLinkCard() {
   const username = link?.botUsername || status.botUsername;
 
   return (
-    <div className="rounded-lg border bg-white p-4">
+    <div className="rounded-lg border bg-card p-4">
       <div className="flex items-center justify-between">
         <div>
-          <div className="text-sm text-gray-500">Telegram</div>
-          <div className="text-sm text-gray-800">
+          <div className="text-sm text-muted-foreground">Telegram</div>
+          <div className="text-sm text-foreground">
             {status.ok ? (status.linked ? "Vinculado" : "No vinculado") : (status.error || "Bot no disponible")}
           </div>
         </div>
         <div className="flex gap-2">
           {status.linked ? (
-            <button onClick={unlink} className="rounded-md border px-3 py-2 text-sm hover:bg-gray-50" disabled={loading}>Desvincular</button>
+            <button onClick={unlink} className="rounded-md border px-3 py-2 text-sm hover:bg-muted" disabled={loading}>Desvincular</button>
           ) : (
-            <button onClick={generateLink} className="rounded-md bg-black px-3 py-2 text-white hover:bg-gray-900" disabled={loading}>Vincular</button>
+            <button onClick={generateLink} className="rounded-md bg-primary px-3 py-2 text-primary-foreground hover:bg-primary/90" disabled={loading}>Vincular</button>
           )}
           {status.linked && (
-            <button onClick={testSend} className="rounded-md border px-3 py-2 text-sm hover:bg-gray-50" disabled={loading}>Probar envío</button>
+            <button onClick={testSend} className="rounded-md border px-3 py-2 text-sm hover:bg-muted" disabled={loading}>Probar envío</button>
           )}
         </div>
       </div>
 
       {!status.linked && link?.deepLink && (
         <div className="mt-3 text-sm">
-          <div className="text-gray-500">Sigue estos pasos:</div>
-          <ol className="mt-1 list-decimal pl-5 text-gray-700">
-            <li>Abre el bot en Telegram: <a className="text-blue-600 hover:underline" href={link.deepLink} target="_blank" rel="noreferrer">@{username}</a></li>
-            <li>Se abrirá con el código automáticamente. Si no, envía: <code className="rounded bg-gray-100 px-1">/start {link.code}</code></li>
+          <div className="text-muted-foreground">Sigue estos pasos:</div>
+          <ol className="mt-1 list-decimal pl-5">
+            <li>Abre el bot en Telegram: <a className="text-primary hover:underline" href={link.deepLink} target="_blank" rel="noreferrer">@{username}</a></li>
+            <li>Se abrirá con el código automáticamente. Si no, envía: <code className="rounded bg-muted px-1">/start {link.code}</code></li>
             <li>Vuelve aquí y pulsa "Actualizar estado" si no se actualiza solo.</li>
           </ol>
           <div className="mt-2">
-            <button onClick={refresh} className="rounded-md border px-3 py-1 text-xs hover:bg-gray-50" disabled={loading}>Actualizar estado</button>
+            <button onClick={refresh} className="rounded-md border px-3 py-1 text-xs hover:bg-muted" disabled={loading}>Actualizar estado</button>
           </div>
         </div>
       )}
 
-      {msg && <div className="mt-3 text-xs text-gray-600">{msg}</div>}
+      {msg && <div className="mt-3 text-xs text-muted-foreground">{msg}</div>}
     </div>
   );
 }

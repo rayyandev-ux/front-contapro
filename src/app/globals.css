@@ -124,3 +124,26 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Componentes reutilizables */
+@layer components {
+  .btn-premium {
+    @apply inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm text-white bg-gradient-to-r from-indigo-700 via-orange-600 to-blue-700 ring-1 ring-white/10;
+    box-shadow: 0 0 18px rgba(99,102,241,0.35);
+    animation: premium-breath 3.2s ease-in-out infinite;
+  }
+  .btn-premium:hover {
+    @apply opacity-95;
+  }
+}
+
+@keyframes premium-breath {
+  0%, 100% {
+    box-shadow: 0 0 14px rgba(99,102,241,0.30);
+    transform: translateZ(0) scale(1);
+  }
+  50% {
+    box-shadow: 0 0 26px rgba(99,102,241,0.55), 0 0 38px rgba(236,72,153,0.35);
+    transform: translateZ(0) scale(1.03);
+  }
+}

@@ -46,16 +46,16 @@ export default function AccountPage() {
     if (!role) return null;
     const cls =
       role === "ADMIN"
-        ? "bg-indigo-50 text-indigo-700 ring-indigo-200"
-        : "bg-slate-50 text-slate-700 ring-slate-200";
+        ? "bg-indigo-500/10 text-indigo-500 ring-1 ring-indigo-500/20"
+        : "bg-slate-500/10 text-slate-500 ring-1 ring-slate-500/20";
     return <span className={`${chipBase} ${cls}`}>{role}</span>;
   };
   const planChip = (plan?: string) => {
     const val = plan || "GRATIS";
     const premium = val.toUpperCase() === "PREMIUM";
     const cls = premium
-      ? "bg-amber-50 text-amber-700 ring-amber-200"
-      : "bg-slate-50 text-slate-700 ring-slate-200";
+      ? "bg-amber-500/10 text-amber-500 ring-1 ring-amber-500/20"
+      : "bg-slate-500/10 text-slate-500 ring-1 ring-slate-500/20";
     return (
       <span className={`${chipBase} ${cls}`}>
         <Crown className="h-3.5 w-3.5" /> {val}
@@ -64,8 +64,8 @@ export default function AccountPage() {
   };
   const verifyChip = (verified?: boolean) => {
     const cls = verified
-      ? "bg-emerald-50 text-emerald-700 ring-emerald-200"
-      : "bg-rose-50 text-rose-700 ring-rose-200";
+      ? "bg-emerald-500/10 text-emerald-500 ring-1 ring-emerald-500/20"
+      : "bg-rose-500/10 text-rose-500 ring-1 ring-rose-500/20";
     const Icon = verified ? CheckCircle2 : XCircle;
     return (
       <span className={`${chipBase} ${cls}`}>
@@ -81,16 +81,16 @@ export default function AccountPage() {
     <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
       <div className="mb-6">
         <h1 className="text-2xl font-semibold tracking-tight">Cuenta</h1>
-        <p className="text-sm text-gray-600">Información de tu perfil y estado</p>
+        <p className="text-sm text-muted-foreground">Información de tu perfil y estado</p>
       </div>
       {error && <p className="mb-6 text-sm text-red-600" aria-live="polite">{error}</p>}
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* Perfil */}
-        <Card className={`bg-white/90 backdrop-blur-sm shadow-lg ring-1 ring-black/5 border-l-4 border-indigo-500`}>
+        <Card className={`bg-card backdrop-blur-sm shadow-lg ring-1 ring-border border-l-4 border-indigo-500`}>
           <CardHeader>
             <div className="flex items-start gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 ring-1 ring-indigo-100">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-500 ring-1 ring-indigo-500/20">
                 <User className="h-5 w-5" />
               </div>
               <div>
@@ -118,10 +118,10 @@ export default function AccountPage() {
         </Card>
 
         {/* Suscripción */}
-        <Card className={`bg-white/90 backdrop-blur-sm shadow-lg ring-1 ring-black/5 border-l-4 ${subAccent}`}>
+        <Card className={`bg-card backdrop-blur-sm shadow-lg ring-1 ring-border border-l-4 ${subAccent}`}>
           <CardHeader>
             <div className="flex items-start gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-50 text-amber-600 ring-1 ring-amber-100">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-500/10 text-amber-500 ring-1 ring-amber-500/20">
                 <Crown className="h-5 w-5" />
               </div>
               <div>
@@ -155,7 +155,7 @@ export default function AccountPage() {
             </div>
             <div className="pt-2">
               <Link href="/premium">
-                <Button className="bg-slate-900 text-white hover:bg-slate-800">
+                <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
                   <Crown className="mr-2 h-4 w-4" /> Gestionar suscripción
                 </Button>
               </Link>
@@ -164,10 +164,10 @@ export default function AccountPage() {
         </Card>
 
         {/* Seguridad */}
-        <Card className={`bg-white/90 backdrop-blur-sm shadow-lg ring-1 ring-black/5 border-l-4 ${secAccent}`}>
+        <Card className={`bg-card backdrop-blur-sm shadow-lg ring-1 ring-border border-l-4 ${secAccent}`}>
           <CardHeader>
             <div className="flex items-start gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-500 ring-1 ring-emerald-500/20">
                 <ShieldCheck className="h-5 w-5" />
               </div>
               <div>
@@ -186,7 +186,7 @@ export default function AccountPage() {
             {!user?.emailVerified && (
               <div className="pt-1">
                 <Link href="/verify">
-                  <Button variant="outline" className="hover:border-rose-300 hover:bg-rose-50">
+                  <Button variant="outline" className="hover:bg-muted">
                     <AlertCircle className="mr-2 h-4 w-4" /> Verificar ahora
                   </Button>
                 </Link>

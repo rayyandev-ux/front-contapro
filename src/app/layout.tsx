@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import ThemeScript from "@/components/ThemeScript";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,6 +16,14 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "ContaPRO — Gestión de Gastos",
   description: "Dashboard web para facturas/boletas con IA y presupuesto",
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/logo.png", type: "image/png", sizes: "32x32" },
+    ],
+    shortcut: "/favicon.svg",
+    apple: "/logo.png",
+  },
 };
 
 export const viewport = {
@@ -28,8 +37,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-gray-50 text-gray-900`}>
+    <html lang="es" suppressHydrationWarning>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-background text-foreground`}>
+        <ThemeScript />
         {children}
       </body>
     </html>

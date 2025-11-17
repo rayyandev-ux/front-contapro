@@ -95,13 +95,13 @@ export default function Page() {
           <form className="space-y-6" onSubmit={onSubmit}>
             {/* Tipos permitidos */}
             <div className="flex flex-wrap items-center gap-2 text-xs">
-              <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-1 text-blue-700 ring-1 ring-blue-200">
+              <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-1 text-primary ring-1 ring-primary/20">
                 <ImageIcon className="h-3 w-3" /> JPG/PNG
               </span>
-              <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-1 text-blue-700 ring-1 ring-blue-200">
+              <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-1 text-primary ring-1 ring-primary/20">
                 <FileText className="h-3 w-3" /> PDF
               </span>
-              <span className="text-gray-500">Máx. 10 MB</span>
+              <span className="text-muted-foreground">Máx. 10 MB</span>
             </div>
 
             {/* Área de dropzone */}
@@ -110,14 +110,14 @@ export default function Page() {
               onDragOver={onDragOver}
               onDragLeave={onDragLeave}
               className={`relative rounded-xl border-2 border-dashed p-6 transition-colors ${
-                dragActive ? "border-blue-400 bg-blue-50" : "border-gray-200 bg-white"
+                dragActive ? "border-primary bg-primary/10" : "border-input bg-card"
               }`}
             >
               <div className="flex flex-col items-center justify-center text-center">
-                <UploadCloud className="mb-2 h-8 w-8 text-blue-600" />
-                <p className="text-sm text-gray-700">
+                <UploadCloud className="mb-2 h-8 w-8 text-primary" />
+                <p className="text-sm text-foreground">
                   Arrastra tu archivo aquí o
-                  <label className="mx-1 cursor-pointer font-medium text-blue-600 underline">
+                  <label className="mx-1 cursor-pointer font-medium text-primary underline">
                     <input
                       type="file"
                       className="sr-only"
@@ -127,23 +127,23 @@ export default function Page() {
                     selecciónalo
                   </label>
                 </p>
-                <p className="text-xs text-gray-500">Acepta imágenes y PDF</p>
+                <p className="text-xs text-muted-foreground">Acepta imágenes y PDF</p>
               </div>
             </div>
 
             {/* Resumen del archivo seleccionado */}
             {file && (
-              <div className="rounded-lg border bg-white p-4">
+              <div className="rounded-lg border bg-card p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     {file.type.startsWith("image/") ? (
-                      <ImageIcon className="h-5 w-5 text-gray-600" />
+                      <ImageIcon className="h-5 w-5 text-muted-foreground" />
                     ) : (
-                      <FileText className="h-5 w-5 text-gray-600" />
+                      <FileText className="h-5 w-5 text-muted-foreground" />
                     )}
                     <div>
-                      <p className="text-sm font-medium text-gray-900">{file.name}</p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-sm font-medium text-foreground">{file.name}</p>
+                      <p className="text-xs text-muted-foreground">
                         {file.type || "desconocido"} · {formatFileSize(file.size)}
                       </p>
                     </div>
@@ -151,7 +151,7 @@ export default function Page() {
                   <button
                     type="button"
                     onClick={() => setFile(null)}
-                    className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs text-gray-700 hover:bg-gray-100"
+                    className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs hover:bg-muted"
                   >
                     <X className="h-3 w-3" /> Quitar
                   </button>
@@ -178,7 +178,7 @@ export default function Page() {
                 {loading ? "Subiendo..." : "Subir y analizar"}
               </button>
               {error && (
-                <span className="inline-flex items-center gap-1 text-xs text-red-600">
+                <span className="inline-flex items-center gap-1 text-xs text-destructive">
                   <AlertTriangle className="h-3 w-3" /> {error}
                 </span>
               )}
@@ -186,7 +186,7 @@ export default function Page() {
 
             {/* Resultado */}
             {result && (
-              <div className="rounded-md border bg-white p-4 text-sm text-gray-700" aria-live="polite">
+              <div className="rounded-md border bg-card p-4 text-sm" aria-live="polite">
                 {result}
               </div>
             )}

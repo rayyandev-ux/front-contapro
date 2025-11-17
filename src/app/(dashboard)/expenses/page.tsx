@@ -65,8 +65,8 @@ export default function Page() {
 
   const typeBadge = (type: Expense["type"]) =>
     type === "FACTURA"
-      ? "bg-blue-50 text-blue-700 ring-blue-200"
-      : "bg-orange-50 text-orange-700 ring-orange-200";
+      ? "bg-blue-500/10 text-blue-500 ring-1 ring-blue-500/20"
+      : "bg-orange-500/10 text-orange-500 ring-1 ring-orange-500/20";
 
   const onDelete = async (id: string) => {
     const yes = confirm("¿Eliminar este gasto?");
@@ -80,7 +80,7 @@ export default function Page() {
     <section>
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-semibold">Gastos</h1>
-        <Link href="/expenses/new" className="rounded-md bg-black px-4 py-2 text-white hover:bg-gray-900">Añadir gasto</Link>
+        <Link href="/expenses/new" className="rounded-md bg-primary px-4 py-2 text-primary-foreground hover:bg-primary/90">Añadir gasto</Link>
       </div>
 
       <Card className="mb-4">
@@ -90,20 +90,20 @@ export default function Page() {
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
             <div className="space-y-1">
-              <label className="text-xs font-medium text-gray-700">Tipo</label>
-              <select className="border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-200" value={filters.type || ""} onChange={e => setFilters(f => ({ ...f, type: e.target.value || undefined }))}>
+              <label className="text-xs font-medium text-muted-foreground">Tipo</label>
+              <select className="border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-primary/30" value={filters.type || ""} onChange={e => setFilters(f => ({ ...f, type: e.target.value || undefined }))}>
                 <option value="">Todos</option>
                 <option value="FACTURA">Factura</option>
                 <option value="BOLETA">Boleta</option>
               </select>
             </div>
             <div className="space-y-1">
-              <label className="text-xs font-medium text-gray-700">Proveedor</label>
-              <input className="border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-200" placeholder="Proveedor" value={filters.provider || ""} onChange={e => setFilters(f => ({ ...f, provider: e.target.value || undefined }))} />
+              <label className="text-xs font-medium text-muted-foreground">Proveedor</label>
+              <input className="border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="Proveedor" value={filters.provider || ""} onChange={e => setFilters(f => ({ ...f, provider: e.target.value || undefined }))} />
             </div>
             <div className="space-y-1">
-              <label className="text-xs font-medium text-gray-700">Categoría</label>
-              <select className="border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-200" value={filters.categoryId || ""} onChange={e => setFilters(f => ({ ...f, categoryId: e.target.value || undefined }))}>
+              <label className="text-xs font-medium text-muted-foreground">Categoría</label>
+              <select className="border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-primary/30" value={filters.categoryId || ""} onChange={e => setFilters(f => ({ ...f, categoryId: e.target.value || undefined }))}>
                 <option value="">Todas</option>
                 {categories.map(c => (
                   <option key={c.id} value={c.id}>{c.name}</option>
@@ -122,7 +122,7 @@ export default function Page() {
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="bg-gray-50">
+                <TableRow className="bg-muted">
                   <TableHead>Fecha</TableHead>
                   <TableHead>Tipo</TableHead>
                   <TableHead>Proveedor</TableHead>
@@ -148,7 +148,7 @@ export default function Page() {
                   </TableRow>
                 )}
                 {items.map(it => (
-                  <TableRow key={it.id} className="odd:bg-white even:bg-gray-50 hover:bg-gray-100">
+                  <TableRow key={it.id} className="hover:bg-muted/50">
                     <TableCell className="whitespace-nowrap">{new Date(it.issuedAt).toLocaleDateString()}</TableCell>
                     <TableCell>
                       <span className={`inline-flex rounded-md px-2 py-0.5 text-xs ring-1 ${typeBadge(it.type)}`}>
@@ -158,7 +158,7 @@ export default function Page() {
                     <TableCell>{it.provider}</TableCell>
                     <TableCell>
                       {it.category?.name ? (
-                        <span className="inline-flex rounded-md bg-gray-100 px-2 py-0.5 text-xs text-gray-700 ring-1 ring-gray-200">
+                        <span className="inline-flex rounded-md bg-muted px-2 py-0.5 text-xs text-foreground ring-1 ring-border">
                           {it.category.name}
                         </span>
                       ) : (
@@ -167,7 +167,7 @@ export default function Page() {
                     </TableCell>
                     <TableCell className="text-right">{formatAmount(it.amount, it.currency)}</TableCell>
                     <TableCell className="text-right">
-                      <Link href={`/expenses/${it.id}`} className="mr-2 inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm hover:bg-gray-50">
+                      <Link href={`/expenses/${it.id}`} className="mr-2 inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm hover:bg-muted">
                         <Eye className="h-4 w-4" /> Ver
                       </Link>
                       {it.document?.mimeType?.startsWith("image/") && (
@@ -175,13 +175,13 @@ export default function Page() {
                           href={`/api/proxy/documents/${it.document.id}/preview`}
                           target="_blank"
                           rel="noreferrer"
-                          className="mr-2 inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm hover:bg-gray-50"
+                          className="mr-2 inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm hover:bg-muted"
                         >
                           <ImageIcon className="h-4 w-4" /> Foto
                         </a>
                       )}
                       <button
-                        className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm text-red-600 hover:bg-red-50"
+                        className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm text-destructive hover:bg-destructive/10"
                         onClick={() => onDelete(it.id)}
                       >
                         <Trash2 className="h-4 w-4" /> Eliminar

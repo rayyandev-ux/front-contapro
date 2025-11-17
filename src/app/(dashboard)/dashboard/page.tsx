@@ -77,23 +77,23 @@ export default async function Page() {
     <section className="space-y-6">
       {/* Banner de suscripción / trial */}
       {me && (
-        <Card className="bg-white/90 backdrop-blur-sm shadow-lg ring-1 ring-black/5">
+        <Card className="shadow-lg ring-1 ring-border">
           <CardContent className="p-4">
             {me.plan === 'PREMIUM' ? (
               <div className="flex items-center justify-between text-sm">
                 <div>
-                  <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">Premium activo</span>
-                  <span className="ml-2 text-gray-600">Vence: {fmtDate(me.planExpires)}</span>
+                  <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">Premium activo</span>
+                  <span className="ml-2 text-muted-foreground">Vence: {fmtDate(me.planExpires)}</span>
                 </div>
                 <Link href="/premium" className="underline">Gestionar</Link>
               </div>
             ) : (
               <div className="flex items-center justify-between text-sm">
                 <div>
-                  <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">Plan GRATIS</span>
-                  <span className="ml-2 text-gray-600">Tu trial termina: {fmtDate(me.trialEnds)}</span>
+                  <span className="inline-flex items-center rounded-full bg-secondary px-2 py-0.5 text-xs font-medium">Plan GRATIS</span>
+                  <span className="ml-2 text-muted-foreground">Tu trial termina: {fmtDate(me.trialEnds)}</span>
                   {typeof daysUntil(me.trialEnds) === 'number' && daysUntil(me.trialEnds)! <= 3 && (
-                    <span className="ml-2 inline-flex items-center rounded-full bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-800">Quedan {daysUntil(me.trialEnds)} días</span>
+                    <span className="ml-2 inline-flex items-center rounded-full bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent-foreground">Quedan {daysUntil(me.trialEnds)} días</span>
                   )}
                 </div>
                 <Link href="/premium" className="underline">Mejorar</Link>
@@ -103,16 +103,16 @@ export default async function Page() {
         </Card>
       )}
       {/* Encabezado con acciones rápidas (paleta nueva) */}
-      <Card className="bg-gradient-to-r from-white via-gray-50 to-blue-100 border border-black/5">
+      <Card className="bg-card border border-border dark:bg-gradient-to-r dark:from-primary/10 dark:via-secondary/10 dark:to-primary/10">
         <CardContent className="p-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="text-2xl font-semibold tracking-tight">Resumen</h1>
-              <p className="text-sm text-gray-600">Tu actividad y gastos recientes</p>
+              <p className="text-sm text-muted-foreground">Tu actividad y gastos recientes</p>
             </div>
             <Link
               href="/upload"
-              className="inline-flex w-full sm:w-auto items-center gap-2 rounded-md bg-black px-4 py-2 text-white shadow-sm transition-colors hover:bg-gray-900"
+              className="inline-flex w-full sm:w-auto items-center gap-2 rounded-md bg-primary px-4 py-2 text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
             >
               <Upload className="h-4 w-4" /> Subir documento
             </Link>
@@ -122,10 +122,10 @@ export default async function Page() {
 
       {/* Métricas principales */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-        <Card className="bg-white/90 backdrop-blur-sm shadow-lg ring-1 ring-black/5">
+        <Card className="shadow-lg ring-1 ring-border">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-semibold text-gray-700">Documentos subidos</CardTitle>
+              <CardTitle className="text-sm font-semibold">Documentos subidos</CardTitle>
               <FileText className="h-4 w-4 text-blue-600" />
             </div>
             <CardDescription className="text-xs">Últimos 30 días</CardDescription>
@@ -135,21 +135,21 @@ export default async function Page() {
           </CardContent>
         </Card>
 
-        <Card className="bg-white/90 backdrop-blur-sm shadow-lg ring-1 ring-black/5">
+        <Card className="shadow-lg ring-1 ring-border">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-semibold text-gray-700">Último archivo</CardTitle>
+            <CardTitle className="text-sm font-semibold">Último archivo</CardTitle>
             <CardDescription className="text-xs">Tu actividad reciente</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="truncate text-sm font-medium text-gray-800" title={items[0]?.filename || "—"}>{items[0]?.filename || "—"}</div>
-            <div className="mt-1 text-xs text-gray-500">{items[0]?.uploadedAt ? new Date(items[0].uploadedAt).toLocaleString() : ""}</div>
+            <div className="truncate text-sm font-medium text-foreground" title={items[0]?.filename || "—"}>{items[0]?.filename || "—"}</div>
+            <div className="mt-1 text-xs text-muted-foreground">{items[0]?.uploadedAt ? new Date(items[0].uploadedAt).toLocaleString() : ""}</div>
           </CardContent>
         </Card>
 
-        <Card className="bg-white/90 backdrop-blur-sm shadow-lg ring-1 ring-black/5">
+        <Card className="shadow-lg ring-1 ring-border">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-semibold text-gray-700">Gasto del mes</CardTitle>
+              <CardTitle className="text-sm font-semibold">Gasto del mes</CardTitle>
               <TrendingUp className="h-4 w-4 text-blue-600" />
             </div>
             <CardDescription className="text-xs">Fuente: gastos creados</CardDescription>
@@ -161,7 +161,7 @@ export default async function Page() {
       </div>
 
       {/* Últimos análisis */}
-      <Card className="bg-white/90 backdrop-blur-sm shadow-lg ring-1 ring-black/5">
+      <Card className="shadow-lg ring-1 ring-border">
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg">Últimos análisis</CardTitle>
@@ -171,16 +171,16 @@ export default async function Page() {
         </CardHeader>
         <CardContent>
           {items.length === 0 ? (
-            <p className="text-sm text-gray-600">Aún no tienes análisis. Sube tu primer documento.</p>
+            <p className="text-sm text-muted-foreground">Aún no tienes análisis. Sube tu primer documento.</p>
           ) : (
             <ul className="divide-y">
               {items.slice(0, 5).map((it) => (
-                <li key={it.id} className="flex items-center justify-between px-2 py-2 text-sm hover:bg-gray-50 rounded">
+                <li key={it.id} className="flex items-center justify-between px-2 py-2 text-sm hover:bg-muted/50 rounded">
                   <div className="flex items-center gap-2 min-w-0">
                     <FileText className="h-4 w-4 text-blue-600 flex-shrink-0" />
-                    <span className="max-w-[50%] truncate text-gray-800" title={it.summary || it.filename}>{it.filename}</span>
+                    <span className="max-w-[50%] truncate text-foreground" title={it.summary || it.filename}>{it.filename}</span>
                   </div>
-                  <span className="text-gray-500">{new Date(it.uploadedAt).toLocaleString()}</span>
+                  <span className="text-muted-foreground">{new Date(it.uploadedAt).toLocaleString()}</span>
                 </li>
               ))}
             </ul>
@@ -190,14 +190,14 @@ export default async function Page() {
 
       {/* Charts */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-        <Card className="bg-white/90 backdrop-blur-sm shadow-lg ring-1 ring-black/5">
+        <Card className="shadow-lg ring-1 ring-border">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-semibold">Gastos por categoría (mes actual)</CardTitle>
             <CardDescription className="text-xs">Distribución de tus gastos</CardDescription>
           </CardHeader>
           <CardContent>
             {byCategory.length === 0 ? (
-              <p className="text-xs text-gray-600">Sin datos</p>
+              <p className="text-xs text-muted-foreground">Sin datos</p>
             ) : (
               <div className="space-y-2">
                 {byCategory.map((c) => {
@@ -205,10 +205,10 @@ export default async function Page() {
                   return (
                     <div key={c.category} className="text-xs">
                       <div className="flex justify-between">
-                        <span className="text-gray-700">{c.category}</span>
-                        <span className="text-gray-500">{formatCurrency(c.total)}</span>
+                        <span className="text-foreground">{c.category}</span>
+                        <span className="text-muted-foreground">{formatCurrency(c.total)}</span>
                       </div>
-                      <div className="h-2 w-full rounded bg-gray-100">
+                      <div className="h-2 w-full rounded bg-muted">
                         <div
                           className="h-2 rounded bg-gradient-to-r from-indigo-700 via-orange-600 to-blue-700 transition-all duration-300 ease-out"
                           style={{ width: `${pct}%` }}
@@ -222,14 +222,14 @@ export default async function Page() {
             )}
           </CardContent>
         </Card>
-        <Card className="bg-white/90 backdrop-blur-sm shadow-lg ring-1 ring-black/5">
+        <Card className="shadow-lg ring-1 ring-border">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-semibold">Gastos por mes (año actual)</CardTitle>
             <CardDescription className="text-xs">Tendencia mensual</CardDescription>
           </CardHeader>
           <CardContent>
             {byMonth.length === 0 ? (
-              <p className="text-xs text-gray-600">Sin datos</p>
+              <p className="text-xs text-muted-foreground">Sin datos</p>
             ) : (
               <div className="grid grid-cols-12 gap-2">
                 {byMonth.map((m) => {
@@ -241,7 +241,7 @@ export default async function Page() {
                         style={{ height: `${Math.max(pct, 2)}px` }}
                         title={`${formatCurrency(m.total)} (${pct}%)`}
                       />
-                      <span className="mt-1 text-[10px] text-gray-600">{m.month}</span>
+                      <span className="mt-1 text-[10px] text-muted-foreground">{m.month}</span>
                     </div>
                   );
                 })}

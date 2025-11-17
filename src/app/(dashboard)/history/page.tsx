@@ -63,16 +63,16 @@ export default function Page() {
   const badgeClasses = (ext: string) => {
     switch (ext) {
       case "PDF":
-        return "bg-red-50 text-red-700 ring-red-200";
+        return "bg-red-500/10 text-red-500 ring-1 ring-red-500/20";
       case "PNG":
-        return "bg-emerald-50 text-emerald-700 ring-emerald-200";
+        return "bg-emerald-500/10 text-emerald-500 ring-1 ring-emerald-500/20";
       case "JPG":
       case "JPEG":
-        return "bg-blue-50 text-blue-700 ring-blue-200";
+        return "bg-blue-500/10 text-blue-500 ring-1 ring-blue-500/20";
       case "GIF":
-        return "bg-purple-50 text-purple-700 ring-purple-200";
+        return "bg-purple-500/10 text-purple-500 ring-1 ring-purple-500/20";
       default:
-        return "bg-gray-100 text-gray-700 ring-gray-200";
+        return "bg-muted text-foreground ring-1 ring-border";
     }
   };
 
@@ -80,7 +80,7 @@ export default function Page() {
     <section>
       <div className="mb-4">
         <h1 className="text-2xl font-semibold">Historial</h1>
-        <p className="text-sm text-gray-600">Documentos subidos y analizados.</p>
+        <p className="text-sm text-muted-foreground">Documentos subidos y analizados.</p>
       </div>
 
       <Card>
@@ -105,7 +105,7 @@ export default function Page() {
                 )}
                 {error && (
                   <TableRow>
-                    <TableCell colSpan={3} className="text-red-600">{error}</TableCell>
+                    <TableCell colSpan={3} className="text-destructive">{error}</TableCell>
                   </TableRow>
                 )}
                 {!loading && !error && items.length === 0 && (
@@ -117,7 +117,7 @@ export default function Page() {
                   const ext = getExt(it.filename);
                   const Icon = ext === "PDF" ? FileText : ext ? FileImage : FileQuestion;
                   return (
-                    <TableRow key={it.id} className="odd:bg-white even:bg-gray-50 hover:bg-gray-100">
+                    <TableRow key={it.id} className="hover:bg-muted/50">
                       <TableCell className="whitespace-nowrap">{new Date(it.uploadedAt).toLocaleString()}</TableCell>
                       <TableCell className="max-w-[320px]">
                         <div className="flex items-center gap-2">
@@ -138,7 +138,7 @@ export default function Page() {
           {/* Paginación */}
           {!loading && !error && items.length > 0 && (
             <div className="mt-4 flex items-center justify-between">
-              <p className="text-xs text-gray-600">
+              <p className="text-xs text-muted-foreground">
                 Mostrando <span className="font-medium">{startIndex + 1}</span>–<span className="font-medium">{endIndex}</span> de <span className="font-medium">{items.length}</span>
               </p>
               <nav className="flex items-center gap-1">
@@ -146,7 +146,7 @@ export default function Page() {
                   type="button"
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page <= 1}
-                  className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+                  className="inline-flex items-center gap-1 rounded-md border border-input px-2 py-1 text-sm text-foreground hover:bg-muted disabled:opacity-50"
                 >
                   <ChevronLeft className="h-4 w-4" /> Prev
                 </button>
@@ -158,21 +158,21 @@ export default function Page() {
                       onClick={() => setPage(p)}
                       className={`rounded-md px-3 py-1 text-sm ${
                         p === page
-                          ? "bg-blue-600 text-white"
-                          : "border text-gray-700 hover:bg-gray-100"
+                          ? "bg-primary text-primary-foreground"
+                          : "border border-input text-foreground hover:bg-muted"
                       }`}
                     >
                       {p}
                     </button>
                   ) : (
-                    <span key={idx} className="px-2 text-sm text-gray-500">{p}</span>
+                    <span key={idx} className="px-2 text-sm text-muted-foreground">{p}</span>
                   )
                 )}
                 <button
                   type="button"
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page >= totalPages}
-                  className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+                  className="inline-flex items-center gap-1 rounded-md border border-input px-2 py-1 text-sm text-foreground hover:bg-muted disabled:opacity-50"
                 >
                   Siguiente <ChevronRight className="h-4 w-4" />
                 </button>

@@ -33,9 +33,12 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends curl && \
     rm -rf /var/lib/apt/lists/*
 
-# Copy app (standalone) and static assets
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
+# Install production deps only
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev
+
+# Copy built app assets
+COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 
 EXPOSE 3000
@@ -45,5 +48,5 @@ HEALTHCHECK --interval=30s --timeout=5s --retries=5 CMD curl -fsS http://localho
 
 USER node
 
-# Start: standalone server
-CMD ["node", "server.js"]
+# Run Next.js server
+CMD ["sh", "-c", "npm run start -- -p ${PORT:-3000} -H 0.0.0.0"]

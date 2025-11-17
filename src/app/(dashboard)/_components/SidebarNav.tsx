@@ -47,23 +47,23 @@ export default function SidebarNav({ isAdmin }: Props) {
           const base =
             "group flex items-center gap-2 px-3 py-2 transition-colors duration-150 border-l-4 pl-2";
           const active =
-            "bg-indigo-50 text-indigo-700 font-medium border-indigo-500";
+            "bg-blue-50 text-blue-700 font-medium border-blue-500";
           const inactive =
-            "text-gray-700 hover:bg-gray-100 hover:text-gray-900 border-transparent hover:border-indigo-200";
+            "text-gray-700 hover:bg-gray-100 hover:text-gray-900 border-transparent hover:border-blue-200";
           return (
             <li key={href}>
               <Link href={href} className={`${base} ${isActive ? active : inactive}`}>
                 <Icon
                   className={`h-4 w-4 ${
                     isActive
-                      ? "text-indigo-600"
+                      ? "text-blue-600"
                       : "text-gray-400 group-hover:text-gray-600"
                   }`}
                 />
                 <span className="flex-1">{label}</span>
                 <span
                   className={`ml-auto h-2 w-2 rounded-full ${
-                    isActive ? "bg-indigo-500" : "bg-transparent group-hover:bg-gray-300"
+                    isActive ? "bg-blue-500" : "bg-transparent group-hover:bg-gray-300"
                   }`}
                 />
               </Link>

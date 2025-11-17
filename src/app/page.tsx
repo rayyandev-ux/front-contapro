@@ -1,10 +1,12 @@
 'use client';
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, UploadCloud, Receipt, BarChart3, ShieldCheck } from "lucide-react";
 import { motion } from "framer-motion";
+import MobileNav from "@/components/MobileNav";
 export default function Home() {
   const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8080";
   const [dashboardHref, setDashboardHref] = useState("/dashboard");
@@ -26,7 +28,7 @@ export default function Home() {
     <div className="relative min-h-svh w-full overflow-hidden">
       {/* Fondo con gradientes vibrantes y acentos orgánicos */}
       <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 via-white to-cyan-50" />
+        <div className="absolute inset-0 bg-gradient-to-br from-white via-gray-50 to-blue-50" />
         {/* Radiales orgánicos para dar vibra y profundidad */}
         <div
           className="absolute inset-0"
@@ -35,42 +37,51 @@ export default function Home() {
               "radial-gradient(800px 400px at 10% 15%, rgba(99,102,241,0.20), transparent 60%), radial-gradient(700px 350px at 85% 20%, rgba(236,72,153,0.18), transparent 60%), radial-gradient(600px 300px at 20% 85%, rgba(14,165,233,0.18), transparent 60%)",
           }}
         />
+        {/* Contornos tipo anillos (repeating radial) para dar estructura */}
+        <div
+          className="absolute inset-0 opacity-[0.30] mix-blend-multiply"
+          style={{
+            backgroundImage:
+              "repeating-radial-gradient(circle at 12% 18%, rgba(99,102,241,0.15) 0px, rgba(99,102,241,0.15) 1px, transparent 6px, transparent 20px), repeating-radial-gradient(circle at 85% 22%, rgba(236,72,153,0.12) 0px, rgba(236,72,153,0.12) 1px, transparent 6px, transparent 22px), repeating-radial-gradient(circle at 22% 82%, rgba(14,165,233,0.12) 0px, rgba(14,165,233,0.12) 1px, transparent 6px, transparent 24px)",
+          }}
+        />
+        {/* Líneas diagonales sutiles tipo mapa (repeating linear) */}
+        <div
+          className="absolute inset-0 opacity-[0.12]"
+          style={{
+            backgroundImage:
+              "repeating-linear-gradient(135deg, rgba(17,24,39,0.05) 0px, rgba(17,24,39,0.05) 1px, transparent 6px, transparent 16px)",
+          }}
+        />
         {/* Glows suaves en esquinas para contraste llamativo */}
         <div className="absolute -top-24 -left-24 h-80 w-80 rounded-full bg-indigo-400/25 blur-3xl" />
         <div className="absolute -bottom-28 -right-28 h-96 w-96 rounded-full bg-fuchsia-400/25 blur-3xl" />
       </div>
 
       {/* Header */}
-      {/* Fondo con gradientes más vibrantes, halos orgánicos y un toque asimétrico */}
-      <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-100 via-rose-50 to-cyan-100 opacity-80" />
-        {/* Halos orgánicos mejorados con formas irregulares */}
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage:
-              "radial-gradient(ellipse 80% 40% at 15% 20%, rgba(99,102,241,0.25), transparent 60%), radial-gradient(ellipse 70% 35% at 80% 25%, rgba(236,72,153,0.22), transparent 60%), radial-gradient(ellipse 60% 30% at 25% 80%, rgba(14,165,233,0.22), transparent 60%), radial-gradient(ellipse 50% 25% at 90% 85%, rgba(245,208,254,0.18), transparent 60%)",
-          }}
-        />
-        {/* Glows con contraste y vibra */}
-        <div className="absolute -top-32 -left-32 h-96 w-96 rounded-[60%] bg-indigo-400/30 blur-3xl opacity-70" />
-        <div className="absolute -bottom-36 -right-36 h-[420px] w-[420px] rounded-[70%] bg-fuchsia-400/30 blur-3xl opacity-70" />
-        <div className="absolute top-1/4 left-3/4 h-48 w-48 rounded-full bg-cyan-300/25 blur-2xl opacity-60" />
-      </div>
       <header className="sticky top-0 z-50 mx-auto max-w-7xl px-6 pt-4">
         <div className="flex items-center justify-between rounded-2xl bg-white/80 backdrop-blur-md px-4 py-3 shadow-sm ring-1 ring-black/5">
           <div className="flex items-center gap-3">
-            <span className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-indigo-600 via-fuchsia-600 to-cyan-500 text-white text-xs shadow-sm">CP</span>
+            <Image
+              src="/logo.png"
+              width={28}
+              height={28}
+              alt="Logo de ContaPRO"
+              className="rounded-md ring-1 ring-black/10 bg-gray-100"
+              unoptimized
+              priority
+            />
             <span className="font-semibold bg-gradient-to-r from-black via-gray-900 to-black bg-clip-text text-transparent">ContaPRO</span>
           </div>
           <nav className="hidden md:flex items-center gap-6 text-sm text-gray-700">
             <a href="#features" className="hover:text-gray-900 hover:underline underline-offset-4 decoration-indigo-400">Características</a>
-            <a href="#how" className="hover:text-gray-900 hover:underline underline-offset-4 decoration-fuchsia-400">Cómo funciona</a>
-            <a href="#pricing" className="hover:text-gray-900 hover:underline underline-offset-4 decoration-cyan-400">Precios</a>
+            <a href="#how" className="hover:text-gray-900 hover:underline underline-offset-4 decoration-orange-400">Cómo funciona</a>
+            <a href="#pricing" className="hover:text-gray-900 hover:underline underline-offset-4 decoration-blue-400">Precios</a>
             <Link href={dashboardHref} className="hover:text-gray-900">Dashboard</Link>
             <Link href="/login" className="hover:text-gray-900">Acceder</Link>
             <Link href="/register" className="rounded-md bg-gradient-to-r from-gray-900 via-black to-gray-900 px-3 py-1.5 text-white shadow-sm hover:opacity-95">Crear cuenta</Link>
           </nav>
+          <MobileNav dashboardHref={dashboardHref} />
         </div>
       </header>
 
@@ -83,17 +94,19 @@ export default function Home() {
             transition={{ duration: 0.6 }}
           >
             <h1 className="text-4xl sm:text-6xl font-bold tracking-tight leading-tight">
-              <span className="bg-gradient-to-r from-indigo-800 via-fuchsia-700 to-cyan-600 bg-clip-text text-transparent">
-                Gestiona gastos y documentos con vibra y poder real
+              <span className="bg-gradient-to-r from-indigo-800 via-orange-700 to-blue-600 bg-clip-text text-transparent">
+                Gestiona comprobantes con IA y reportes claros
               </span>
             </h1>
-            <p className="mt-4 text-gray-800 text-lg font-medium">Centraliza comprobantes, extrae datos con IA y métricas que inspiran decisiones audaces. Siente el flow.</p>
+            <p className="mt-4 text-gray-800 text-lg font-medium">
+              Centraliza tus documentos, extrae datos clave automáticamente y toma decisiones con métricas limpias y accionables.
+            </p>
             <div className="mt-7 flex flex-wrap items-center gap-4">
               <Link href="/register">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="rounded-lg bg-gradient-to-r from-indigo-600 to-fuchsia-600 text-white px-6 py-3 shadow-md hover:shadow-lg transition-shadow"
+                  className="rounded-lg bg-gradient-to-r from-indigo-700 via-orange-600 to-blue-700 text-white px-6 py-3 shadow-md hover:shadow-lg transition-shadow"
                 >
                   Comenzar gratis
                   <ArrowRight className="ml-2 h-4 w-4 inline" />
@@ -103,13 +116,13 @@ export default function Home() {
             </div>
             <div className="mt-7 flex items-center gap-4 text-xs font-medium">
               <div className="flex items-center gap-2 rounded-full bg-white/50 px-3 py-1.5 text-gray-800 shadow-sm"><UploadCloud className="h-4 w-4 text-indigo-600" /> Subida rápida</div>
-              <div className="flex items-center gap-2 rounded-full bg-white/50 px-3 py-1.5 text-gray-800 shadow-sm"><Receipt className="h-4 w-4 text-fuchsia-600" /> Extracción precisa</div>
-              <div className="flex items-center gap-2 rounded-full bg-white/50 px-3 py-1.5 text-gray-800 shadow-sm"><BarChart3 className="h-4 w-4 text-cyan-600" /> Métricas claras</div>
+              <div className="flex items-center gap-2 rounded-full bg-white/50 px-3 py-1.5 text-gray-800 shadow-sm"><Receipt className="h-4 w-4 text-orange-600" /> Extracción precisa</div>
+              <div className="flex items-center gap-2 rounded-full bg-white/50 px-3 py-1.5 text-gray-800 shadow-sm"><BarChart3 className="h-4 w-4 text-blue-600" /> Métricas claras</div>
             </div>
           </motion.div>
           <div className="relative">
             {/* Panel con halo asimétrico */}
-            <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-indigo-200/50 via-fuchsia-200/50 to-cyan-200/50 blur-xl opacity-70 rotate-2" />
+            <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-indigo-200/50 via-orange-200/50 to-blue-200/50 blur-xl opacity-70 rotate-2" />
             <div className="relative rounded-2xl border bg-white/90 p-4 shadow-lg ring-1 ring-black/5 transform -rotate-1">
               <div className="mb-3 flex items-center justify-between">
                 <div className="font-medium">Tu panel financiero</div>
@@ -158,28 +171,61 @@ export default function Home() {
         <h2 className="text-2xl font-semibold">Características claves</h2>
         <p className="mt-2 text-sm text-gray-600">Todo lo que necesitas para dominar tus finanzas empresariales.</p>
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Card className="transition hover:translate-y-[2px]">
+          <motion.div initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4 }}>
+            <Card className="transition hover:translate-y-[2px]">
+              <CardContent className="p-5">
+                <div className="mb-2 flex items-center gap-2"><UploadCloud className="h-5 w-5 text-indigo-600" /><span className="font-medium">Uploads inteligentes</span></div>
+                <p className="text-sm text-gray-600">Arrastra y suelta tus archivos. Procesamos imágenes y PDFs.</p>
+              </CardContent>
+            </Card>
+          </motion.div>
+          <motion.div initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45, delay: 0.05 }}>
+            <Card className="transition hover:translate-y-[2px]">
+              <CardContent className="p-5">
+                <div className="mb-2 flex items-center gap-2"><Receipt className="h-5 w-5 text-fuchsia-600" /><span className="font-medium">Extracción con IA</span></div>
+                <p className="text-sm text-gray-600">Campos clave como RUC, total, fecha y más automáticamente.</p>
+              </CardContent>
+            </Card>
+          </motion.div>
+          <motion.div initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.1 }}>
+            <Card className="transition hover:translate-y-[2px]">
+              <CardContent className="p-5">
+                <div className="mb-2 flex items-center gap-2"><BarChart3 className="h-5 w-5 text-cyan-600" /><span className="font-medium">Métricas y reportes</span></div>
+                <p className="text-sm text-gray-600">Gráficos por categoría y por mes para entender tus gastos.</p>
+              </CardContent>
+            </Card>
+          </motion.div>
+          <motion.div initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.55, delay: 0.15 }}>
+            <Card className="transition hover:translate-y-[2px]">
+              <CardContent className="p-5">
+                <div className="mb-2 flex items-center gap-2"><ShieldCheck className="h-5 w-5 text-indigo-700" /><span className="font-medium">Seguridad</span></div>
+                <p className="text-sm text-gray-600">Autenticación segura, datos encriptados y control de acceso.</p>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section id="faq" className="mx-auto max-w-7xl px-6 py-12 scroll-mt-24">
+        <h2 className="text-2xl font-semibold">Preguntas frecuentes</h2>
+        <div className="mt-6 grid gap-4 md:grid-cols-3">
+          <Card>
             <CardContent className="p-5">
-              <div className="mb-2 flex items-center gap-2"><UploadCloud className="h-5 w-5 text-indigo-600" /><span className="font-medium">Uploads inteligentes</span></div>
-              <p className="text-sm text-gray-600">Arrastra y suelta tus archivos. Procesamos imágenes y PDFs.</p>
+              <div className="font-medium">¿Necesito tarjeta para empezar?</div>
+              <p className="mt-2 text-sm text-gray-600">No. El plan Free no requiere tarjeta y puedes cancelar cuando quieras.</p>
             </CardContent>
           </Card>
-          <Card className="transition hover:translate-y-[2px]">
+          <Card>
             <CardContent className="p-5">
-              <div className="mb-2 flex items-center gap-2"><Receipt className="h-5 w-5 text-fuchsia-600" /><span className="font-medium">Extracción con IA</span></div>
-              <p className="text-sm text-gray-600">Campos clave como RUC, total, fecha y más automáticamente.</p>
+              <div className="font-medium">¿Qué documentos soportan?</div>
+              <p className="mt-2 text-sm text-gray-600">Imágenes (JPG/PNG) y PDFs. Próximamente formatos escaneados multipágina.</p>
             </CardContent>
           </Card>
-          <Card className="transition hover:translate-y-[2px]">
+          <Card>
             <CardContent className="p-5">
-              <div className="mb-2 flex items-center gap-2"><BarChart3 className="h-5 w-5 text-cyan-600" /><span className="font-medium">Métricas y reportes</span></div>
-              <p className="text-sm text-gray-600">Gráficos por categoría y por mes para entender tus gastos.</p>
-            </CardContent>
-          </Card>
-          <Card className="transition hover:translate-y-[2px]">
-            <CardContent className="p-5">
-              <div className="mb-2 flex items-center gap-2"><ShieldCheck className="h-5 w-5 text-indigo-700" /><span className="font-medium">Seguridad</span></div>
-              <p className="text-sm text-gray-600">Autenticación segura, datos encriptados y control de acceso.</p>
+              <div className="font-medium">¿Cómo manejan la seguridad?</div>
+              <p className="mt-2 text-sm text-gray-600">Cifrado en tránsito y reposo, autenticación segura y control de acceso por roles.</p>
             </CardContent>
           </Card>
         </div>
@@ -236,7 +282,7 @@ export default function Home() {
               </ul>
             </div>
           </div>
-          <div className="mt-6 flex items-center justify-between rounded-lg bg-gradient-to-r from-indigo-50 via-fuchsia-50 to-cyan-50 p-4">
+          <div className="mt-6 flex items-center justify-between rounded-lg bg-gradient-to-r from-indigo-50 via-orange-50 to-blue-50 p-4">
             <div>
               <div className="font-medium">Empieza hoy mismo</div>
               <div className="text-sm text-gray-600">Sin tarjeta. Cancela cuando quieras.</div>

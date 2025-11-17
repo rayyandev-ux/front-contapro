@@ -72,16 +72,16 @@ function VerifyForm() {
   return (
     <div className="relative min-h-svh w-full overflow-hidden">
       <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 via-white to-cyan-50" />
+        <div className="absolute inset-0 bg-gradient-to-br from-white via-gray-50 to-blue-50" />
         <div
           className="absolute inset-0"
           style={{
             backgroundImage:
-              "radial-gradient(800px 400px at 10% 15%, rgba(99,102,241,0.20), transparent 60%), radial-gradient(700px 350px at 85% 20%, rgba(236,72,153,0.18), transparent 60%), radial-gradient(600px 300px at 20% 85%, rgba(14,165,233,0.18), transparent 60%)",
+              "radial-gradient(800px 400px at 10% 15%, rgba(99,102,241,0.20), transparent 60%), radial-gradient(700px 350px at 85% 20%, rgba(234,88,12,0.18), transparent 60%), radial-gradient(600px 300px at 20% 85%, rgba(37,99,235,0.18), transparent 60%)",
           }}
         />
         <div className="absolute -top-24 -left-24 h-80 w-80 rounded-full bg-indigo-400/25 blur-3xl" />
-        <div className="absolute -bottom-28 -right-28 h-96 w-96 rounded-full bg-fuchsia-400/25 blur-3xl" />
+        <div className="absolute -bottom-28 -right-28 h-96 w-96 rounded-full bg-orange-400/25 blur-3xl" />
       </div>
       <section className="mx-auto max-w-md px-6 py-16">
         <div className="fixed top-6 left-6 z-10">
@@ -95,7 +95,7 @@ function VerifyForm() {
         <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
           <Card className="bg-white/90 backdrop-blur-sm shadow-lg ring-1 ring-black/5">
             <CardHeader>
-              <CardTitle className="bg-gradient-to-r from-indigo-800 via-fuchsia-700 to-cyan-600 bg-clip-text text-transparent">Verifica tu cuenta</CardTitle>
+              <CardTitle className="bg-gradient-to-r from-indigo-800 via-orange-700 to-blue-600 bg-clip-text text-transparent">Verifica tu cuenta</CardTitle>
               <CardDescription>Ingresa el código enviado a tu correo</CardDescription>
             </CardHeader>
             <CardContent>
@@ -125,7 +125,7 @@ function VerifyForm() {
                   disabled={loading}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="w-full rounded-md bg-gradient-to-r from-indigo-600 to-fuchsia-600 px-4 py-2.5 text-white shadow-md hover:shadow-lg disabled:opacity-60"
+                  className="w-full rounded-md bg-gradient-to-r from-indigo-700 via-orange-600 to-blue-700 px-4 py-2.5 text-white shadow-md hover:shadow-lg disabled:opacity-60"
                 >
                   {loading ? "Verificando..." : (
                     <span className="inline-flex items-center gap-2">Verificar <ArrowRight className="h-4 w-4" /></span>

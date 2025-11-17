@@ -68,7 +68,7 @@ export default function Page() {
         return "bg-emerald-50 text-emerald-700 ring-emerald-200";
       case "JPG":
       case "JPEG":
-        return "bg-indigo-50 text-indigo-700 ring-indigo-200";
+        return "bg-blue-50 text-blue-700 ring-blue-200";
       case "GIF":
         return "bg-purple-50 text-purple-700 ring-purple-200";
       default:
@@ -158,7 +158,7 @@ export default function Page() {
                       onClick={() => setPage(p)}
                       className={`rounded-md px-3 py-1 text-sm ${
                         p === page
-                          ? "bg-indigo-600 text-white"
+                          ? "bg-blue-600 text-white"
                           : "border text-gray-700 hover:bg-gray-100"
                       }`}
                     >

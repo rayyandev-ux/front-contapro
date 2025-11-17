@@ -95,10 +95,10 @@ export default function Page() {
           <form className="space-y-6" onSubmit={onSubmit}>
             {/* Tipos permitidos */}
             <div className="flex flex-wrap items-center gap-2 text-xs">
-              <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2 py-1 text-indigo-700 ring-1 ring-indigo-200">
+              <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-1 text-blue-700 ring-1 ring-blue-200">
                 <ImageIcon className="h-3 w-3" /> JPG/PNG
               </span>
-              <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2 py-1 text-indigo-700 ring-1 ring-indigo-200">
+              <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-1 text-blue-700 ring-1 ring-blue-200">
                 <FileText className="h-3 w-3" /> PDF
               </span>
               <span className="text-gray-500">Máx. 10 MB</span>
@@ -110,14 +110,14 @@ export default function Page() {
               onDragOver={onDragOver}
               onDragLeave={onDragLeave}
               className={`relative rounded-xl border-2 border-dashed p-6 transition-colors ${
-                dragActive ? "border-indigo-400 bg-indigo-50" : "border-gray-200 bg-white"
+                dragActive ? "border-blue-400 bg-blue-50" : "border-gray-200 bg-white"
               }`}
             >
               <div className="flex flex-col items-center justify-center text-center">
-                <UploadCloud className="mb-2 h-8 w-8 text-indigo-600" />
+                <UploadCloud className="mb-2 h-8 w-8 text-blue-600" />
                 <p className="text-sm text-gray-700">
                   Arrastra tu archivo aquí o
-                  <label className="mx-1 cursor-pointer font-medium text-indigo-600 underline">
+                  <label className="mx-1 cursor-pointer font-medium text-blue-600 underline">
                     <input
                       type="file"
                       className="sr-only"
@@ -172,7 +172,7 @@ export default function Page() {
               <button
                 type="submit"
                 disabled={loading}
-                className="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700 disabled:opacity-60"
+                className="inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-indigo-700 via-orange-600 to-blue-700 px-4 py-2 text-white shadow-md hover:shadow-lg disabled:opacity-60"
               >
                 {loading && <Loader2 className="h-4 w-4 animate-spin" />}
                 {loading ? "Subiendo..." : "Subir y analizar"}

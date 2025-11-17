@@ -57,11 +57,11 @@ function ResetForm() {
   return (
     <div className="relative min-h-svh w-full overflow-hidden">
       <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 via-white to-cyan-50" />
+        <div className="absolute inset-0 bg-gradient-to-br from-white via-gray-50 to-blue-50" />
         <div className="absolute inset-0" style={{ backgroundImage:
-          "radial-gradient(800px 400px at 10% 15%, rgba(99,102,241,0.20), transparent 60%), radial-gradient(700px 350px at 85% 20%, rgba(236,72,153,0.18), transparent 60%), radial-gradient(600px 300px at 20% 85%, rgba(14,165,233,0.18), transparent 60%)" }} />
+          "radial-gradient(800px 400px at 10% 15%, rgba(99,102,241,0.20), transparent 60%), radial-gradient(700px 350px at 85% 20%, rgba(234,88,12,0.18), transparent 60%), radial-gradient(600px 300px at 20% 85%, rgba(37,99,235,0.18), transparent 60%)" }} />
         <div className="absolute -top-24 -left-24 h-80 w-80 rounded-full bg-indigo-400/25 blur-3xl" />
-        <div className="absolute -bottom-28 -right-28 h-96 w-96 rounded-full bg-fuchsia-400/25 blur-3xl" />
+        <div className="absolute -bottom-28 -right-28 h-96 w-96 rounded-full bg-orange-400/25 blur-3xl" />
       </div>
       <div className="fixed top-6 left-6 z-10">
         <Link href={LANDING_URL} aria-label="Ir a la landing">
@@ -74,14 +74,14 @@ function ResetForm() {
         <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
           <Card className="bg-white/90 backdrop-blur-sm shadow-lg ring-1 ring-black/5">
             <CardHeader>
-              <CardTitle className="bg-gradient-to-r from-indigo-800 via-fuchsia-700 to-cyan-600 bg-clip-text text-transparent">Restablecer contraseña</CardTitle>
+              <CardTitle className="bg-gradient-to-r from-indigo-800 via-orange-700 to-blue-600 bg-clip-text text-transparent">Restablecer contraseña</CardTitle>
               <CardDescription>Introduce el código recibido y tu nueva contraseña</CardDescription>
             </CardHeader>
             <CardContent>
               <form className="space-y-4" onSubmit={onSubmit} aria-busy={loading}>
                 <div className="space-y-2">
                   <Label htmlFor="email">Correo</Label>
-                  <Input id="email" name="email" type="email" defaultValue={presetEmail} aria-invalid={!!emailError} onChange={() => setEmailError(null)} placeholder="tu@correo.com" className={`${emailError ? "ring-2 ring-red-500" : ""} focus-visible:ring-indigo-500/60 focus-visible:ring-2 focus-visible:outline-none`} />
+                  <Input id="email" name="email" type="email" defaultValue={presetEmail} aria-invalid={!!emailError} onChange={() => setEmailError(null)} placeholder="tu@correo.com" className={`${emailError ? "ring-2 ring-red-500" : ""} focus-visible:ring-blue-600/60 focus-visible:ring-2 focus-visible:outline-none`} />
                   {emailError && <p className="text-xs text-red-600">{emailError}</p>}
                 </div>
                 <div className="space-y-2">
@@ -98,14 +98,14 @@ function ResetForm() {
                     placeholder="000000"
                     aria-invalid={!!codeError}
                     onChange={(e) => { e.currentTarget.value = e.currentTarget.value.replace(/\D/g, ""); setCodeError(null); }}
-                    className={`${codeError ? "ring-2 ring-red-500" : ""} focus-visible:ring-indigo-500/60 focus-visible:ring-2 focus-visible:outline-none`}
+                    className={`${codeError ? "ring-2 ring-red-500" : ""} focus-visible:ring-blue-600/60 focus-visible:ring-2 focus-visible:outline-none`}
                   />
                   {codeError && <p className="text-xs text-red-600">{codeError}</p>}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="password">Nueva contraseña</Label>
                   <div className="relative">
-                    <Input id="password" name="password" type={showPassword ? "text" : "password"} autoComplete="new-password" placeholder="••••••••" aria-invalid={!!passwordError} onChange={() => setPasswordError(null)} className={`${passwordError ? "ring-2 ring-red-500" : ""} pr-10 focus-visible:ring-indigo-500/60 focus-visible:ring-2 focus-visible:outline-none`} />
+                    <Input id="password" name="password" type={showPassword ? "text" : "password"} autoComplete="new-password" placeholder="••••••••" aria-invalid={!!passwordError} onChange={() => setPasswordError(null)} className={`${passwordError ? "ring-2 ring-red-500" : ""} pr-10 focus-visible:ring-blue-600/60 focus-visible:ring-2 focus-visible:outline-none`} />
                     <button type="button" onClick={() => setShowPassword(v => !v)} aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"} className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-gray-600 hover:text-gray-900">
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
@@ -113,7 +113,7 @@ function ResetForm() {
                   {passwordError && <p className="text-xs text-red-600">{passwordError}</p>}
                 </div>
 
-                <motion.button type="submit" disabled={loading} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full rounded-md bg-gradient-to-r from-indigo-600 to-fuchsia-600 px-4 py-2.5 text-white shadow-md hover:shadow-lg disabled:opacity-60">
+                <motion.button type="submit" disabled={loading} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full rounded-md bg-gradient-to-r from-indigo-700 via-orange-600 to-blue-700 px-4 py-2.5 text-white shadow-md hover:shadow-lg disabled:opacity-60">
                   {loading ? "Guardando..." : (<span className="inline-flex items-center gap-2">Restablecer <ArrowRight className="h-4 w-4" /></span>)}
                 </motion.button>
                 {error && (<p className="text-sm text-red-600" aria-live="polite">{error}</p>)}

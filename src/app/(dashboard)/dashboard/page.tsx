@@ -82,7 +82,7 @@ export default async function Page() {
             {me.plan === 'PREMIUM' ? (
               <div className="flex items-center justify-between text-sm">
                 <div>
-                  <span className="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700">Premium activo</span>
+                  <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">Premium activo</span>
                   <span className="ml-2 text-gray-600">Vence: {fmtDate(me.planExpires)}</span>
                 </div>
                 <Link href="/premium" className="underline">Gestionar</Link>
@@ -93,7 +93,7 @@ export default async function Page() {
                   <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">Plan GRATIS</span>
                   <span className="ml-2 text-gray-600">Tu trial termina: {fmtDate(me.trialEnds)}</span>
                   {typeof daysUntil(me.trialEnds) === 'number' && daysUntil(me.trialEnds)! <= 3 && (
-                    <span className="ml-2 inline-flex items-center rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-800">Quedan {daysUntil(me.trialEnds)} días</span>
+                    <span className="ml-2 inline-flex items-center rounded-full bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-800">Quedan {daysUntil(me.trialEnds)} días</span>
                   )}
                 </div>
                 <Link href="/premium" className="underline">Mejorar</Link>
@@ -102,8 +102,8 @@ export default async function Page() {
           </CardContent>
         </Card>
       )}
-      {/* Encabezado con acciones rápidas */}
-      <Card className="bg-gradient-to-r from-indigo-50 to-cyan-50 border border-black/5">
+      {/* Encabezado con acciones rápidas (paleta nueva) */}
+      <Card className="bg-gradient-to-r from-white via-gray-50 to-blue-100 border border-black/5">
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
             <div>
@@ -126,7 +126,7 @@ export default async function Page() {
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-semibold text-gray-700">Documentos subidos</CardTitle>
-              <FileText className="h-4 w-4 text-indigo-600" />
+              <FileText className="h-4 w-4 text-blue-600" />
             </div>
             <CardDescription className="text-xs">Últimos 30 días</CardDescription>
           </CardHeader>
@@ -150,7 +150,7 @@ export default async function Page() {
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-semibold text-gray-700">Gasto del mes</CardTitle>
-              <TrendingUp className="h-4 w-4 text-cyan-600" />
+              <TrendingUp className="h-4 w-4 text-blue-600" />
             </div>
             <CardDescription className="text-xs">Fuente: gastos creados</CardDescription>
           </CardHeader>
@@ -177,7 +177,7 @@ export default async function Page() {
               {items.slice(0, 5).map((it) => (
                 <li key={it.id} className="flex items-center justify-between px-2 py-2 text-sm hover:bg-gray-50 rounded">
                   <div className="flex items-center gap-2 min-w-0">
-                    <FileText className="h-4 w-4 text-indigo-600 flex-shrink-0" />
+                    <FileText className="h-4 w-4 text-blue-600 flex-shrink-0" />
                     <span className="max-w-[50%] truncate text-gray-800" title={it.summary || it.filename}>{it.filename}</span>
                   </div>
                   <span className="text-gray-500">{new Date(it.uploadedAt).toLocaleString()}</span>
@@ -210,7 +210,7 @@ export default async function Page() {
                       </div>
                       <div className="h-2 w-full rounded bg-gray-100">
                         <div
-                          className="h-2 rounded bg-gradient-to-r from-indigo-600 to-cyan-600 transition-all duration-300 ease-out"
+                          className="h-2 rounded bg-gradient-to-r from-indigo-700 via-orange-600 to-blue-700 transition-all duration-300 ease-out"
                           style={{ width: `${pct}%` }}
                           title={`${formatCurrency(c.total)} (${pct}%)`}
                         />
@@ -237,7 +237,7 @@ export default async function Page() {
                   return (
                     <div key={m.month} className="flex flex-col items-center">
                       <div
-                        className="w-4 rounded bg-gradient-to-b from-indigo-600 to-cyan-600 transition-all duration-300 ease-out"
+                        className="w-4 rounded bg-gradient-to-b from-indigo-700 via-orange-600 to-blue-700 transition-all duration-300 ease-out"
                         style={{ height: `${Math.max(pct, 2)}px` }}
                         title={`${formatCurrency(m.total)} (${pct}%)`}
                       />

@@ -17,6 +17,11 @@ export const metadata: Metadata = {
   description: "Dashboard web para facturas/boletas con IA y presupuesto",
 };
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+} as const;
+
 export default function RootLayout({
   children,
 }: Readonly<{

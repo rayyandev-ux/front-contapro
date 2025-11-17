@@ -65,8 +65,8 @@ export default function Page() {
 
   const typeBadge = (type: Expense["type"]) =>
     type === "FACTURA"
-      ? "bg-indigo-50 text-indigo-700 ring-indigo-200"
-      : "bg-emerald-50 text-emerald-700 ring-emerald-200";
+      ? "bg-blue-50 text-blue-700 ring-blue-200"
+      : "bg-orange-50 text-orange-700 ring-orange-200";
 
   const onDelete = async (id: string) => {
     const yes = confirm("¿Eliminar este gasto?");
@@ -91,7 +91,7 @@ export default function Page() {
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
             <div className="space-y-1">
               <label className="text-xs font-medium text-gray-700">Tipo</label>
-              <select className="border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-200" value={filters.type || ""} onChange={e => setFilters(f => ({ ...f, type: e.target.value || undefined }))}>
+              <select className="border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-200" value={filters.type || ""} onChange={e => setFilters(f => ({ ...f, type: e.target.value || undefined }))}>
                 <option value="">Todos</option>
                 <option value="FACTURA">Factura</option>
                 <option value="BOLETA">Boleta</option>
@@ -99,11 +99,11 @@ export default function Page() {
             </div>
             <div className="space-y-1">
               <label className="text-xs font-medium text-gray-700">Proveedor</label>
-              <input className="border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-200" placeholder="Proveedor" value={filters.provider || ""} onChange={e => setFilters(f => ({ ...f, provider: e.target.value || undefined }))} />
+              <input className="border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-200" placeholder="Proveedor" value={filters.provider || ""} onChange={e => setFilters(f => ({ ...f, provider: e.target.value || undefined }))} />
             </div>
             <div className="space-y-1">
               <label className="text-xs font-medium text-gray-700">Categoría</label>
-              <select className="border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-200" value={filters.categoryId || ""} onChange={e => setFilters(f => ({ ...f, categoryId: e.target.value || undefined }))}>
+              <select className="border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-200" value={filters.categoryId || ""} onChange={e => setFilters(f => ({ ...f, categoryId: e.target.value || undefined }))}>
                 <option value="">Todas</option>
                 {categories.map(c => (
                   <option key={c.id} value={c.id}>{c.name}</option>

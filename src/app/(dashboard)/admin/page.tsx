@@ -12,6 +12,7 @@ export default function Page() {
   const [error, setError] = useState<string | null>(null);
   const [planByUser, setPlanByUser] = useState<Record<string, "FREE" | "PREMIUM">>({});
   const [expiresByUser, setExpiresByUser] = useState<Record<string, string>>({});
+  const [clearingCache, setClearingCache] = useState(false);
 
   async function load() {
     setLoading(true);
@@ -79,10 +80,28 @@ export default function Page() {
     return d.toLocaleDateString();
   };
 
+  async function clearCache() {
+    if (clearingCache) return;
+    setClearingCache(true);
+    const res = await apiJson<{ deleted: number }>("/api/admin/cache/clear", { method: "POST" });
+    setClearingCache(false);
+    if (!res.ok) {
+      alert(res.error || "No se pudo limpiar la caché");
+      return;
+    }
+    const count = Number((res.data as any)?.deleted ?? 0);
+    alert(`Caché limpiada. Entradas eliminadas: ${count}`);
+  }
+
   return (
     <section>
       <h1 className="text-2xl font-semibold mb-4">Panel de administrador</h1>
-      <p className="text-sm text-muted-foreground mb-6">Gestión de usuarios y suscripciones (Free/Premium).</p>
+      <div className="mb-6 flex items-center justify-between">
+        <p className="text-sm text-muted-foreground">Gestión de usuarios y suscripciones (Free/Premium).</p>
+        <Button size="sm" variant="outline" onClick={clearCache} disabled={clearingCache}>
+          {clearingCache ? "Limpiando…" : "Borrar caché"}
+        </Button>
+      </div>
       <Table>
         <TableHeader>
           <TableRow>

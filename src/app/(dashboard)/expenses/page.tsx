@@ -149,7 +149,7 @@ export default function Page() {
                 )}
                 {items.map(it => (
                   <TableRow key={it.id} className="hover:bg-muted/50">
-                    <TableCell className="whitespace-nowrap">{new Date(it.issuedAt).toLocaleDateString()}</TableCell>
+                    <TableCell className="whitespace-nowrap">{new Date(it.issuedAt).toLocaleDateString('es-PE')}</TableCell>
                     <TableCell>
                       <span className={`inline-flex rounded-md px-2 py-0.5 text-xs ring-1 ${typeBadge(it.type)}`}>
                         {it.type}

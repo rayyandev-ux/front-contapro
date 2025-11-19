@@ -27,7 +27,7 @@ export default function Page() {
   const fmtDate = (iso?: string | null) => {
     if (!iso) return "—";
     const d = new Date(iso);
-    return d.toLocaleDateString();
+    return d.toLocaleDateString('es-PE');
   };
 
   const isPremium = String(user?.plan || '').toUpperCase() === 'PREMIUM';

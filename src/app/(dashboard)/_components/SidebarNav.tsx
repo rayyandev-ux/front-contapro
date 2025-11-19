@@ -15,6 +15,7 @@ import {
 
 type Props = {
   isAdmin?: boolean;
+  onNavigate?: () => void;
 };
 
 type NavItem = {
@@ -35,7 +36,7 @@ const items: NavItem[] = [
   { href: "/admin", label: "Admin", Icon: Shield, adminOnly: true },
 ];
 
-export default function SidebarNav({ isAdmin }: Props) {
+export default function SidebarNav({ isAdmin, onNavigate }: Props) {
   const pathname = usePathname();
   const list = items.filter((i) => !i.adminOnly || isAdmin);
 
@@ -52,7 +53,7 @@ export default function SidebarNav({ isAdmin }: Props) {
             "text-muted-foreground hover:bg-muted hover:text-foreground border-transparent hover:border-primary/30";
           return (
             <li key={href}>
-              <Link href={href} className={`${base} ${isActive ? active : inactive}`}>
+              <Link href={href} onClick={() => onNavigate?.()} className={`${base} ${isActive ? active : inactive}`}>
                 <Icon
                   className={`h-4 w-4 ${
                     isActive

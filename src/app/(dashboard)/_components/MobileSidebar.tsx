@@ -43,7 +43,7 @@ export default function MobileSidebar({ isAdmin }: { isAdmin?: boolean }) {
                   Cerrar
                 </button>
               </div>
-              <SidebarNav isAdmin={isAdmin} />
+              <SidebarNav isAdmin={isAdmin} onNavigate={() => setOpen(false)} />
               <div className="my-3 h-px bg-border" />
               <div className="flex items-center justify-between px-1 mb-2">
                 <span className="text-xs text-muted-foreground">Acciones</span>

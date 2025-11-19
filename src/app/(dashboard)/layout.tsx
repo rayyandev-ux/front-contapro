@@ -17,7 +17,10 @@ export default async function DashboardLayout({ children }: { children: ReactNod
   let user: { name?: string | null; email?: string | null } | undefined;
   try {
     const BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8080";
-    const res = await fetch(`${BASE}/api/auth/me`, { headers: { cookie: cookieHeader } });
+    const res = await fetch(`${BASE}/api/auth/me`, {
+      headers: { cookie: cookieHeader },
+      next: { revalidate: 60, tags: ['auth-me'] },
+    });
     authenticated = res.ok;
     if (res.ok) {
       const data = await res.json();

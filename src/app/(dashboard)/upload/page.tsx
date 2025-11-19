@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { apiMultipart } from "@/lib/api";
+import { apiJson, apiMultipart } from "@/lib/api";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { UploadCloud, FileText, Image as ImageIcon, AlertTriangle, Loader2, X } from "lucide-react";
 
@@ -47,8 +47,44 @@ export default function Page() {
       if (!ok) {
         setError(error || "Error al subir");
       } else {
-        const expenseId = (data as any)?.expenseId;
-        setResult(String((data as any)?.summary));
+        const payload: any = data || {};
+        const expenseId: string | undefined = payload?.expenseId;
+        const queued: boolean = Boolean(payload?.queued);
+        const messageText: string = typeof payload?.message === "string" ? payload.message : "";
+        const summaryTextRaw: any = payload?.summary ?? payload?.json?.summary;
+        const summaryText: string = typeof summaryTextRaw === "string" ? summaryTextRaw : "";
+        const documentId: string | undefined = payload?.documentId;
+
+        if (queued) {
+          // Cuando el backend encola el análisis (202), no hay resumen inmediato
+          setResult(messageText || "Documento en cola de análisis. Te avisaremos cuando esté listo.");
+          // Intentar redirigir automáticamente cuando el gasto esté listo
+          if (documentId) {
+            // Poll: consultar lista de gastos hasta encontrar el vinculado al documento
+            (async () => {
+              const maxAttempts = 30; // ~90s si interval=3s
+              const intervalMs = 3000;
+              for (let attempt = 0; attempt < maxAttempts; attempt++) {
+                const res = await apiJson<{ ok: boolean; items: Array<any> }>(`/api/expenses?t=${Date.now()}`);
+                if (res.ok && Array.isArray(res.data?.items)) {
+                  const match = res.data!.items.find(it => it?.document?.id === documentId);
+                  if (match?.id) {
+                    window.location.href = `/expenses/${match.id}`;
+                    return;
+                  }
+                }
+                await new Promise(r => setTimeout(r, intervalMs));
+              }
+              // Si no se encuentra en tiempo razonable, dejar el mensaje y no redirigir
+            })();
+          }
+        } else if (summaryText) {
+          setResult(summaryText);
+        } else {
+          // Evitar mostrar "undefined" si no hay resumen
+          setResult(null);
+        }
+
         if (expenseId) {
           // Redirigir automáticamente al detalle del gasto creado
           window.location.href = `/expenses/${expenseId}`;

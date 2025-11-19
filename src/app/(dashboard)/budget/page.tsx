@@ -20,7 +20,10 @@ export default async function Page() {
   let currencyCode = 'PEN';
   try {
     // Usamos source=created para que el presupuesto descuente por fecha de registro
-    const res = await fetch(`${BASE}/api/budget?source=created`, { headers: { cookie: cookieHeader } });
+    const res = await fetch(`${BASE}/api/budget?source=created`, {
+      headers: { cookie: cookieHeader },
+      next: { revalidate: 300, tags: ['budget-current'] },
+    });
     if (!res.ok) throw new Error(`Error ${res.status}`);
     const d = await res.json();
     amount = Number(d?.budget?.amount ?? 0);
@@ -45,6 +48,7 @@ export default async function Page() {
     const payload: any = { month: now.getMonth() + 1, year: now.getFullYear(), amount };
     if (currency) payload.currency = currency;
     await fetch(`${BASE}/api/budget`, { method: "POST", headers: { "Content-Type": "application/json", cookie: cookieHeader }, body: JSON.stringify(payload) });
+    // Invalidar cachés relacionadas
     revalidatePath("/budget");
   }
 
@@ -58,6 +62,7 @@ export default async function Page() {
     // Incluimos solo el umbral; el backend usa valores actuales para los demás campos
     const payload = { month: now.getMonth() + 1, year: now.getFullYear(), alertThreshold: threshold } as any;
     await fetch(`${BASE}/api/budget`, { method: "POST", headers: { "Content-Type": "application/json", cookie: cookieHeader }, body: JSON.stringify(payload) });
+    // Invalidar cachés relacionadas
     revalidatePath("/budget");
   }
 

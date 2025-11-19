@@ -11,7 +11,10 @@ export default async function Page() {
   // Datos reales: historial de documentos del usuario
   let items: Array<{ id: string; filename: string; uploadedAt: string; summary?: string; total?: number }> = [];
   try {
-    const resHistory = await fetch(`${BASE}/api/history`, { headers: { cookie: cookieHeader } });
+    const resHistory = await fetch(`${BASE}/api/history`, {
+      headers: { cookie: cookieHeader },
+      next: { revalidate: 300, tags: ['dashboard-history'] },
+    });
     if (resHistory.ok) {
       const data = await resHistory.json();
       items = data.items || [];
@@ -22,14 +25,20 @@ export default async function Page() {
   let byCategory: Array<{ category: string; total: number }> = [];
   let byMonth: Array<{ month: number; total: number }> = [];
   try {
-    const resCat = await fetch(`${BASE}/api/stats/expenses/by-category`, { headers: { cookie: cookieHeader } });
+    const resCat = await fetch(`${BASE}/api/stats/expenses/by-category`, {
+      headers: { cookie: cookieHeader },
+      next: { revalidate: 300, tags: ['dashboard-stats-category'] },
+    });
     if (resCat.ok) {
       const data = await resCat.json();
       byCategory = data.items || [];
     }
   } catch {}
   try {
-    const resMon = await fetch(`${BASE}/api/stats/expenses/by-month`, { headers: { cookie: cookieHeader } });
+    const resMon = await fetch(`${BASE}/api/stats/expenses/by-month`, {
+      headers: { cookie: cookieHeader },
+      next: { revalidate: 300, tags: ['dashboard-stats-month'] },
+    });
     if (resMon.ok) {
       const data = await resMon.json();
       byMonth = data.items || [];
@@ -39,7 +48,10 @@ export default async function Page() {
   // Total del mes (creado): más útil si los documentos tienen issuedAt antiguo
   let totalMonth = 0;
   try {
-    const resBudget = await fetch(`${BASE}/api/budget?source=created`, { headers: { cookie: cookieHeader } });
+    const resBudget = await fetch(`${BASE}/api/budget?source=created`, {
+      headers: { cookie: cookieHeader },
+      next: { revalidate: 300, tags: ['budget-current'] },
+    });
     if (resBudget.ok) {
       const data = await resBudget.json();
       totalMonth = (data?.spent ?? 0) as number;
@@ -53,7 +65,10 @@ export default async function Page() {
   // Estado de suscripción para banner
   let me: { plan?: string; trialEnds?: string | null; planExpires?: string | null } | null = null;
   try {
-    const resMe = await fetch(`${BASE}/api/auth/me`, { headers: { cookie: cookieHeader } });
+    const resMe = await fetch(`${BASE}/api/auth/me`, {
+      headers: { cookie: cookieHeader },
+      next: { revalidate: 60, tags: ['auth-me'] },
+    });
     if (resMe.ok) {
       const data = await resMe.json();
       me = data?.user || null;

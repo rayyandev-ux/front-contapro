@@ -9,7 +9,10 @@ export default async function ExpenseDetail({ params }: { params: Promise<{ id: 
   const cookieStore = await cookies();
   const token = cookieStore.get("session")?.value;
   const BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8080";
-  const res = await fetch(`${BASE}/api/expenses/${id}`, { headers: token ? { cookie: `session=${token}` } : undefined });
+  const res = await fetch(`${BASE}/api/expenses/${id}`, {
+    headers: token ? { cookie: `session=${token}` } : undefined,
+    next: { revalidate: 300, tags: ['expense', id] },
+  });
   if (!res.ok) {
     return (
       <section>

@@ -6,7 +6,6 @@ export async function GET() {
   const BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8080";
   const res = await fetch(`${BASE}/api/integrations/whatsapp/status`, {
     headers: { cookie: cookieHeader },
-    next: { revalidate: 300, tags: ['integration-whatsapp-status'] },
   });
   const data = await res.json().catch(() => ({}));
   return new Response(JSON.stringify(data), { status: res.status, headers: { "Content-Type": "application/json" } });

@@ -40,6 +40,7 @@ RUN npm ci --omit=dev
 # Copy built app assets
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
+RUN mkdir -p /app/.next/cache && chown -R node:node /app/.next
 
 EXPOSE 3000
 

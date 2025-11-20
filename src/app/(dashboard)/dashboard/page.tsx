@@ -8,12 +8,28 @@ export default async function Page() {
   const cookieHeader = cookieStore.getAll().map(c => `${c.name}=${c.value}`).join("; ");
   const BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8080";
 
+  // Estado de suscripción y preferencias
+  let me: { plan?: string; trialEnds?: string | null; planExpires?: string | null; preferredCurrency?: string; dateFormat?: 'DMY' | 'MDY' } | null = null;
+  try {
+    const resMe = await fetch(`${BASE}/api/auth/me`, {
+      headers: { cookie: cookieHeader },
+      cache: 'no-store',
+      next: { tags: ['auth-me'] },
+    });
+    if (resMe.ok) {
+      const data = await resMe.json();
+      me = data?.user || null;
+    }
+  } catch {}
+  const currency = me?.preferredCurrency || 'PEN';
+
   // Datos reales: historial de documentos del usuario
   let items: Array<{ id: string; filename: string; uploadedAt: string; summary?: string; total?: number }> = [];
   try {
     const resHistory = await fetch(`${BASE}/api/history`, {
       headers: { cookie: cookieHeader },
-      next: { revalidate: 300, tags: ['dashboard-history'] },
+      cache: 'no-store',
+      next: { tags: ['dashboard-history'] },
     });
     if (resHistory.ok) {
       const data = await resHistory.json();
@@ -25,9 +41,10 @@ export default async function Page() {
   let byCategory: Array<{ category: string; total: number }> = [];
   let byMonth: Array<{ month: number; total: number }> = [];
   try {
-    const resCat = await fetch(`${BASE}/api/stats/expenses/by-category`, {
+    const resCat = await fetch(`${BASE}/api/stats/expenses/by-category?source=created`, {
       headers: { cookie: cookieHeader },
-      next: { revalidate: 300, tags: ['dashboard-stats-category'] },
+      cache: 'no-store',
+      next: { tags: ['dashboard-stats-category'] },
     });
     if (resCat.ok) {
       const data = await resCat.json();
@@ -35,13 +52,27 @@ export default async function Page() {
     }
   } catch {}
   try {
-    const resMon = await fetch(`${BASE}/api/stats/expenses/by-month`, {
+    const resMon = await fetch(`${BASE}/api/stats/expenses/by-month?source=created`, {
       headers: { cookie: cookieHeader },
-      next: { revalidate: 300, tags: ['dashboard-stats-month'] },
+      cache: 'no-store',
+      next: { tags: ['dashboard-stats-month'] },
     });
     if (resMon.ok) {
       const data = await resMon.json();
       byMonth = data.items || [];
+    }
+  } catch {}
+
+  let byMonthBudget: Array<{ month: number; budget: number; spent: number; remaining: number; currency: string }> = [];
+  try {
+    const res = await fetch(`${BASE}/api/stats/budget/by-month?source=created`, {
+      headers: { cookie: cookieHeader },
+      cache: 'no-store',
+      next: { tags: ['dashboard-budget-month'] },
+    });
+    if (res.ok) {
+      const data = await res.json();
+      byMonthBudget = data.items || [];
     }
   } catch {}
 
@@ -50,7 +81,8 @@ export default async function Page() {
   try {
     const resBudget = await fetch(`${BASE}/api/budget?source=created`, {
       headers: { cookie: cookieHeader },
-      next: { revalidate: 300, tags: ['budget-current'] },
+      cache: 'no-store',
+      next: { tags: ['budget-current'] },
     });
     if (resBudget.ok) {
       const data = await resBudget.json();
@@ -58,27 +90,22 @@ export default async function Page() {
     }
   } catch {}
 
-  const formatCurrency = (n: number) => new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'USD' }).format(n);
+  const formatCurrency = (n: number) => new Intl.NumberFormat('es-PE', { style: 'currency', currency }).format(n);
+  const fmt = (n: number) => new Intl.NumberFormat('es-PE', { style: 'currency', currency }).format(n);
   const maxCat = byCategory.length > 0 ? Math.max(...byCategory.map(c => c.total)) : 0;
   const maxMonth = byMonth.length > 0 ? Math.max(...byMonth.map(m => m.total)) : 0;
   
-  // Estado de suscripción para banner
-  let me: { plan?: string; trialEnds?: string | null; planExpires?: string | null } | null = null;
-  try {
-    const resMe = await fetch(`${BASE}/api/auth/me`, {
-      headers: { cookie: cookieHeader },
-      next: { revalidate: 60, tags: ['auth-me'] },
-    });
-    if (resMe.ok) {
-      const data = await resMe.json();
-      me = data?.user || null;
-    }
-  } catch {}
 
   const fmtDate = (iso?: string | null) => {
     if (!iso) return '—';
     const d = new Date(iso);
-    return d.toLocaleString();
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const yyyy = d.getFullYear();
+    const hh = String(d.getHours()).padStart(2, '0');
+    const min = String(d.getMinutes()).padStart(2, '0');
+    const datePart = (me?.dateFormat || 'DMY') === 'MDY' ? `${mm}/${dd}/${yyyy}` : `${dd}/${mm}/${yyyy}`;
+    return `${datePart} ${hh}:${min}`;
   };
   const daysUntil = (iso?: string | null) => {
     if (!iso) return null;
@@ -127,7 +154,7 @@ export default async function Page() {
             </div>
             <Link
               href="/upload"
-              className="inline-flex w-full sm:w-auto items-center gap-2 rounded-md bg-primary px-4 py-2 text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
+              className="btn-important w-full sm:w-auto"
             >
               <Upload className="h-4 w-4" /> Subir documento
             </Link>
@@ -260,6 +287,34 @@ export default async function Page() {
                     </div>
                   );
                 })}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+        <Card className="shadow-lg ring-1 ring-border">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-semibold">Presupuesto vs Gastos (año actual)</CardTitle>
+            <CardDescription className="text-xs">Comparativa mensual</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {byMonthBudget.length === 0 ? (
+              <p className="text-xs text-muted-foreground">Sin datos</p>
+            ) : (
+              <div className="grid grid-cols-1 gap-1 text-xs">
+                <div className="grid grid-cols-4 font-medium text-muted-foreground">
+                  <div>Mes</div>
+                  <div>Presupuesto</div>
+                  <div>Gastos</div>
+                  <div>Saldo</div>
+                </div>
+                {byMonthBudget.map((m) => (
+                  <div key={m.month} className="grid grid-cols-4">
+                    <div>{String(m.month).padStart(2, '0')}</div>
+                    <div className="text-indigo-700">{fmt(m.budget)}</div>
+                    <div className="text-slate-700">{fmt(m.spent)}</div>
+                    <div className={m.remaining < 0 ? 'text-red-700' : 'text-emerald-700'}>{fmt(m.remaining)}</div>
+                  </div>
+                ))}
               </div>
             )}
           </CardContent>

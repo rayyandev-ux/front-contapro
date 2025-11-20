@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { apiJson } from "@/lib/api";
+import { apiJson, invalidateApiCache } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -17,11 +17,17 @@ type MeUser = {
   emailVerified?: boolean;
   trialEnds?: string | null;
   planExpires?: string | null;
+  preferredCurrency?: 'PEN' | 'USD' | 'EUR';
+  dateFormat?: 'DMY' | 'MDY';
 };
 
 export default function AccountPage() {
   const [user, setUser] = useState<MeUser | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState<string | null>(null);
+  const [original, setOriginal] = useState<{ preferredCurrency?: 'PEN' | 'USD' | 'EUR'; dateFormat?: 'DMY' | 'MDY' } | null>(null);
+  
 
   useEffect(() => {
     (async () => {
@@ -31,8 +37,14 @@ export default function AccountPage() {
         return;
       }
       setUser(res.data!.user);
+      const u = res.data!.user;
+      setOriginal({ preferredCurrency: u.preferredCurrency, dateFormat: u.dateFormat });
     })();
   }, []);
+
+  const dirty = !!user && !!original && (
+    user.preferredCurrency !== original.preferredCurrency || user.dateFormat !== original.dateFormat
+  );
 
   const fmtDate = (iso?: string | null) => {
     if (!iso) return "—";
@@ -74,23 +86,24 @@ export default function AccountPage() {
     );
   };
 
-  const subAccent = (user?.plan || "").toUpperCase() === "PREMIUM" ? "border-amber-500" : "border-slate-400";
-  const secAccent = user?.emailVerified ? "border-emerald-500" : "border-rose-500";
+  const subAccent = (user?.plan || "").toUpperCase() === "PREMIUM" ? "text-amber-600" : "text-slate-600";
+  const secAccent = user?.emailVerified ? "text-emerald-600" : "text-rose-600";
 
   return (
     <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold tracking-tight">Cuenta</h1>
-        <p className="text-sm text-muted-foreground">Información de tu perfil y estado</p>
-      </div>
-      {error && <p className="mb-6 text-sm text-red-600" aria-live="polite">{error}</p>}
+      <div className="max-w-6xl mx-auto px-6 md:px-8 py-6 md:py-8">
+        <div className="mb-6">
+          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Cuenta</h1>
+          <p className="text-sm text-muted-foreground">Información de tu perfil y estado</p>
+        </div>
+        {error && <p className="mb-6 text-sm text-red-600" aria-live="polite">{error}</p>}
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
         {/* Perfil */}
-        <Card className={`bg-card backdrop-blur-sm shadow-lg ring-1 ring-border border-l-4 border-indigo-500`}>
+        <Card className={`bg-card border shadow-sm`}>
           <CardHeader>
             <div className="flex items-start gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-500 ring-1 ring-indigo-500/20">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted text-indigo-600">
                 <User className="h-5 w-5" />
               </div>
               <div>
@@ -117,11 +130,74 @@ export default function AccountPage() {
           </CardContent>
         </Card>
 
-        {/* Suscripción */}
-        <Card className={`bg-card backdrop-blur-sm shadow-lg ring-1 ring-border border-l-4 ${subAccent}`}>
+        {/* Configuraciones */}
+        <Card className={`bg-card border shadow-sm`}>
           <CardHeader>
             <div className="flex items-start gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-500/10 text-amber-500 ring-1 ring-amber-500/20">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted text-blue-600">
+                <CalendarDays className="h-5 w-5" />
+              </div>
+              <div>
+                <CardTitle>Configuraciones</CardTitle>
+                <CardDescription>Moneda y formato de fecha</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4 text-sm">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <Label>Moneda preferida</Label>
+                <select
+                  className="mt-1 w-full h-9 rounded-md border border-input bg-transparent px-3 text-sm focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                  value={user?.preferredCurrency || 'PEN'}
+                  onChange={(e) => setUser(u => u ? { ...u, preferredCurrency: e.target.value as MeUser['preferredCurrency'] } : u)}
+                >
+                  <option value="PEN">PEN (S/)</option>
+                  <option value="USD">USD ($)</option>
+                  <option value="EUR">EUR (€)</option>
+                </select>
+              </div>
+              <div>
+                <Label>Formato de fecha</Label>
+                <select
+                  className="mt-1 w-full h-9 rounded-md border border-input bg-transparent px-3 text-sm focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                  value={user?.dateFormat || 'DMY'}
+                  onChange={(e) => setUser(u => u ? { ...u, dateFormat: e.target.value as MeUser['dateFormat'] } : u)}
+                >
+                  <option value="DMY">Día/Mes/Año</option>
+                  <option value="MDY">Mes/Día/Año</option>
+                </select>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <Button
+                disabled={saving || !dirty}
+                onClick={async () => {
+                  if (!user) return;
+                  setSaving(true); setSaved(null);
+                  const payload: { preferredCurrency?: MeUser['preferredCurrency']; dateFormat?: MeUser['dateFormat'] } = { preferredCurrency: user.preferredCurrency, dateFormat: user.dateFormat };
+                  const res = await apiJson<{ ok: boolean; user: Partial<MeUser> }>("/api/auth/preferences", { method: 'PATCH', body: JSON.stringify(payload) });
+                  setSaving(false);
+                  if (!res.ok) { setSaved(res.error || 'Error al guardar'); return; }
+                  setUser(prev => prev ? { ...prev, ...res.data!.user } : prev);
+                  setOriginal({ preferredCurrency: res.data!.user.preferredCurrency as MeUser['preferredCurrency'], dateFormat: res.data!.user.dateFormat as MeUser['dateFormat'] });
+                  setSaved('Guardado');
+                  try { invalidateApiCache('/api/auth'); } catch {}
+                  setTimeout(() => setSaved(null), 2000);
+                }}
+              >
+                Guardar
+              </Button>
+              {saved && <span className="text-xs text-muted-foreground">{saved}</span>}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Suscripción */}
+        <Card className={`bg-card border shadow-sm`}>
+          <CardHeader>
+            <div className="flex items-start gap-3">
+              <div className={`flex h-9 w-9 items-center justify-center rounded-lg bg-muted ${subAccent}`}>
                 <Crown className="h-5 w-5" />
               </div>
               <div>
@@ -137,7 +213,7 @@ export default function AccountPage() {
                 {planChip(user?.plan)}
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="flex items-start gap-2">
                 <CalendarDays className="mt-0.5 h-4 w-4 text-slate-500" />
                 <div>
@@ -164,10 +240,10 @@ export default function AccountPage() {
         </Card>
 
         {/* Seguridad */}
-        <Card className={`bg-card backdrop-blur-sm shadow-lg ring-1 ring-border border-l-4 ${secAccent}`}>
+        <Card className={`bg-card border shadow-sm`}>
           <CardHeader>
             <div className="flex items-start gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-500 ring-1 ring-emerald-500/20">
+              <div className={`flex h-9 w-9 items-center justify-center rounded-lg bg-muted ${secAccent}`}>
                 <ShieldCheck className="h-5 w-5" />
               </div>
               <div>
@@ -201,6 +277,8 @@ export default function AccountPage() {
             </div>
           </CardContent>
         </Card>
+
+        </div>
       </div>
     </motion.div>
   );

@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import Image from "next/image";
 import UserDropdown from "@/components/UserDropdown";
+import RealtimeRefresh from "@/components/RealtimeRefresh";
 import ThemeToggle from "@/components/ThemeToggle";
 import { ReactNode } from "react";
 import SidebarNav from "./_components/SidebarNav";
@@ -45,7 +46,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
       {/* Header */}
       <header className="sticky top-0 z-20 border-b border-border bg-card/80 backdrop-blur-lg shadow-sm">
         <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-6">
-          <div className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2">
             <Image
               src="/logo.png"
               width={24}
@@ -57,7 +58,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
             />
             <span className="font-semibold tracking-tight">ContaPRO</span>
             <span className="text-sm text-muted-foreground">Dashboard</span>
-          </div>
+          </Link>
           <div className="flex items-center gap-3">
             <div className="hidden sm:flex items-center gap-3">
               {premiumActive ? (
@@ -80,7 +81,8 @@ export default async function DashboardLayout({ children }: { children: ReactNod
         </aside>
 
         {/* Main content */}
-        <main className="rounded-xl border border-border bg-card p-6 shadow-lg ring-1 ring-border backdrop-blur-sm pb-20 md:pb-0">
+        <main className="rounded-xl border border-border bg-card p-6 shadow-lg ring-1 ring-border backdrop-blur-sm pb-32">
+          <RealtimeRefresh />
           {children}
         </main>
       </div>

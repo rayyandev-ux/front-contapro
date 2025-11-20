@@ -16,6 +16,7 @@ import {
 type Props = {
   isAdmin?: boolean;
   onNavigate?: () => void;
+  mobileOnly?: boolean;
 };
 
 type NavItem = {
@@ -36,9 +37,12 @@ const items: NavItem[] = [
   { href: "/admin", label: "Admin", Icon: Shield, adminOnly: true },
 ];
 
-export default function SidebarNav({ isAdmin, onNavigate }: Props) {
+export default function SidebarNav({ isAdmin, onNavigate, mobileOnly }: Props) {
   const pathname = usePathname();
-  const list = items.filter((i) => !i.adminOnly || isAdmin);
+  let list = items.filter((i) => !i.adminOnly || isAdmin);
+  if (mobileOnly) {
+    list = list.filter((i) => i.href === '/integrations' || i.href === '/account' || i.href === '/admin');
+  }
 
   return (
     <nav className="text-sm">

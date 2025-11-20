@@ -43,32 +43,32 @@ export default function MobileNav({ dashboardHref }: { dashboardHref: string }) 
               <nav className="text-sm">
                 <ul className="space-y-1">
                 <li>
-                  <a href="#features" className="flex items-center justify-between rounded-md px-3 py-2 hover:bg-muted">
+                  <a href="#features" className="flex items-center justify-between rounded-md px-3 py-2 hover:bg-muted" onClick={() => setOpen(false)}>
                     Características
                     <ChevronRight className="h-4 w-4 text-muted-foreground" />
                   </a>
                 </li>
                 <li>
-                  <a href="#how" className="flex items-center justify-between rounded-md px-3 py-2 hover:bg-muted">
+                  <a href="#how" className="flex items-center justify-between rounded-md px-3 py-2 hover:bg-muted" onClick={() => setOpen(false)}>
                     Cómo funciona
                     <ChevronRight className="h-4 w-4 text-muted-foreground" />
                   </a>
                 </li>
                 <li>
-                  <a href="#integrations" className="flex items-center justify-between rounded-md px-3 py-2 hover:bg-muted">
+                  <a href="#integrations" className="flex items-center justify-between rounded-md px-3 py-2 hover:bg-muted" onClick={() => setOpen(false)}>
                     Integraciones
                     <ChevronRight className="h-4 w-4 text-muted-foreground" />
                   </a>
                 </li>
                 <li>
-                  <a href="#pricing" className="flex items-center justify-between rounded-md px-3 py-2 hover:bg-muted">
+                  <a href="#pricing" className="flex items-center justify-between rounded-md px-3 py-2 hover:bg-muted" onClick={() => setOpen(false)}>
                     Precios
                     <ChevronRight className="h-4 w-4 text-muted-foreground" />
                   </a>
                 </li>
                 {dashboardHref === "/dashboard" ? (
                   <li>
-                    <Link href="/dashboard" className="flex items-center justify-between rounded-md bg-primary px-3 py-2 text-primary-foreground hover:bg-primary/90">
+                    <Link href="/dashboard" className="flex items-center justify-between rounded-md bg-primary px-3 py-2 text-primary-foreground hover:bg-primary/90" onClick={() => setOpen(false)}>
                       Ir al dashboard
                       <ChevronRight className="h-4 w-4 text-primary-foreground/70" />
                     </Link>
@@ -76,13 +76,13 @@ export default function MobileNav({ dashboardHref }: { dashboardHref: string }) 
                 ) : (
                   <>
                     <li>
-                      <Link href="/login" className="flex items-center justify-between rounded-md px-3 py-2 hover:bg-muted">
+                      <Link href="/login" className="flex items-center justify-between rounded-md px-3 py-2 hover:bg-muted" onClick={() => setOpen(false)}>
                         Acceder
                         <ChevronRight className="h-4 w-4 text-muted-foreground" />
                       </Link>
                     </li>
                     <li>
-                      <Link href="/register" className="flex items-center justify-between rounded-md bg-gradient-to-r from-indigo-700 via-orange-600 to-blue-700 px-3 py-2 text-white shadow-sm hover:opacity-95">
+                      <Link href="/register" className="flex items-center justify-between rounded-md bg-gradient-to-r from-indigo-700 via-orange-600 to-blue-700 px-3 py-2 text-white shadow-sm hover:opacity-95" onClick={() => setOpen(false)}>
                         Crear cuenta
                         <ChevronRight className="h-4 w-4 text-white/80" />
                       </Link>

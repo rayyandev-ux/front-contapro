@@ -38,6 +38,15 @@ export async function POST(req: Request) {
       orderId = form.get('commerceOrder') || form.get('orderId') || orderId;
     }
     const url = buildSuccessUrl(req, token, orderId);
+    try {
+      const BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8080';
+      const cookieHeader = req.headers.get('cookie') || '';
+      if (orderId) {
+        await fetch(`${BASE}/api/payments/flow/confirm/order`, { method: 'POST', headers: { 'content-type': 'application/json', ...(cookieHeader ? { cookie: cookieHeader } : {}) }, body: JSON.stringify({ orderId }) }).catch(() => {});
+      } else if (token) {
+        await fetch(`${BASE}/api/payments/flow/confirm`, { method: 'POST', headers: { 'content-type': 'application/json', ...(cookieHeader ? { cookie: cookieHeader } : {}) }, body: JSON.stringify({ token }) }).catch(() => {});
+      }
+    } catch {}
     return NextResponse.redirect(url, { status: 302 });
   } catch {
     return NextResponse.json({ ok: true }, { status: 200 });
@@ -49,6 +58,15 @@ export async function GET(req: Request) {
   const token = u.searchParams.get('token') || '';
   const orderId = u.searchParams.get('orderId') || '';
   const url = buildSuccessUrl(req, token || undefined, orderId || undefined);
+  try {
+    const BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8080';
+    const cookieHeader = req.headers.get('cookie') || '';
+    if (orderId) {
+      await fetch(`${BASE}/api/payments/flow/confirm/order`, { method: 'POST', headers: { 'content-type': 'application/json', ...(cookieHeader ? { cookie: cookieHeader } : {}) }, body: JSON.stringify({ orderId }) }).catch(() => {});
+    } else if (token) {
+      await fetch(`${BASE}/api/payments/flow/confirm`, { method: 'POST', headers: { 'content-type': 'application/json', ...(cookieHeader ? { cookie: cookieHeader } : {}) }, body: JSON.stringify({ token }) }).catch(() => {});
+    }
+  } catch {}
   return NextResponse.redirect(url, { status: 302 });
 }
 

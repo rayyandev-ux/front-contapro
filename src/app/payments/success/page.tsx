@@ -4,7 +4,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { apiJson } from "@/lib/api";
+import { apiJson, invalidateApiCache } from "@/lib/api";
 
 export default function Page() {
   const [loading, setLoading] = useState(true);
@@ -36,14 +36,16 @@ export default function Page() {
         if (token) {
           const r = await apiJson<{ ok: boolean; status?: string; applied?: boolean }>("/api/payments/flow/confirm", { method: 'POST', body: JSON.stringify({ token }) });
           if (r.ok) {
+            invalidateApiCache("/api/auth/me");
             const res = await apiJson<{ ok: boolean; user: { plan?: string; planExpires?: string | null } }>("/api/auth/me");
             if (res.ok) setUser(res.data!.user);
           }
-          return;
+          
         }
         if (lastToken) {
           const r = await apiJson<{ ok: boolean; status?: string; applied?: boolean }>("/api/payments/flow/confirm", { method: 'POST', body: JSON.stringify({ token: lastToken }) });
           if (r.ok) {
+            invalidateApiCache("/api/auth/me");
             const res = await apiJson<{ ok: boolean; user: { plan?: string; planExpires?: string | null } }>("/api/auth/me");
             if (res.ok) setUser(res.data!.user);
           }
@@ -53,6 +55,7 @@ export default function Page() {
         if (lastOrderId) {
           const r = await apiJson<{ ok: boolean; status?: string; applied?: boolean }>("/api/payments/flow/confirm/order", { method: 'POST', body: JSON.stringify({ orderId: lastOrderId }) });
           if (r.ok) {
+            invalidateApiCache("/api/auth/me");
             const res = await apiJson<{ ok: boolean; user: { plan?: string; planExpires?: string | null } }>("/api/auth/me");
             if (res.ok) setUser(res.data!.user);
           }

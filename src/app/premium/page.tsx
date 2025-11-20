@@ -19,10 +19,8 @@ export default function Page() {
   const [isPremium, setIsPremium] = useState(false);
   const [manageOpen, setManageOpen] = useState(false);
 
-  const prices = {
-    monthly: 4.99,
-    annual: 24.99,
-  };
+  const [prices, setPrices] = useState<{ monthly: number; annual: number }>({ monthly: 4.99, annual: 24.99 });
+  const [labels, setLabels] = useState<{ monthlyName: string; monthlyDesc?: string; annualName: string; annualDesc?: string }>({ monthlyName: 'Premium Mensual', monthlyDesc: 'Acceso completo por 1 mes', annualName: 'Premium Anual', annualDesc: 'Acceso completo por 12 meses' });
 
   const checkout = async (plan: 'MONTHLY'|'ANNUAL') => {
     setLoading(true);
@@ -51,6 +49,24 @@ export default function Page() {
     })();
   }, []);
 
+  useEffect(() => {
+    (async () => {
+      const r = await apiJson<{ items: Array<{ period: 'MONTHLY'|'ANNUAL'; name: string; description?: string; priceUsd: number; active?: boolean }> }>("/api/payments/plans");
+      if (r.ok && r.data?.items) {
+        const m = r.data.items.find(it => it.period === 'MONTHLY');
+        const a = r.data.items.find(it => it.period === 'ANNUAL');
+        if (m) {
+          setPrices(prev => ({ ...prev, monthly: Number(m.priceUsd || prev.monthly) }));
+          setLabels(prev => ({ ...prev, monthlyName: m.name || prev.monthlyName, monthlyDesc: m.description || prev.monthlyDesc }));
+        }
+        if (a) {
+          setPrices(prev => ({ ...prev, annual: Number(a.priceUsd || prev.annual) }));
+          setLabels(prev => ({ ...prev, annualName: a.name || prev.annualName, annualDesc: a.description || prev.annualDesc }));
+        }
+      }
+    })();
+  }, []);
+
   const fmtDate = (iso?: string | null) => {
     if (!iso) return "—";
     const d = new Date(iso);
@@ -75,8 +91,8 @@ export default function Page() {
                 <CardHeader className="pt-8">
                   <div className="flex items-start justify-between">
                     <div>
-                      <CardTitle className="flex items-center gap-2 text-2xl"><Crown className="h-6 w-6 text-indigo-600" /> Premium Mensual</CardTitle>
-                      <CardDescription className="text-base">Acceso completo por 1 mes</CardDescription>
+                      <CardTitle className="flex items-center gap-2 text-2xl"><Crown className="h-6 w-6 text-indigo-600" /> {labels.monthlyName}</CardTitle>
+                      <CardDescription className="text-base">{labels.monthlyDesc}</CardDescription>
                     </div>
                     <span className="inline-flex items-center rounded-full bg-indigo-500/10 px-2.5 py-0.5 text-xs font-medium text-indigo-500 ring-1 ring-indigo-500/20">Flexible</span>
                   </div>
@@ -97,8 +113,8 @@ export default function Page() {
                 <CardHeader className="pt-8">
                   <div className="flex items-start justify-between">
                     <div>
-                      <CardTitle className="flex items-center gap-2 text-2xl"><Crown className="h-6 w-6 text-amber-600" /> Premium Anual</CardTitle>
-                      <CardDescription className="text-base">Acceso completo por 12 meses</CardDescription>
+                      <CardTitle className="flex items-center gap-2 text-2xl"><Crown className="h-6 w-6 text-amber-600" /> {labels.annualName}</CardTitle>
+                      <CardDescription className="text-base">{labels.annualDesc}</CardDescription>
                     </div>
                     <span className="inline-flex items-center rounded-full bg-amber-500/10 px-2.5 py-0.5 text-xs font-medium text-amber-500 ring-1 ring-amber-500/20">Popular • Ahorra 50%</span>
                   </div>

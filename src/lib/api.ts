@@ -45,6 +45,16 @@ export async function apiJson<T = any>(path: string, init: RequestInit = {}): Pr
       credentials: "include",
     });
     const data = await res.json().catch(() => ({}));
+    if (res.status === 402) {
+      const msg402 = (data && (data.message || data.error)) || `Error ${res.status}`;
+      try {
+        if (typeof window !== 'undefined') {
+          clearApiCache();
+          window.location.href = '/premium';
+        }
+      } catch {}
+      return { ok: false, error: msg402 };
+    }
     if (!res.ok || (data && data.ok === false)) {
       const msg = (data && (data.message || data.error)) || `Error ${res.status}`;
       return { ok: false, error: msg };
@@ -66,6 +76,16 @@ export async function apiMultipart<T = any>(path: string, formData: FormData): P
       credentials: "include",
     });
     const data = await res.json().catch(() => ({}));
+    if (res.status === 402) {
+      const msg402 = (data && (data.message || data.error)) || `Error ${res.status}`;
+      try {
+        if (typeof window !== 'undefined') {
+          clearApiCache();
+          window.location.href = '/premium';
+        }
+      } catch {}
+      return { ok: false, error: msg402 };
+    }
     if (!res.ok || (data && data.ok === false)) {
       const msg = (data && (data.message || data.error)) || `Error ${res.status}`;
       return { ok: false, error: msg };

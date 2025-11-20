@@ -55,6 +55,33 @@ export async function middleware(req: NextRequest) {
     }
   }
 
+  if (sameBaseDomain && isProtected) {
+    try {
+      const BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8080";
+      const res = await fetch(`${BASE}/api/auth/me`, {
+        headers: token ? { cookie: `session=${token}` } : undefined,
+      });
+      if (!res.ok) {
+        const url = new URL("/login", `https://${host}`);
+        return NextResponse.redirect(url);
+      }
+      const data = await res.json();
+      const now = new Date();
+      const plan = String(data?.user?.plan || "").toUpperCase();
+      const planExpires = data?.user?.planExpires ? new Date(data.user.planExpires) : null;
+      const trialEnds = data?.user?.trialEnds ? new Date(data.user.trialEnds) : null;
+      const premiumActivo = plan === "PREMIUM" && planExpires != null && planExpires > now;
+      const trialActivo = trialEnds != null && trialEnds > now;
+      if (!premiumActivo && !trialActivo) {
+        const url = new URL("/premium", `https://${host}`);
+        return NextResponse.redirect(url);
+      }
+    } catch {
+      const url = new URL("/login", `https://${host}`);
+      return NextResponse.redirect(url);
+    }
+  }
+
   return NextResponse.next();
 }
 

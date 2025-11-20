@@ -1,5 +1,6 @@
 "use client";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -24,6 +25,22 @@ export default function Page() {
     })();
   }, []);
 
+  function TokenConfirm() {
+    const p = useSearchParams();
+    useEffect(() => {
+      (async () => {
+        const token = p.get('token');
+        if (!token) return;
+        const r = await apiJson<{ ok: boolean; status?: string; applied?: boolean }>("/api/payments/flow/confirm", { method: 'POST', body: JSON.stringify({ token }) });
+        if (r.ok) {
+          const res = await apiJson<{ ok: boolean; user: { plan?: string; planExpires?: string | null } }>("/api/auth/me");
+          if (res.ok) setUser(res.data!.user);
+        }
+      })();
+    }, [p]);
+    return null;
+  }
+
   const fmtDate = (iso?: string | null) => {
     if (!iso) return "—";
     const d = new Date(iso);
@@ -38,6 +55,7 @@ export default function Page() {
         <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 via-white to-cyan-50" />
       </div>
       <section className="mx-auto max-w-xl px-8 py-20">
+        <Suspense fallback={null}><TokenConfirm /></Suspense>
         <Card className="bg-white/90 backdrop-blur-sm shadow-lg ring-1 ring-black/5">
           <CardHeader>
             <CardTitle className="bg-gradient-to-r from-indigo-800 via-fuchsia-700 to-cyan-600 bg-clip-text text-transparent">

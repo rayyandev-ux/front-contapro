@@ -15,6 +15,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
   let authenticated = false;
   let isAdmin = false;
   let premiumActive = false;
+  let trialActive = false;
   let user: { name?: string | null; email?: string | null } | undefined;
   try {
     const BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8080";
@@ -28,7 +29,10 @@ export default async function DashboardLayout({ children }: { children: ReactNod
       isAdmin = data?.user?.role === 'ADMIN';
       const expStr = data?.user?.planExpires as string | undefined;
       const exp = expStr ? new Date(expStr) : undefined;
-      premiumActive = (data?.user?.plan === 'PREMIUM') && !!exp && exp.getTime() > Date.now();
+      const trialStr = data?.user?.trialEnds as string | undefined;
+      const trial = trialStr ? new Date(trialStr) : undefined;
+      trialActive = !!trial && trial.getTime() > Date.now();
+      premiumActive = ((data?.user?.plan === 'PREMIUM') && !!exp && exp.getTime() > Date.now()) || trialActive;
       user = { name: data?.user?.name ?? null, email: data?.user?.email ?? null };
     }
   } catch {}
@@ -62,7 +66,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
           <div className="flex items-center gap-3">
             <div className="hidden sm:flex items-center gap-3">
               {premiumActive ? (
-                <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">Premium activo</span>
+                <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">{trialActive ? 'Prueba activa' : 'Premium activo'}</span>
               ) : (
                 <Link href="/premium" aria-label="Comprar Premium" className="btn-premium">Premium</Link>
               )}
@@ -87,7 +91,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
         </main>
       </div>
       {/* Mobile quick actions */}
-      <MobileActionBar />
+      <MobileActionBar isAdmin={isAdmin} />
     </div>
   );
 }

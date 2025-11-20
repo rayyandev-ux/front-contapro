@@ -45,9 +45,17 @@ export default function Page() {
         let lastToken = '';
         try { lastToken = localStorage.getItem('contapro:lastToken') || ''; } catch {}
         const tokensUnique = Array.from(new Set([token, lastToken].filter(Boolean)));
+        const TTL_MS = 2 * 60 * 1000;
         for (const tok of tokensUnique) {
+          try {
+            const key = `contapro:confirm:tok:${tok}`;
+            const now = Date.now();
+            const until = Number(localStorage.getItem(key) || 0);
+            if (until && until > now) continue;
+            localStorage.setItem(key, String(now + TTL_MS));
+          } catch {}
           const r = await apiJson<{ ok: boolean; status?: string; applied?: boolean }>("/api/payments/flow/confirm", { method: 'POST', body: JSON.stringify({ token: tok }) });
-          if (r.ok) {
+          if (r.ok && (r.data?.applied || ['PAID','SUCCESS','CONFIRMED'].includes(String(r.data?.status || '').toUpperCase()))) {
             invalidateApiCache("/api/auth/me");
             const res = await apiJson<{ ok: boolean; user: { plan?: string; planExpires?: string | null } }>("/api/auth/me");
             if (res.ok) setUser(res.data!.user);
@@ -56,11 +64,19 @@ export default function Page() {
         let lastOrderId = '';
         try { lastOrderId = orderIdFromQuery || localStorage.getItem('contapro:lastOrderId') || ''; } catch {}
         if (lastOrderId) {
-          const r = await apiJson<{ ok: boolean; status?: string; applied?: boolean }>("/api/payments/flow/confirm/order", { method: 'POST', body: JSON.stringify({ orderId: lastOrderId }) });
-          if (r.ok) {
-            invalidateApiCache("/api/auth/me");
-            const res = await apiJson<{ ok: boolean; user: { plan?: string; planExpires?: string | null } }>("/api/auth/me");
-            if (res.ok) setUser(res.data!.user);
+          try {
+            const key = `contapro:confirm:oid:${lastOrderId}`;
+            const now = Date.now();
+            const until = Number(localStorage.getItem(key) || 0);
+            if (!until || until <= now) localStorage.setItem(key, String(now + TTL_MS)); else lastOrderId = '';
+          } catch {}
+          if (lastOrderId) {
+            const r = await apiJson<{ ok: boolean; status?: string; applied?: boolean }>("/api/payments/flow/confirm/order", { method: 'POST', body: JSON.stringify({ orderId: lastOrderId }) });
+            if (r.ok && (r.data?.applied || ['PAID','SUCCESS','CONFIRMED'].includes(String(r.data?.status || '').toUpperCase()))) {
+              invalidateApiCache("/api/auth/me");
+              const res = await apiJson<{ ok: boolean; user: { plan?: string; planExpires?: string | null } }>("/api/auth/me");
+              if (res.ok) setUser(res.data!.user);
+            }
           }
         }
       })();

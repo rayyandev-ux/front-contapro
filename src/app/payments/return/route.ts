@@ -4,7 +4,7 @@ function getOrigin(req: Request) {
   const fh = req.headers.get('x-forwarded-host') || req.headers.get('host') || '';
   const host = fh.split(':')[0] || new URL(req.url).hostname;
   const proto = (req.headers.get('x-forwarded-proto') || req.headers.get('x-forwarded-scheme') || 'https');
-  const envHost = (process.env.NEXT_PUBLIC_APP_HOST || '').trim();
+  const envHost = (process.env.NEXT_PUBLIC_APP_HOST || 'app.contapro.lat').trim();
   const base = envHost ? (envHost.includes('://') ? envHost : `https://${envHost}`) : `${proto}://${host}`;
   return base;
 }

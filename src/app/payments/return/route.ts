@@ -18,23 +18,24 @@ function buildSuccessUrl(req: Request, token?: string, orderId?: string) {
 
 export async function POST(req: Request) {
   try {
+    const u = new URL(req.url);
     const ct = String(req.headers.get('content-type') || '').toLowerCase();
     let token = '';
-    let orderId = '';
+    let orderId = u.searchParams.get('orderId') || '';
     if (ct.includes('application/x-www-form-urlencoded')) {
       const bodyText = await req.text();
       const form = new URLSearchParams(bodyText);
       token = form.get('token') || form.get('Token') || '';
-      orderId = form.get('commerceOrder') || form.get('orderId') || '';
+      orderId = form.get('commerceOrder') || form.get('orderId') || orderId;
     } else if (ct.includes('application/json')) {
       const body: any = await req.json().catch(() => ({}));
       token = String(body?.token || body?.Token || '');
-      orderId = String(body?.commerceOrder || body?.orderId || '');
+      orderId = String(body?.commerceOrder || body?.orderId || orderId);
     } else {
       const bodyText = await req.text();
       const form = new URLSearchParams(bodyText);
       token = form.get('token') || form.get('Token') || '';
-      orderId = form.get('commerceOrder') || form.get('orderId') || '';
+      orderId = form.get('commerceOrder') || form.get('orderId') || orderId;
     }
     const url = buildSuccessUrl(req, token, orderId);
     return NextResponse.redirect(url, { status: 302 });

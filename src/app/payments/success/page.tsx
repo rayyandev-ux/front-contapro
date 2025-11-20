@@ -1,5 +1,5 @@
 "use client";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -27,23 +27,26 @@ export default function Page() {
 
   function TokenConfirm() {
     const p = useSearchParams();
+    const ranRef = useRef(false);
     useEffect(() => {
+      if (ranRef.current) return;
+      ranRef.current = true;
       (async () => {
-        const token = p.get('token');
-        const orderIdFromQuery = p.get('orderId') || '';
+        let token = '';
+        let orderIdFromQuery = '';
+        try {
+          const usp = new URLSearchParams(window.location.search);
+          token = usp.get('token') || '';
+          orderIdFromQuery = usp.get('orderId') || '';
+        } catch {
+          token = p.get('token') || '';
+          orderIdFromQuery = p.get('orderId') || '';
+        }
         let lastToken = '';
         try { lastToken = localStorage.getItem('contapro:lastToken') || ''; } catch {}
-        if (token) {
-          const r = await apiJson<{ ok: boolean; status?: string; applied?: boolean }>("/api/payments/flow/confirm", { method: 'POST', body: JSON.stringify({ token }) });
-          if (r.ok) {
-            invalidateApiCache("/api/auth/me");
-            const res = await apiJson<{ ok: boolean; user: { plan?: string; planExpires?: string | null } }>("/api/auth/me");
-            if (res.ok) setUser(res.data!.user);
-          }
-          
-        }
-        if (lastToken) {
-          const r = await apiJson<{ ok: boolean; status?: string; applied?: boolean }>("/api/payments/flow/confirm", { method: 'POST', body: JSON.stringify({ token: lastToken }) });
+        const tokensUnique = Array.from(new Set([token, lastToken].filter(Boolean)));
+        for (const tok of tokensUnique) {
+          const r = await apiJson<{ ok: boolean; status?: string; applied?: boolean }>("/api/payments/flow/confirm", { method: 'POST', body: JSON.stringify({ token: tok }) });
           if (r.ok) {
             invalidateApiCache("/api/auth/me");
             const res = await apiJson<{ ok: boolean; user: { plan?: string; planExpires?: string | null } }>("/api/auth/me");
@@ -61,7 +64,7 @@ export default function Page() {
           }
         }
       })();
-    }, [p]);
+    }, []);
     return null;
   }
 

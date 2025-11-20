@@ -25,13 +25,14 @@ export default function Page() {
   const checkout = async (plan: 'MONTHLY'|'ANNUAL') => {
     setLoading(true);
     setError(null);
-    const { ok, data, error } = await apiJson<{ redirectUrl: string }>("/api/payments/checkout", {
+    const { ok, data, error } = await apiJson<{ redirectUrl: string; orderId?: string }>("/api/payments/checkout", {
       method: "POST",
       body: JSON.stringify({ plan, currency: 'USD' }),
     });
     if (!ok) {
       setError(error || "Error creando checkout");
     } else if (data?.redirectUrl) {
+      try { if (data.orderId) localStorage.setItem('contapro:lastOrderId', data.orderId); } catch {}
       window.location.href = data.redirectUrl;
     }
     setLoading(false);

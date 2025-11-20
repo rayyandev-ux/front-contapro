@@ -30,11 +30,22 @@ export default function Page() {
     useEffect(() => {
       (async () => {
         const token = p.get('token');
-        if (!token) return;
-        const r = await apiJson<{ ok: boolean; status?: string; applied?: boolean }>("/api/payments/flow/confirm", { method: 'POST', body: JSON.stringify({ token }) });
-        if (r.ok) {
-          const res = await apiJson<{ ok: boolean; user: { plan?: string; planExpires?: string | null } }>("/api/auth/me");
-          if (res.ok) setUser(res.data!.user);
+        if (token) {
+          const r = await apiJson<{ ok: boolean; status?: string; applied?: boolean }>("/api/payments/flow/confirm", { method: 'POST', body: JSON.stringify({ token }) });
+          if (r.ok) {
+            const res = await apiJson<{ ok: boolean; user: { plan?: string; planExpires?: string | null } }>("/api/auth/me");
+            if (res.ok) setUser(res.data!.user);
+          }
+          return;
+        }
+        let lastOrderId = '';
+        try { lastOrderId = localStorage.getItem('contapro:lastOrderId') || ''; } catch {}
+        if (lastOrderId) {
+          const r = await apiJson<{ ok: boolean; status?: string; applied?: boolean }>("/api/payments/flow/confirm/order", { method: 'POST', body: JSON.stringify({ orderId: lastOrderId }) });
+          if (r.ok) {
+            const res = await apiJson<{ ok: boolean; user: { plan?: string; planExpires?: string | null } }>("/api/auth/me");
+            if (res.ok) setUser(res.data!.user);
+          }
         }
       })();
     }, [p]);

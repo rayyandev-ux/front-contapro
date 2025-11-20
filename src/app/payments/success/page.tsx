@@ -31,6 +31,8 @@ export default function Page() {
       (async () => {
         const token = p.get('token');
         const orderIdFromQuery = p.get('orderId') || '';
+        let lastToken = '';
+        try { lastToken = localStorage.getItem('contapro:lastToken') || ''; } catch {}
         if (token) {
           const r = await apiJson<{ ok: boolean; status?: string; applied?: boolean }>("/api/payments/flow/confirm", { method: 'POST', body: JSON.stringify({ token }) });
           if (r.ok) {
@@ -38,6 +40,13 @@ export default function Page() {
             if (res.ok) setUser(res.data!.user);
           }
           return;
+        }
+        if (lastToken) {
+          const r = await apiJson<{ ok: boolean; status?: string; applied?: boolean }>("/api/payments/flow/confirm", { method: 'POST', body: JSON.stringify({ token: lastToken }) });
+          if (r.ok) {
+            const res = await apiJson<{ ok: boolean; user: { plan?: string; planExpires?: string | null } }>("/api/auth/me");
+            if (res.ok) setUser(res.data!.user);
+          }
         }
         let lastOrderId = '';
         try { lastOrderId = orderIdFromQuery || localStorage.getItem('contapro:lastOrderId') || ''; } catch {}

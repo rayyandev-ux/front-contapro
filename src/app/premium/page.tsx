@@ -32,7 +32,12 @@ export default function Page() {
     if (!ok) {
       setError(error || "Error creando checkout");
     } else if (data?.redirectUrl) {
-      try { if (data.orderId) localStorage.setItem('contapro:lastOrderId', data.orderId); } catch {}
+      try {
+        if (data.orderId) localStorage.setItem('contapro:lastOrderId', data.orderId);
+        const u = new URL(data.redirectUrl);
+        const tok = u.searchParams.get('token') || '';
+        if (tok) localStorage.setItem('contapro:lastToken', tok);
+      } catch {}
       window.location.href = data.redirectUrl;
     }
     setLoading(false);

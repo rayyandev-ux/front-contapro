@@ -30,6 +30,7 @@ export default function Page() {
     useEffect(() => {
       (async () => {
         const token = p.get('token');
+        const orderIdFromQuery = p.get('orderId') || '';
         if (token) {
           const r = await apiJson<{ ok: boolean; status?: string; applied?: boolean }>("/api/payments/flow/confirm", { method: 'POST', body: JSON.stringify({ token }) });
           if (r.ok) {
@@ -39,7 +40,7 @@ export default function Page() {
           return;
         }
         let lastOrderId = '';
-        try { lastOrderId = localStorage.getItem('contapro:lastOrderId') || ''; } catch {}
+        try { lastOrderId = orderIdFromQuery || localStorage.getItem('contapro:lastOrderId') || ''; } catch {}
         if (lastOrderId) {
           const r = await apiJson<{ ok: boolean; status?: string; applied?: boolean }>("/api/payments/flow/confirm/order", { method: 'POST', body: JSON.stringify({ orderId: lastOrderId }) });
           if (r.ok) {

@@ -16,8 +16,8 @@ export default function Page() {
   const [clearingCache, setClearingCache] = useState(false);
   const [plansLoading, setPlansLoading] = useState(true);
   const [plansError, setPlansError] = useState<string | null>(null);
-  const [monthly, setMonthly] = useState<PlanSetting>({ period: "MONTHLY", name: "Premium Mensual", description: "Suscripción mensual", priceUsd: 4.99, flowPlanId: "", active: true });
-  const [annual, setAnnual] = useState<PlanSetting>({ period: "ANNUAL", name: "Premium Anual", description: "Suscripción anual", priceUsd: 24.99, flowPlanId: "", active: true });
+  const [monthly, setMonthly] = useState<PlanSetting>({ period: "MONTHLY", name: "Premium Mensual", description: "Suscripción mensual", priceUsd: 3, flowPlanId: "", active: true });
+  const [annual, setAnnual] = useState<PlanSetting>({ period: "ANNUAL", name: "Premium Anual", description: "Suscripción anual", priceUsd: 14.99, flowPlanId: "", active: true });
   const [syncing, setSyncing] = useState(false);
 
   async function load() {

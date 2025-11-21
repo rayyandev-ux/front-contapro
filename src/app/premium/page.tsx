@@ -19,7 +19,7 @@ export default function Page() {
   const [isPremium, setIsPremium] = useState(false);
   const [manageOpen, setManageOpen] = useState(false);
 
-  const [prices, setPrices] = useState<{ monthly: number; annual: number }>({ monthly: 4.99, annual: 24.99 });
+  const [prices, setPrices] = useState<{ monthly: number; annual: number }>({ monthly: 3, annual: 14.99 });
   const [labels, setLabels] = useState<{ monthlyName: string; monthlyDesc?: string; annualName: string; annualDesc?: string }>({ monthlyName: 'Premium Mensual', monthlyDesc: 'Acceso completo por 1 mes', annualName: 'Premium Anual', annualDesc: 'Acceso completo por 12 meses' });
 
   const checkout = async (plan: 'MONTHLY'|'ANNUAL') => {
@@ -105,8 +105,15 @@ export default function Page() {
                 </CardHeader>
                 <CardContent className="p-8">
                   <p className="mb-4 text-3xl font-bold tracking-tight">USD {prices.monthly.toFixed(2)}</p>
-                  <ul className="mb-6 space-y-2 text-base text-muted-foreground">
+                  <ul className="mb-6 space-y-2 text-base text-white">
                     <li className="flex items-center gap-2"><Check className="h-5 w-5 text-emerald-600" /> Acceso a todas las funciones</li>
+                    <li className="flex items-center gap-2"><Check className="h-5 w-5 text-emerald-600" /> Uploads inteligentes</li>
+                    <li className="flex items-center gap-2"><Check className="h-5 w-5 text-emerald-600" /> Extracción con IA</li>
+                    <li className="flex items-center gap-2"><Check className="h-5 w-5 text-emerald-600" /> Métricas y reportes</li>
+                    <li className="flex items-center gap-2"><Check className="h-5 w-5 text-emerald-600" /> Presupuesto y alertas</li>
+                    <li className="flex items-center gap-2"><Check className="h-5 w-5 text-emerald-600" /> Multi-moneda (PEN, USD, EUR)</li>
+                    <li className="flex items-center gap-2"><Check className="h-5 w-5 text-emerald-600" /> Integraciones por chat (Telegram y WhatsApp)</li>
+                    <li className="flex items-center gap-2"><Check className="h-5 w-5 text-emerald-600" /> Seguridad avanzada</li>
                     <li className="flex items-center gap-2"><Check className="h-5 w-5 text-emerald-600" /> Soporte por correo</li>
                     <li className="flex items-center gap-2"><Check className="h-5 w-5 text-emerald-600" /> Renovación mensual</li>
                   </ul>
@@ -127,9 +134,16 @@ export default function Page() {
                 </CardHeader>
                 <CardContent className="p-8">
                   <p className="mb-4 text-3xl font-bold tracking-tight">USD {prices.annual.toFixed(2)}</p>
-                  <ul className="mb-6 space-y-2 text-base text-muted-foreground">
-                    <li className="flex items-center gap-2"><Check className="h-5 w-5 text-emerald-600" /> Todo lo del mensual</li>
-                    <li className="flex items-center gap-2"><Check className="h-5 w-5 text-emerald-600" /> Mejor precio por mes</li>
+                  <ul className="mb-6 space-y-2 text-base text-white">
+                    <li className="flex items-center gap-2"><Check className="h-5 w-5 text-emerald-600" /> Acceso a todas las funciones</li>
+                    <li className="flex items-center gap-2"><Check className="h-5 w-5 text-emerald-600" /> Uploads inteligentes</li>
+                    <li className="flex items-center gap-2"><Check className="h-5 w-5 text-emerald-600" /> Extracción con IA</li>
+                    <li className="flex items-center gap-2"><Check className="h-5 w-5 text-emerald-600" /> Métricas y reportes</li>
+                    <li className="flex items-center gap-2"><Check className="h-5 w-5 text-emerald-600" /> Presupuesto y alertas</li>
+                    <li className="flex items-center gap-2"><Check className="h-5 w-5 text-emerald-600" /> Multi-moneda (PEN, USD, EUR)</li>
+                    <li className="flex items-center gap-2"><Check className="h-5 w-5 text-emerald-600" /> Integraciones por chat (Telegram y WhatsApp)</li>
+                    <li className="flex items-center gap-2"><Check className="h-5 w-5 text-emerald-600" /> Seguridad avanzada</li>
+                    <li className="flex items-center gap-2"><Check className="h-5 w-5 text-emerald-600" /> Soporte por correo</li>
                     <li className="flex items-center gap-2"><Check className="h-5 w-5 text-emerald-600" /> Renovación anual</li>
                   </ul>
                   <Button disabled={loading} onClick={() => checkout('ANNUAL')} className="bg-primary text-primary-foreground hover:bg-primary/90 h-12 px-6 text-base">

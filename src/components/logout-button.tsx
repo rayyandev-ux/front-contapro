@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { apiJson } from "@/lib/api";
+import { Button } from "@/components/ui/button";
 
 export default function LogoutButton({ className }: { className?: string }) {
   const [loading, setLoading] = useState(false);
@@ -17,12 +18,14 @@ export default function LogoutButton({ className }: { className?: string }) {
   };
 
   return (
-    <button
+    <Button
       onClick={onClick}
       disabled={loading}
-      className={className ?? "rounded-md border px-3 py-1 text-sm hover:bg-muted"}
+      variant="outline"
+      size="sm"
+      className={className}
     >
       {loading ? "Cerrando sesión..." : "Cerrar sesión"}
-    </button>
+    </Button>
   );
 }

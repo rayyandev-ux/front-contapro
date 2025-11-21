@@ -53,15 +53,13 @@ export default async function DashboardLayout({ children }: { children: ReactNod
           <Link href="/" className="flex items-center gap-2">
             <Image
               src="/logo.png"
-              width={24}
-              height={24}
-              alt="Logo de ContaPRO"
-              className="rounded-md ring-1 ring-border bg-secondary"
+              width={200}
+              height={60}
+              alt="ContaPRO"
+              className="h-14 w-auto object-contain"
               unoptimized
               priority
             />
-            <span className="font-semibold tracking-tight">ContaPRO</span>
-            <span className="text-sm text-muted-foreground">Dashboard</span>
           </Link>
           <div className="flex items-center gap-3">
             <div className="hidden sm:flex items-center gap-3">

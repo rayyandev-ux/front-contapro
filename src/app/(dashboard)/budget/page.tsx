@@ -122,6 +122,7 @@ export default async function Page({ searchParams }: { searchParams?: Promise<Re
     } catch {
       return redirect(`/budget?error=${encodeURIComponent('Error de red al guardar categoría')}`);
     }
+    revalidatePath('/budget');
     return redirect('/budget');
   }
 
@@ -170,6 +171,7 @@ export default async function Page({ searchParams }: { searchParams?: Promise<Re
     } catch {
       return redirect(`/budget?error=${encodeURIComponent('Error de red al guardar presupuesto')}`);
     }
+    revalidatePath('/budget');
     return redirect('/budget');
   }
 

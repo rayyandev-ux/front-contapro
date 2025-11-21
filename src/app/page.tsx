@@ -1,17 +1,24 @@
 'use client';
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, UploadCloud, Receipt, BarChart3, ShieldCheck, Bot, MessageCircle, Check } from "lucide-react";
-import { motion } from "framer-motion";
+import { ArrowRight, UploadCloud, Receipt, BarChart3, ShieldCheck, Bot, MessageCircle, Check, Send, Instagram, Plus, Minus } from "lucide-react";
+import { motion, useAnimate, type AnimationPlaybackControls } from "framer-motion";
+import { Reveal, RevealList } from "@/components/Reveal";
 import MobileNav from "@/components/MobileNav";
-import ThemeToggle from "@/components/ThemeToggle";
+type Sponsor = { name: string; src: string; href: string };
 export default function Home() {
   const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8080";
   const [dashboardHref, setDashboardHref] = useState("/dashboard");
   const [buyHref, setBuyHref] = useState("/register");
+  const [sponsorsLight, setSponsorsLight] = useState<Sponsor[]>([]);
+  const [sponsorsDark, setSponsorsDark] = useState<Sponsor[]>([]);
+  const [scopeLight, animateLight] = useAnimate();
+  const [scopeDark, animateDark] = useAnimate();
+  const marqueeLight = useRef<AnimationPlaybackControls | null>(null);
+  const marqueeDark = useRef<AnimationPlaybackControls | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -33,8 +40,76 @@ export default function Home() {
     check();
     return () => { cancelled = true; };
   }, [API_BASE]);
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const [resLight, resDark] = await Promise.all([
+          fetch("/api/sponsors?mode=light"),
+          fetch("/api/sponsors?mode=dark"),
+        ]);
+        if (!cancelled) {
+          const [dataLight, dataDark] = await Promise.all([resLight.json(), resDark.json()]);
+          setSponsorsLight(Array.isArray(dataLight) ? dataLight : []);
+          setSponsorsDark(Array.isArray(dataDark) ? dataDark : []);
+        }
+      } catch {
+        if (!cancelled) {
+          setSponsorsLight([]);
+          setSponsorsDark([]);
+        }
+      }
+    };
+    load();
+    return () => { cancelled = true; };
+  }, []);
+  useEffect(() => {
+    const elLight = (scopeLight as unknown as React.RefObject<HTMLDivElement>).current;
+    if (elLight) {
+      try { marqueeLight.current = animateLight(elLight, { x: ["0%", "-50%"] }, { duration: 30, ease: "linear", repeat: Infinity }); } catch {}
+    }
+    const elDark = (scopeDark as unknown as React.RefObject<HTMLDivElement>).current;
+    if (elDark) {
+      try { marqueeDark.current = animateDark(elDark, { x: ["0%", "-50%"] }, { duration: 30, ease: "linear", repeat: Infinity }); } catch {}
+    }
+  }, [scopeLight, animateLight, scopeDark, animateDark, sponsorsLight.length, sponsorsDark.length]);
+  const nLight = Math.max(1, sponsorsLight.length || 1);
+  const gapLight = sponsorsLight.length <= 2 ? "1rem" : "1.5rem";
+  const styleLight = { willChange: "transform", gap: gapLight } as React.CSSProperties & Record<'--n' | '--gap', string>;
+  styleLight["--n"] = String(nLight);
+  styleLight["--gap"] = gapLight;
+  const nDark = Math.max(1, sponsorsDark.length || 1);
+  const gapDark = sponsorsDark.length <= 2 ? "1rem" : "1.5rem";
+  const styleDark = { willChange: "transform", gap: gapDark } as React.CSSProperties & Record<'--n' | '--gap', string>;
+  styleDark["--n"] = String(nDark);
+  styleDark["--gap"] = gapDark;
+  const faqs = [
+    {
+      q: "¿Necesito tarjeta para empezar?",
+      a: [
+        "No. El plan Free no requiere tarjeta y puedes cancelar cuando quieras.",
+        "Crea tu cuenta y prueba todas las funciones antes de suscribirte.",
+      ],
+    },
+    {
+      q: "¿Qué documentos soportan?",
+      a: [
+        "Imágenes (JPG/PNG) y PDFs.",
+        "Próximamente soportaremos escaneados multipágina.",
+      ],
+    },
+    {
+      q: "¿Cómo manejan la seguridad?",
+      a: [
+        "Cifrado en tránsito y reposo, autenticación segura y control de acceso por roles.",
+        "Mantenemos buenas prácticas de seguridad para proteger tus datos.",
+      ],
+    },
+  ];
+  const [faqOpen, setFaqOpen] = useState<number | null>(0);
+  const activeFaq = faqOpen !== null ? faqs[faqOpen] : null;
   return (
-    <div className="relative min-h-svh w-full overflow-hidden">
+    <div className="dark relative min-h-svh w-full overflow-hidden">
       {/* Fondo con gradientes vibrantes y acentos orgánicos */}
       <div className="pointer-events-none absolute inset-0 -z-10 dark:opacity-0">
         <div className="absolute inset-0 bg-gradient-to-br from-white via-gray-50 to-blue-50" />
@@ -68,36 +143,33 @@ export default function Home() {
       </div>
 
       {/* Header */}
-      <header className="sticky top-0 z-50 mx-auto max-w-7xl px-6 pt-4">
-        <div className="flex items-center justify-between rounded-2xl bg-card/80 backdrop-blur-md px-4 py-3 shadow-sm ring-1 ring-border">
-          <div className="flex items-center gap-3">
+      <header className="sticky top-0 z-50 w-full border-b border-border bg-card/90 backdrop-blur-lg shadow-sm">
+        <div className="relative flex h-20 items-center px-3 md:px-8">
+          <div className="flex items-center gap-2 md:gap- ml-0 md:ml-80">
             <Image
               src="/logo.png"
-              width={28}
-              height={28}
-              alt="Logo de ContaPRO"
-              className="rounded-md ring-1 ring-border bg-secondary"
+              width={520}
+              height={200}
+              alt="ContaPRO"
+              className="h-16 md:h-24 w-auto object-contain"
               unoptimized
               priority
             />
-            <span className="font-semibold bg-gradient-to-r from-indigo-700 via-orange-600 to-blue-700 bg-clip-text text-transparent">ContaPRO</span>
+            <a href="#pricing" className="hidden md:inline transition-opacity hover:opacity-90 hover:underline underline-offset-4 decoration-indigo-400">Planes y precios</a>
           </div>
-          <nav className="hidden md:flex items-center gap-6 text-sm text-muted-foreground">
-            <a href="#features" className="hover:text-gray-900 hover:underline underline-offset-4 decoration-indigo-400">Características</a>
-            <a href="#how" className="hover:text-gray-900 hover:underline underline-offset-4 decoration-orange-400">Cómo funciona</a>
-            <a href="#integrations" className="hover:text-gray-900 hover:underline underline-offset-4 decoration-green-400">Integraciones</a>
-            <a href="#pricing" className="hover:text-gray-900 hover:underline underline-offset-4 decoration-blue-400">Precios</a>
+          <div className="hidden md:flex items-center gap-4 absolute right-100 top-1/2 -translate-y-1/2">
             {dashboardHref === "/dashboard" ? (
-              <Link href="/dashboard" className="rounded-md bg-gradient-to-r from-indigo-700 via-orange-600 to-blue-700 px-3 py-1.5 text-white shadow-sm hover:opacity-95">Ir al dashboard</Link>
+              <Link href="/dashboard" className="rounded-md bg-gradient-to-r from-indigo-700 via-orange-600 to-blue-700 px-3 py-1.5 text-white shadow-sm hover:opacity-95 transition-transform hover:-translate-y-[1px]">Ir al dashboard</Link>
             ) : (
               <>
-                <Link href="/login" className="hover:text-gray-900">Acceder</Link>
-                <Link href="/register" className="rounded-md bg-gradient-to-r from-indigo-700 via-orange-600 to-blue-700 px-3 py-1.5 text-white shadow-sm hover:opacity-95">Crear cuenta</Link>
+                <Link href="/login" className="hover:underline underline-offset-4 decoration-blue-400 transition-opacity hover:opacity-90">Ingresar</Link>
+                <Link href="/register" className="rounded-md bg-gradient-to-r from-indigo-700 via-orange-600 to-blue-700 px-4 py-2 text-white shadow-sm hover:opacity-95 transition-transform hover:-translate-y-[1px]">Empieza gratis</Link>
               </>
             )}
-            <ThemeToggle />
-          </nav>
-          <MobileNav dashboardHref={dashboardHref} />
+          </div>
+          <div className="md:hidden absolute right-3 top-1/2 -translate-y-1/2">
+            <MobileNav dashboardHref={dashboardHref} showThemeToggle={false} />
+          </div>
         </div>
       </header>
 
@@ -111,11 +183,11 @@ export default function Home() {
           >
             <h1 className="text-4xl sm:text-6xl font-bold tracking-tight leading-tight">
               <span className="bg-gradient-to-r from-indigo-800 via-orange-700 to-blue-600 bg-clip-text text-transparent">
-                Gestiona comprobantes con IA y reportes claros
+                Gestión de gastos con IA, integraciones y presupuesto inteligente
               </span>
             </h1>
-            <p className="mt-4 text-gray-800 text-lg font-medium">
-              Centraliza tus documentos, extrae datos clave automáticamente y toma decisiones con métricas limpias y accionables.
+            <p className="mt-4 text-black dark:text-white text-lg font-medium">
+              Procesa comprobantes con IA y controla tus gastos con métricas claras, presupuesto con alertas, integraciones por WhatsApp y Telegram y seguridad avanzada.
             </p>
             <div className="mt-7 flex flex-wrap items-center gap-4">
               <Link href="/register">
@@ -128,16 +200,11 @@ export default function Home() {
                 <ArrowRight className="ml-2 h-4 w-4 inline" />
               </motion.button>
               </Link>
-              <Link href="/dashboard" className="text-sm font-medium text-gray-800 hover:text-black underline underline-offset-4">Ver demo</Link>
+              <Link href="/dashboard" className="text-sm font-medium text-black dark:text-white hover:underline underline-offset-4">Ver demo</Link>
             </div>
-            <div className="mt-7 flex items-center gap-4 text-xs font-medium">
-              <div className="flex items-center gap-2 rounded-full bg-white/50 px-3 py-1.5 text-gray-800 shadow-sm"><UploadCloud className="h-4 w-4 text-indigo-600" /> Subida rápida</div>
-              <div className="flex items-center gap-2 rounded-full bg-white/50 px-3 py-1.5 text-gray-800 shadow-sm"><Receipt className="h-4 w-4 text-orange-600" /> Extracción precisa</div>
-              <div className="flex items-center gap-2 rounded-full bg-white/50 px-3 py-1.5 text-gray-800 shadow-sm"><BarChart3 className="h-4 w-4 text-blue-600" /> Métricas claras</div>
-            </div>
+            
           </motion.div>
           <div className="relative">
-            {/* Panel con halo asimétrico */}
             <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-indigo-200/50 via-orange-200/50 to-blue-200/50 blur-xl opacity-70 rotate-2 dark:opacity-0" />
             <div className="relative rounded-2xl border border-border bg-card/90 p-4 shadow-lg ring-1 ring-border transform -rotate-1">
               <div className="mb-3 flex items-center justify-between">
@@ -164,107 +231,151 @@ export default function Home() {
                   </CardContent>
                 </Card>
               </div>
-              <div className="mt-4 h-32 rounded-md bg-muted" />
+              <div className="mt-4 rounded-md bg-muted p-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <Button type="button" className="w-full justify-center bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm">
+                    <MessageCircle className="h-4 w-4 mr-2" />
+                    Integrar con WhatsApp
+                  </Button>
+                  <Button type="button" className="w-full justify-center bg-sky-600 hover:bg-sky-700 text-white shadow-sm">
+                    <Send className="h-4 w-4 mr-2" />
+                    Integrar con Telegram
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Trusted by */}
-      <section className="mx-auto max-w-7xl px-6">
-        <div className="rounded-2xl border bg-white/80 p-4 text-center text-sm text-gray-700">
-          <span>Confiado por equipos en </span>
-          <span className="mx-1 font-medium text-gray-900">Comercio</span>
-          ·
-          <span className="mx-1 font-medium text-gray-900">Servicios</span>
-          ·
-          <span className="mx-1 font-medium text-gray-900">Consultoría</span>
+      
+
+      {/* Sponsors */}
+      <section id="sponsors" className="w-full py-12">
+        <div className="mx-auto max-w-7xl px-6">
+          <Reveal>
+            <h2 className="text-2xl font-semibold text-center">Tecnologías y servicios que usamos</h2>
+          </Reveal>
+          <Reveal delay={0.08}>
+            <p className="mt-1 text-sm text-gray-600 text-center">Proveedores líderes que potencian nuestra plataforma.</p>
+          </Reveal>
+        </div>
+        {/* Light logos */}
+        <div className="mt-6 relative w-full overflow-hidden block dark:hidden">
+          <motion.div
+            ref={scopeLight as unknown as React.RefObject<HTMLDivElement>}
+            className="flex items-center min-w-max"
+            style={styleLight}
+            onMouseEnter={() => marqueeLight.current?.pause?.()}
+            onMouseLeave={() => marqueeLight.current?.play?.()}
+          >
+            {[...sponsorsLight, ...sponsorsLight].map((s, i) => (
+              <motion.a
+                key={`${s.name}-${i}`}
+                href={s.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex-shrink-0 flex items-center justify-center rounded-xl border border-primary/30 bg-card px-6 py-4 shadow-md ring-inset ring-2 ring-primary/30 hover:bg-muted hover:shadow-lg hover:ring-primary/60 hover:border-primary/50 transition"
+                style={{ flexBasis: "calc((100vw - var(--gap) * (var(--n) - 1)) / var(--n))", width: "calc((100vw - var(--gap) * (var(--n) - 1)) / var(--n))" }}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ type: "spring", stiffness: 260, damping: 20 }}
+              >
+                <Image src={s.src} alt={s.name} width={600} height={200} className="w-full h-12 sm:h-14 object-contain transition group-hover:scale-105 group-hover:brightness-110" />
+              </motion.a>
+            ))}
+          </motion.div>
+        </div>
+        {/* Dark logos */}
+        <div className="mt-6 relative w-full overflow-hidden hidden dark:block">
+          <motion.div
+            ref={scopeDark as unknown as React.RefObject<HTMLDivElement>}
+            className="flex items-center min-w-max"
+            style={styleDark}
+            onMouseEnter={() => marqueeDark.current?.pause?.()}
+            onMouseLeave={() => marqueeDark.current?.play?.()}
+          >
+            {[...sponsorsDark, ...sponsorsDark].map((s, i) => (
+              <motion.a
+                key={`${s.name}-${i}`}
+                href={s.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex-shrink-0 flex items-center justify-center rounded-xl border border-primary/30 bg-card px-6 py-4 shadow-md ring-inset ring-2 ring-primary/30 hover:bg-muted hover:shadow-lg hover:ring-primary/60 hover:border-primary/50 transition"
+                style={{ flexBasis: "calc((100vw - var(--gap) * (var(--n) - 1)) / var(--n))", width: "calc((100vw - var(--gap) * (var(--n) - 1)) / var(--n))" }}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ type: "spring", stiffness: 260, damping: 20 }}
+              >
+                <Image src={s.src} alt={s.name} width={600} height={200} className="w-full h-12 sm:h-14 object-contain transition group-hover:scale-105 group-hover:brightness-110" />
+              </motion.a>
+            ))}
+          </motion.div>
         </div>
       </section>
 
-      {/* Features */}
       <section id="features" className="mx-auto max-w-7xl px-6 py-12 scroll-mt-24">
-        <h2 className="text-2xl font-semibold">Características claves</h2>
-        <p className="mt-2 text-sm text-gray-600">Todo lo que necesitas para dominar tus finanzas empresariales.</p>
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <Reveal>
+          <h2 className="text-2xl font-semibold text-center">Características claves</h2>
+        </Reveal>
+        <Reveal delay={0.08}>
+          <p className="mt-2 text-sm text-gray-600 text-center">Todo lo que necesitas para dominar tus finanzas empresariales.</p>
+        </Reveal>
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <motion.div initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4 }}>
-            <Card className="transition hover:translate-y-[2px]">
-              <CardContent className="p-5">
-                <div className="mb-2 flex items-center gap-2"><UploadCloud className="h-5 w-5 text-indigo-600" /><span className="font-medium">Uploads inteligentes</span></div>
-                <p className="text-sm text-gray-600">Arrastra y suelta tus archivos. Procesamos imágenes y PDFs.</p>
-              </CardContent>
-            </Card>
+            <div className="rounded-2xl border border-border bg-card p-6 shadow-lg ring-1 ring-border hover:bg-muted transition">
+              <div className="flex items-center gap-3"><UploadCloud className="h-5 w-5 text-indigo-600" /><div className="font-medium">Uploads inteligentes</div></div>
+              <p className="mt-2 text-sm text-gray-600">Arrastra y suelta, soporte para imágenes y PDFs.</p>
+            </div>
           </motion.div>
           <motion.div initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45, delay: 0.05 }}>
-            <Card className="transition hover:translate-y-[2px]">
-              <CardContent className="p-5">
-                <div className="mb-2 flex items-center gap-2"><Receipt className="h-5 w-5 text-fuchsia-600" /><span className="font-medium">Extracción con IA</span></div>
-                <p className="text-sm text-gray-600">Campos clave como RUC, total, fecha y más automáticamente.</p>
-              </CardContent>
-            </Card>
+            <div className="rounded-2xl border border-border bg-card p-6 shadow-lg ring-1 ring-border hover:bg-muted transition">
+              <div className="flex items-center gap-3"><Receipt className="h-5 w-5 text-fuchsia-600" /><div className="font-medium">Extracción con IA</div></div>
+              <p className="mt-2 text-sm text-gray-600">RUC, total, fecha y más automáticamente.</p>
+            </div>
           </motion.div>
           <motion.div initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.1 }}>
-            <Card className="transition hover:translate-y-[2px]">
-              <CardContent className="p-5">
-                <div className="mb-2 flex items-center gap-2"><BarChart3 className="h-5 w-5 text-cyan-600" /><span className="font-medium">Métricas y reportes</span></div>
-                <p className="text-sm text-gray-600">Gráficos por categoría y por mes para entender tus gastos.</p>
-              </CardContent>
-            </Card>
+            <div className="rounded-2xl border border-border bg-card p-6 shadow-lg ring-1 ring-border hover:bg-muted transition">
+              <div className="flex items-center gap-3"><BarChart3 className="h-5 w-5 text-cyan-600" /><div className="font-medium">Métricas y reportes</div></div>
+              <p className="mt-2 text-sm text-gray-600">Gráficos por categoría y por mes para entender tus gastos.</p>
+            </div>
           </motion.div>
           <motion.div initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.55, delay: 0.15 }}>
-            <Card className="transition hover:translate-y-[2px]">
-              <CardContent className="p-5">
-                <div className="mb-2 flex items-center gap-2"><ShieldCheck className="h-5 w-5 text-indigo-700" /><span className="font-medium">Seguridad</span></div>
-                <p className="text-sm text-gray-600">Autenticación segura, datos encriptados y control de acceso.</p>
-              </CardContent>
-            </Card>
+            <div className="rounded-2xl border border-border bg-card p-6 shadow-lg ring-1 ring-border hover:bg-muted transition">
+              <div className="flex items-center gap-3"><Bot className="h-5 w-5 text-sky-600" /><div className="font-medium">Integraciones por chat</div></div>
+              <p className="mt-2 text-sm text-gray-600">Conecta Telegram y WhatsApp para enviar comprobantes.</p>
+            </div>
           </motion.div>
           <motion.div initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.2 }}>
-            <Card className="transition hover:translate-y-[2px]">
-              <CardContent className="p-5">
-                <div className="mb-2 flex items-center gap-2"><Bot className="h-5 w-5 text-indigo-600" /><span className="font-medium">Integraciones por chat</span></div>
-                <p className="text-sm text-gray-600">Funciona con Telegram y WhatsApp para enviar comprobantes.</p>
-              </CardContent>
-            </Card>
+            <div className="rounded-2xl border border-border bg-card p-6 shadow-lg ring-1 ring-border hover:bg-muted transition">
+              <div className="flex items-center gap-3"><BarChart3 className="h-5 w-5 text-blue-600" /><div className="font-medium">Presupuesto y alertas</div></div>
+              <p className="mt-2 text-sm text-gray-600">Define presupuesto mensual y recibe alertas al acercarte al límite.</p>
+            </div>
           </motion.div>
           <motion.div initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.65, delay: 0.25 }}>
-            <Card className="transition hover:translate-y-[2px]">
-              <CardContent className="p-5">
-                <div className="mb-2 flex items-center gap-2"><BarChart3 className="h-5 w-5 text-blue-600" /><span className="font-medium">Presupuesto y alertas</span></div>
-                <p className="text-sm text-gray-600">Define presupuesto mensual y recibe alertas al acercarte al límite.</p>
-              </CardContent>
-            </Card>
+            <div className="rounded-2xl border border-border bg-card p-6 shadow-lg ring-1 ring-border hover:bg-muted transition">
+              <div className="flex items-center gap-3"><Receipt className="h-5 w-5 text-emerald-600" /><div className="font-medium">Multi-moneda</div></div>
+              <p className="mt-2 text-sm text-gray-600">PEN, USD y EUR para registrar y analizar tus gastos.</p>
+            </div>
           </motion.div>
           <motion.div initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7, delay: 0.3 }}>
-            <Card className="transition hover:translate-y-[2px]">
-              <CardContent className="p-5">
-                <div className="mb-2 flex items-center gap-2"><Receipt className="h-5 w-5 text-emerald-600" /><span className="font-medium">Multi-moneda</span></div>
-                <p className="text-sm text-gray-600">PEN, USD y EUR para registrar y analizar tus gastos.</p>
-              </CardContent>
-            </Card>
+            <div className="rounded-2xl border border-border bg-card p-6 shadow-lg ring-1 ring-border hover:bg-muted transition">
+              <div className="flex items-center gap-3"><ShieldCheck className="h-5 w-5 text-indigo-700" /><div className="font-medium">Seguridad</div></div>
+              <p className="mt-2 text-sm text-gray-600">Autenticación segura, datos encriptados y control de acceso.</p>
+            </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Integraciones */}
-      <section id="integrations" className="mx-auto max-w-7xl px-6 py-8">
-        <div className="rounded-2xl border bg-card/85 p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h3 className="text-xl font-semibold flex items-center gap-2"><MessageCircle className="h-5 w-5 text-green-600" /> Integraciones por chat</h3>
-            <p className="mt-1 text-sm text-gray-700">Conecta Telegram y WhatsApp para enviar comprobantes directo al sistema.</p>
-            <p className="mt-1 text-xs text-gray-500">Gestiona integraciones desde el panel.</p>
-          </div>
-          <Link href={dashboardHref === "/dashboard" ? "/dashboard/integrations" : "/register"} className="w-full sm:w-auto">
-            <Button className="w-full sm:w-auto bg-gradient-to-r from-indigo-700 via-orange-600 to-blue-700 text-white shadow-sm hover:opacity-95">Configurar integraciones</Button>
-          </Link>
-        </div>
-      </section>
+      
 
 
       {/* How it works */}
       <section id="how" className="mx-auto max-w-7xl px-6 py-12 scroll-mt-24">
-        <h2 className="text-2xl font-semibold">Cómo funciona</h2>
-        <div className="mt-6 grid gap-4 sm:grid-cols-3">
+        <Reveal>
+          <h2 className="text-2xl font-semibold text-center">Cómo funciona</h2>
+        </Reveal>
+        <RevealList className="mt-6 grid gap-4 sm:grid-cols-3" itemOffset={{ y: 14 }}>
           <Card className="overflow-hidden">
             <CardContent className="p-5">
               <div className="text-xs text-gray-500">Paso 1</div>
@@ -286,24 +397,35 @@ export default function Home() {
               <p className="mt-2 text-sm text-gray-600">Obtén métricas y reportes para optimizar gastos.</p>
             </CardContent>
           </Card>
-        </div>
+        </RevealList>
       </section>
 
       {/* Pricing / CTA */}
       <section id="pricing" className="mx-auto max-w-7xl px-6 py-12 scroll-mt-24">
         <div className="rounded-2xl border bg-card p-6 shadow-sm">
-          <h2 className="text-2xl font-semibold">Precios</h2>
-          <p className="mt-1 text-sm text-muted-foreground">Elige el plan que se ajuste a tu negocio.</p>
-          <div className="mt-6 grid gap-6 md:grid-cols-2">
+          <Reveal>
+            <h2 className="text-2xl font-semibold">Precios</h2>
+          </Reveal>
+          <Reveal delay={0.08}>
+            <p className="mt-1 text-sm text-muted-foreground">Elige el plan que se ajuste a tu negocio.</p>
+          </Reveal>
+          <RevealList className="mt-6 grid gap-6 md:grid-cols-2" itemOffset={{ y: 16 }}>
             <Card className="bg-card/90 backdrop-blur-sm shadow-md ring-1 ring-border border-l-4 border-indigo-500">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">Premium Mensual</CardTitle>
               </CardHeader>
               <CardContent className="p-5">
-                <div className="text-3xl font-bold">USD 4.99</div>
-                <ul className="mt-3 space-y-2 text-sm text-slate-700">
+                <div className="text-3xl font-bold bg-gradient-to-r from-indigo-700 via-orange-600 to-blue-700 bg-clip-text text-transparent">USD 3</div>
+                <ul className="mt-3 space-y-2 text-sm text-black dark:text-white">
                   <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Acceso a todas las funciones</li>
-                  <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Reportes avanzados</li>
+                  <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Uploads inteligentes</li>
+                  <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Extracción con IA</li>
+                  <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Métricas y reportes</li>
+                  <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Presupuesto y alertas</li>
+                  <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Multi-moneda (PEN, USD, EUR)</li>
+                  <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Integraciones por chat (Telegram y WhatsApp)</li>
+                  <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Seguridad avanzada</li>
+                  <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Soporte por correo</li>
                   <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Renovación mensual</li>
                 </ul>
                  <Link href={buyHref} className="mt-4 inline-block">
@@ -316,10 +438,17 @@ export default function Home() {
                 <CardTitle className="flex items-center gap-2">Premium Anual</CardTitle>
               </CardHeader>
               <CardContent className="p-5">
-                <div className="text-3xl font-bold">USD 24.99</div>
-                <ul className="mt-3 space-y-2 text-sm text-slate-700">
-                  <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Todo lo del mensual</li>
-                  <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Ahorro de 50%</li>
+                <div className="text-3xl font-bold bg-gradient-to-r from-indigo-700 via-orange-600 to-blue-700 bg-clip-text text-transparent">USD 14.99</div>
+                <ul className="mt-3 space-y-2 text-sm text-black dark:text-white">
+                  <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Acceso a todas las funciones</li>
+                  <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Uploads inteligentes</li>
+                  <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Extracción con IA</li>
+                  <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Métricas y reportes</li>
+                  <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Presupuesto y alertas</li>
+                  <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Multi-moneda (PEN, USD, EUR)</li>
+                  <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Integraciones por chat (Telegram y WhatsApp)</li>
+                  <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Seguridad avanzada</li>
+                  <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Soporte por correo</li>
                   <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Renovación anual</li>
                 </ul>
                  <Link href={buyHref} className="mt-4 inline-block">
@@ -327,71 +456,134 @@ export default function Home() {
                  </Link>
               </CardContent>
             </Card>
-          </div>
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-lg border border-border bg-card p-4">
-            <div>
-              <div className="font-medium">Empieza hoy mismo</div>
-              <div className="text-sm text-muted-foreground">Sin tarjeta. Cancela cuando quieras.</div>
+          </RevealList>
+          <Reveal className="mt-6">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-lg border border-border bg-card p-4">
+              <div>
+                <div className="font-medium">Empieza hoy mismo</div>
+                <div className="text-sm text-muted-foreground">Sin tarjeta. Cancela cuando quieras.</div>
+              </div>
+              <Link href="/register" className="w-full sm:w-auto">
+                <Button className="w-full sm:w-auto bg-gradient-to-r from-indigo-700 via-orange-600 to-blue-700 text-white shadow-sm hover:opacity-95">Crear cuenta</Button>
+              </Link>
             </div>
-            <Link href="/register" className="w-full sm:w-auto">
-              <Button className="w-full sm:w-auto bg-gradient-to-r from-indigo-700 via-orange-600 to-blue-700 text-white shadow-sm hover:opacity-95">Crear cuenta</Button>
-            </Link>
-          </div>
+          </Reveal>
         </div>
       </section>
 
       {/* FAQ */}
-      <section id="faq" className="mx-auto max-w-7xl px-6 py-12 scroll-mt-24">
-        <h2 className="text-2xl font-semibold">Preguntas frecuentes</h2>
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
-          <Card>
-            <CardContent className="p-5">
-              <div className="font-medium">¿Necesito tarjeta para empezar?</div>
-              <p className="mt-2 text-sm text-gray-600">No. El plan Free no requiere tarjeta y puedes cancelar cuando quieras.</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-5">
-              <div className="font-medium">¿Qué documentos soportan?</div>
-              <p className="mt-2 text-sm text-gray-600">Imágenes (JPG/PNG) y PDFs. Próximamente formatos escaneados multipágina.</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-5">
-              <div className="font-medium">¿Cómo manejan la seguridad?</div>
-              <p className="mt-2 text-sm text-gray-600">Cifrado en tránsito y reposo, autenticación segura y control de acceso por roles.</p>
-            </CardContent>
-          </Card>
+      <section id="faq" className="mx-auto max-w-7xl px-6 py-20 scroll-mt-24">
+        <Reveal>
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-center bg-gradient-to-r from-sky-600 to-indigo-700 bg-clip-text text-transparent">¿TODAVÍA TIENES DUDAS?</h2>
+        </Reveal>
+        <Reveal delay={0.06}>
+          <p className="mt-2 text-sm text-muted-foreground text-center">Encuentra respuestas a preguntas comunes sobre ContaPRO y sus características.</p>
+        </Reveal>
+        <div className="mt-10 grid gap-8 md:grid-cols-2 items-start md:items-center">
+          <Reveal className="order-2 md:order-1">
+            {activeFaq !== null && (
+              <div className="rounded-xl border bg-card shadow-sm">
+                <div className="flex items-center justify-between border-b p-4">
+                  <div className="text-sm font-semibold text-sky-700">{activeFaq.q}</div>
+                  <button type="button" aria-label="Cerrar respuesta" className="inline-flex h-7 w-7 items-center justify-center rounded-md border hover:bg-muted" onClick={() => setFaqOpen(null)}>
+                    <Minus className="h-4 w-4" />
+                  </button>
+                </div>
+                <div className="p-5 text-sm text-gray-700 space-y-2">
+                  {activeFaq.a.map((line, i) => (
+                    <p key={i}>{line}</p>
+                  ))}
+                </div>
+              </div>
+            )}
+            <ul className="mt-6 space-y-2">
+              {faqs.map((it, i) => (
+                <li key={i}>
+                  <button type="button" className="w-full rounded-md border bg-card px-4 py-3 text-left text-sm hover:bg-muted flex items-center justify-between" onClick={() => setFaqOpen(prev => (prev === i ? null : i))}>
+                    <span className="font-medium">{it.q}</span>
+                    <Plus className="h-4 w-4" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </Reveal>
+          <Reveal className="order-1 md:order-2">
+            <div className="flex items-center justify-center md:justify-center md:items-center">
+              <Image src="/logo_faq.png" alt="FAQ" width={800} height={600} className="w-full max-w-md md:max-w-xl lg:max-w-2xl h-auto object-contain" priority />
+            </div>
+          </Reveal>
         </div>
       </section>
 
       {/* Testimonials & Footer */}
-      <section className="mx-auto max-w-7xl px-6 pb-24">
-        <div className="rounded-2xl border bg-card/85 p-6">
-          <div className="grid gap-6 md:grid-cols-3">
-            <blockquote className="text-sm text-gray-700">
-              “Nos ahorra horas cada semana procesando boletas.”
-              <div className="mt-2 text-xs text-gray-500">Gerencia - Comercio</div>
-            </blockquote>
-            <blockquote className="text-sm text-gray-700">
-              “Las métricas por categoría nos ayudaron a recortar gastos.”
-              <div className="mt-2 text-xs text-gray-500">Servicios Profesionales</div>
-            </blockquote>
-            <blockquote className="text-sm text-gray-700">
-              “La subida desde móvil es súper rápida y práctica.”
-              <div className="mt-2 text-xs text-gray-500">Emprendimiento</div>
-            </blockquote>
+      <section className="mx-auto max-w-7xl px-6 pb-16">
+        <Reveal>
+          <h3 className="text-2xl sm:text-3xl font-bold text-center">
+            Sí, quiero <span className="bg-gradient-to-r from-indigo-700 via-orange-600 to-blue-700 bg-clip-text text-transparent">automatizar mi contabilidad</span> con ContaPRO
+          </h3>
+        </Reveal>
+        <Reveal delay={0.06}>
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-4 text-sm text-muted-foreground">
+            <div className="inline-flex items-center gap-2"><Check className="h-4 w-4 text-sky-600" /> Prueba 7 días gratis</div>
+            <div className="inline-flex items-center gap-2"><Check className="h-4 w-4 text-sky-600" /> Cancela cuando quieras</div>
+            <div className="inline-flex items-center gap-2"><Check className="h-4 w-4 text-sky-600" /> Configuración en 5 minutos</div>
           </div>
-          <div className="mt-8 flex flex-col items-center gap-3 border-t pt-4 text-sm text-gray-700 sm:flex-row sm:items-center sm:justify-between">
-            <div>© {new Date().getFullYear()} ContaPRO</div>
-            <div className="flex flex-wrap items-center justify-center gap-4">
-              <a href="#" className="hover:text-gray-900">Privacidad</a>
-              <a href="#" className="hover:text-gray-900">Términos</a>
-              <Link href="/login" className="hover:text-gray-900">Acceder</Link>
+        </Reveal>
+        <Reveal delay={0.12}>
+          <div className="mt-6 flex justify-center">
+            <Link href="/register">
+              <Button className="h-11 px-6 rounded-full bg-gradient-to-r from-indigo-700 via-orange-600 to-blue-700 text-white shadow-md hover:opacity-95">Empieza ahora</Button>
+            </Link>
+          </div>
+        </Reveal>
+        <Reveal delay={0.18}>
+          <div className="mt-10 flex items-center justify-center">
+            <Image src="/logo_venta.png" alt="ContaPRO" width={720} height={520} className="w-full max-w-xl h-auto object-contain" />
+          </div>
+        </Reveal>
+      </section>
+
+      <footer className="w-full border-t border-border bg-card">
+        <div className="mx-auto max-w-7xl px-6 py-10">
+          <div className="grid gap-8 md:grid-cols-4">
+            <div className="flex flex-col gap-4">
+              <Image src="/logo.png" alt="ContaPRO" width={200} height={80} className="h-14 w-auto object-contain" />
+            </div>
+            <div>
+              <div className="font-semibold">Enlaces útiles</div>
+              <div className="mt-3 flex flex-col gap-2 text-sm">
+                <Link href="#faq" className="text-muted-foreground hover:text-foreground">FAQ</Link>
+                <Link href="/login" className="text-muted-foreground hover:text-foreground">Centro de soporte</Link>
+              </div>
+            </div>
+            <div>
+              <div className="font-semibold">Cumplimiento</div>
+              <div className="mt-3 flex flex-col gap-2 text-sm">
+                <Link href="#" className="text-muted-foreground hover:text-foreground">Términos y condiciones</Link>
+                <Link href="#" className="text-muted-foreground hover:text-foreground">Política de privacidad</Link>
+                <Link href="#" className="text-muted-foreground hover:text-foreground">Política de Cookies</Link>
+              </div>
+            </div>
+            <div>
+              <div className="font-semibold">Síguenos</div>
+              <div className="mt-3 flex items-center gap-3">
+                <a aria-label="Instagram" href="https://www.instagram.com/contapro.lat/" target="_blank" rel="noopener noreferrer" className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-fuchsia-400 to-pink-600 text-white shadow-md hover:brightness-110">
+                  <Instagram className="h-5 w-5" />
+                </a>
+              </div>
+            </div>
+          </div>
+          <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="text-xs text-muted-foreground sm:order-1 order-2">© {new Date().getFullYear()} ContaPRO. Todos los derechos reservados.</div>
+            <div className="flex flex-wrap items-center justify-start sm:justify-end gap-3 order-1 sm:order-2">
+              <Image src="/cards/mastercard.svg" alt="Mastercard" width={64} height={40} className="h-8 w-auto" unoptimized />
+              <Image src="/cards/visa.svg" alt="Visa" width={64} height={40} className="h-8 w-auto" unoptimized />
+              <Image src="/cards/amex.svg" alt="American Express" width={64} height={40} className="h-8 w-auto" unoptimized />
+              <Image src="/cards/maestro.svg" alt="Maestro" width={64} height={40} className="h-8 w-auto" unoptimized />
             </div>
           </div>
         </div>
-      </section>
+      </footer>
     </div>
   );
 }

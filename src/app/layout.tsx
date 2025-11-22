@@ -16,6 +16,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "ContaPRO — Gestión de Gastos",
   description: "Dashboard web para facturas/boletas con IA y presupuesto",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_LANDING_HOST || "http://localhost:3000"),
   icons: {
     icon: [
       { url: "/favicon.svg", type: "image/svg+xml" },
@@ -23,6 +24,23 @@ export const metadata: Metadata = {
     ],
     shortcut: "/favicon.svg",
     apple: "/logo.png",
+  },
+  openGraph: {
+    title: "ContaPRO — Gestión de Gastos",
+    description: "Dashboard web para facturas/boletas con IA y presupuesto",
+    url: "/",
+    siteName: "ContaPRO",
+    images: [
+      { url: "/logo.png", width: 1200, height: 630, alt: "ContaPRO" },
+    ],
+    locale: "es",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "ContaPRO — Gestión de Gastos",
+    description: "Dashboard web para facturas/boletas con IA y presupuesto",
+    images: ["/logo.png"],
   },
 };
 

@@ -134,6 +134,16 @@
   }
 }
 
+.font-science {
+  font-family: "Science Gothic", sans-serif;
+}
+
+.font-stack-sans {
+  font-family: "Stack Sans Text", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+}
+
 /* Componentes reutilizables */
 @layer components {
   .btn-premium {
@@ -147,6 +157,23 @@
   .btn-important {
     @apply inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-indigo-700 via-orange-600 to-blue-700 px-4 py-2 text-white shadow-md hover:shadow-lg disabled:opacity-60;
   }
+  .menu-pop {
+    animation: menu-pop .16s ease-out;
+  }
+  .panel-bg {
+    position: relative;
+    border-radius: 18px;
+    background: var(--card);
+    box-shadow: inset 0 0 0 1px var(--border), 0 12px 24px rgba(0,0,0,0.2);
+  }
+  .panel-bg::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(120% 100% at 0% 0%, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 40%), radial-gradient(120% 100% at 100% 100%, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0) 50%), linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0) 60%);
+    pointer-events: none;
+    border-radius: inherit;
+  }
 }
 
 @keyframes premium-breath {
@@ -158,4 +185,9 @@
     box-shadow: 0 0 26px rgba(99,102,241,0.55), 0 0 38px rgba(236,72,153,0.35);
     transform: translateZ(0) scale(1.03);
   }
+}
+
+@keyframes menu-pop {
+  0% { opacity: 0; transform: translateY(6px) scale(0.98); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
 }

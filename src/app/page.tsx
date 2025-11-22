@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useEffect, useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, UploadCloud, Receipt, BarChart3, ShieldCheck, Bot, MessageCircle, Check, Send, Instagram, Plus, Minus } from "lucide-react";
+import { ArrowRight, UploadCloud, Receipt, BarChart3, ShieldCheck, Bot, Check, Instagram, Plus, Minus } from "lucide-react";
 import { motion, useAnimate, type AnimationPlaybackControls } from "framer-motion";
 import { Reveal, RevealList } from "@/components/Reveal";
 import MobileNav from "@/components/MobileNav";
@@ -19,6 +19,30 @@ export default function Home() {
   const [scopeDark, animateDark] = useAnimate();
   const marqueeLight = useRef<AnimationPlaybackControls | null>(null);
   const marqueeDark = useRef<AnimationPlaybackControls | null>(null);
+  const typedPhrases = [
+    "Con IA",
+    "Con WhatsApp",
+    "Con Telegram",
+  ];
+  const [typedText, setTypedText] = useState("");
+  const [typedIndex, setTypedIndex] = useState(0);
+  const [charIndex, setCharIndex] = useState(0);
+  const [deleting, setDeleting] = useState(false);
+  const [caretOn, setCaretOn] = useState(true);
+  const promoItems = [
+    { parts: [{ text: "Prueba gratis", className: "text-primary" }, { text: " 7 días usando el código" }], code: "TRIAL" },
+    { parts: [{ text: "10% extra de descuento", className: "text-accent" }, { text: " usando el código" }], code: "CONTA10" },
+    { parts: [{ text: "Configura en 5 minutos", className: "text-primary" }, { text: " y controla tus gastos con IA" }] },
+  ] as const;
+  const [copiedCode, setCopiedCode] = useState<string | null>(null);
+  const copyCode = (code: string) => {
+    if (!code) return;
+    try {
+      navigator.clipboard.writeText(code);
+      setCopiedCode(code);
+      setTimeout(() => setCopiedCode(null), 1200);
+    } catch {}
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -73,6 +97,33 @@ export default function Home() {
       try { marqueeDark.current = animateDark(elDark, { x: ["0%", "-50%"] }, { duration: 30, ease: "linear", repeat: Infinity }); } catch {}
     }
   }, [scopeLight, animateLight, scopeDark, animateDark, sponsorsLight.length, sponsorsDark.length]);
+  useEffect(() => {
+    const i = setInterval(() => setCaretOn(v => !v), 700);
+    return () => clearInterval(i);
+  }, []);
+  useEffect(() => {
+    const current = typedPhrases[typedIndex];
+    if (!deleting && charIndex === current.length) {
+      const p = setTimeout(() => setDeleting(true), 1200);
+      return () => clearTimeout(p);
+    }
+    const speed = deleting ? 80 : 130;
+    const t = setTimeout(() => {
+      if (!deleting) {
+        setTypedText(current.slice(0, charIndex + 1));
+        setCharIndex(charIndex + 1);
+      } else {
+        if (charIndex > 0) {
+          setTypedText(current.slice(0, charIndex - 1));
+          setCharIndex(charIndex - 1);
+        } else {
+          setDeleting(false);
+          setTypedIndex((typedIndex + 1) % typedPhrases.length);
+        }
+      }
+    }, speed);
+    return () => clearTimeout(t);
+  }, [typedIndex, charIndex, deleting]);
   const nLight = Math.max(1, sponsorsLight.length || 1);
   const gapLight = sponsorsLight.length <= 2 ? "1rem" : "1.5rem";
   const styleLight = { willChange: "transform", gap: gapLight } as React.CSSProperties & Record<'--n' | '--gap', string>;
@@ -109,7 +160,7 @@ export default function Home() {
   const [faqOpen, setFaqOpen] = useState<number | null>(0);
   const activeFaq = faqOpen !== null ? faqs[faqOpen] : null;
   return (
-    <div className="dark relative min-h-svh w-full overflow-hidden">
+    <div className={`font-science dark relative min-h-svh w-full overflow-hidden`}>
       {/* Fondo con gradientes vibrantes y acentos orgánicos */}
       <div className="pointer-events-none absolute inset-0 -z-10 dark:opacity-0">
         <div className="absolute inset-0 bg-gradient-to-br from-white via-gray-50 to-blue-50" />
@@ -145,7 +196,7 @@ export default function Home() {
       {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b border-border bg-card/90 backdrop-blur-lg shadow-sm">
         <div className="relative flex h-20 items-center px-3 md:px-8">
-          <div className="flex items-center gap-2 md:gap- ml-0 md:ml-80">
+          <div className="flex items-center gap-2 md:gap-4 ml-0 md:ml-0">
             <Image
               src="/logo.png"
               width={520}
@@ -157,7 +208,7 @@ export default function Home() {
             />
             <a href="#pricing" className="hidden md:inline transition-opacity hover:opacity-90 hover:underline underline-offset-4 decoration-indigo-400">Planes y precios</a>
           </div>
-          <div className="hidden md:flex items-center gap-4 absolute right-100 top-1/2 -translate-y-1/2">
+          <div className="hidden md:flex items-center gap-4 absolute right-10 top-1/2 -translate-y-1/2">
             {dashboardHref === "/dashboard" ? (
               <Link href="/dashboard" className="rounded-md bg-gradient-to-r from-indigo-700 via-orange-600 to-blue-700 px-3 py-1.5 text-white shadow-sm hover:opacity-95 transition-transform hover:-translate-y-[1px]">Ir al dashboard</Link>
             ) : (
@@ -173,6 +224,36 @@ export default function Home() {
         </div>
       </header>
 
+      <section className="w-full border-b border-border bg-card/80 backdrop-blur-sm">
+        <div className="relative w-full overflow-hidden px-4">
+          <motion.div
+            className="flex items-center min-w-max gap-8 py-2 text-sm font-semibold"
+            animate={{ x: ["0%", "-50%"] }}
+            transition={{ duration: 28, ease: "linear", repeat: Infinity }}
+          >
+            {[...promoItems, ...promoItems].map((item, i) => (
+              <span key={`promo-${i}`} className="whitespace-nowrap flex items-center gap-2">
+                <span>•</span>
+                <span>
+                  {item.parts.map((p, idx) => (
+                    <span key={`part-${i}-${idx}`} className={'className' in p ? p.className : ""}>{p.text}</span>
+                  ))}
+                  {'code' in item && item.code ? (
+                    <button
+                      onClick={() => copyCode(item.code!)}
+                      title="Copiar código"
+                      className={`ml-2 inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-semibold transition-colors ${copiedCode === item.code ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border hover:bg-muted"}`}
+                    >
+                      {item.code}
+                    </button>
+                  ) : null}
+                </span>
+              </span>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
       {/* Hero */}
       <section className="mx-auto max-w-7xl px-6 py-16">
         <div className="grid items-center gap-12 md:grid-cols-2 lg:gap-16">
@@ -181,15 +262,18 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <h1 className="text-4xl sm:text-6xl font-bold tracking-tight leading-tight">
-              <span className="bg-gradient-to-r from-indigo-800 via-orange-700 to-blue-600 bg-clip-text text-transparent">
-                Gestión de gastos con IA, integraciones y presupuesto inteligente
-              </span>
+            <p className="text-center text-3xl sm:text-6xl font-bold tracking-tight">
+              <span className="bg-gradient-to-r from-indigo-800 via-orange-700 to-blue-600 bg-clip-text text-transparent">Gestión de gastos</span>
+            </p>
+            <h1 className="mt-2 text-center text-3xl sm:text-6xl font-bold tracking-tight leading-tight">
+              <span className="bg-gradient-to-r from-indigo-800 via-orange-700 to-blue-600 bg-clip-text text-transparent whitespace-nowrap">{typedText}</span>
+              <span className="inline-block w-2">{caretOn ? "|" : " "}</span>
             </h1>
-            <p className="mt-4 text-black dark:text-white text-lg font-medium">
+            <p className="mt-4 text-center text-black dark:text-white text-lg font-medium">
               Procesa comprobantes con IA y controla tus gastos con métricas claras, presupuesto con alertas, integraciones por WhatsApp y Telegram y seguridad avanzada.
             </p>
-            <div className="mt-7 flex flex-wrap items-center gap-4">
+            
+            <div className="mt-7 flex flex-wrap items-center justify-center gap-4">
               <Link href="/register">
               <motion.button
                 whileHover={{ scale: 1.05 }}
@@ -204,46 +288,8 @@ export default function Home() {
             </div>
             
           </motion.div>
-          <div className="relative">
-            <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-indigo-200/50 via-orange-200/50 to-blue-200/50 blur-xl opacity-70 rotate-2 dark:opacity-0" />
-            <div className="relative rounded-2xl border border-border bg-card/90 p-4 shadow-lg ring-1 ring-border transform -rotate-1">
-              <div className="mb-3 flex items-center justify-between">
-                <div className="font-medium">Tu panel financiero</div>
-                <div className="text-xs text-muted-foreground">Demo</div>
-              </div>
-              <div className="grid grid-cols-3 gap-3">
-                <Card className="border border-border bg-card hover:bg-muted transition-colors">
-                  <CardContent className="p-4">
-                    <div className="text-xs text-muted-foreground">Documentos</div>
-                    <div className="text-xl font-semibold">128</div>
-                  </CardContent>
-                </Card>
-                <Card className="border border-border bg-card hover:bg-muted transition-colors">
-                  <CardContent className="p-4">
-                    <div className="text-xs text-muted-foreground">Gasto del mes</div>
-                    <div className="text-xl font-semibold">S/ 2,340</div>
-                  </CardContent>
-                </Card>
-                <Card className="border border-border bg-card hover:bg-muted transition-colors">
-                  <CardContent className="p-4">
-                    <div className="text-xs text-muted-foreground">Categorías</div>
-                    <div className="text-xl font-semibold">15</div>
-                  </CardContent>
-                </Card>
-              </div>
-              <div className="mt-4 rounded-md bg-muted p-3">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <Button type="button" className="w-full justify-center bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm">
-                    <MessageCircle className="h-4 w-4 mr-2" />
-                    Integrar con WhatsApp
-                  </Button>
-                  <Button type="button" className="w-full justify-center bg-sky-600 hover:bg-sky-700 text-white shadow-sm">
-                    <Send className="h-4 w-4 mr-2" />
-                    Integrar con Telegram
-                  </Button>
-                </div>
-              </div>
-            </div>
+          <div className="mt-6 md:mt-0 flex items-center justify-center md:justify-end md:ml-auto">
+            <Image src="/logo_hero.png" alt="ContaPRO" width={1080} height={777} className="w-[1080px] max-w-full h-auto object-contain" />
           </div>
         </div>
       </section>
@@ -410,13 +456,17 @@ export default function Home() {
             <p className="mt-1 text-sm text-muted-foreground">Elige el plan que se ajuste a tu negocio.</p>
           </Reveal>
           <RevealList className="mt-6 grid gap-6 md:grid-cols-2" itemOffset={{ y: 16 }}>
-            <Card className="bg-card/90 backdrop-blur-sm shadow-md ring-1 ring-border border-l-4 border-indigo-500">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">Premium Mensual</CardTitle>
-              </CardHeader>
-              <CardContent className="p-5">
-                <div className="text-3xl font-bold bg-gradient-to-r from-indigo-700 via-orange-600 to-blue-700 bg-clip-text text-transparent">USD 3</div>
-                <ul className="mt-3 space-y-2 text-sm text-black dark:text-white">
+            <Card className="rounded-2xl shadow-lg border border-border bg-card">
+              <CardContent className="p-6">
+                <div className="text-center">
+                  <Image src="/icono_plan_mensual_hd.png" alt="Plan ContaPRO" width={80} height={80} className="mx-auto h-30 w-80 object-contain" />
+                  <div className="mt-3 text-lg font-bold uppercase">PREMIUM MENSUAL</div>
+                  <div className="mt-1 text-sm text-muted-foreground">Ideal si prefieres pagar mes a mes</div>
+                  <div className="mt-4 text-xs line-through text-muted-foreground">Antes USD 5</div>
+                  <div className="mt-1 text-4xl font-bold">USD 3<span className="text-base font-medium">/mes</span></div>
+                </div>
+                <div className="mt-5 text-center text-sm font-semibold">Incluye</div>
+                <ul className="mt-2 space-y-2 text-sm text-black dark:text-white">
                   <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Acceso a todas las funciones</li>
                   <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Uploads inteligentes</li>
                   <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Extracción con IA</li>
@@ -428,18 +478,22 @@ export default function Home() {
                   <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Soporte por correo</li>
                   <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Renovación mensual</li>
                 </ul>
-                 <Link href={buyHref} className="mt-4 inline-block">
-                  <Button className="bg-gradient-to-r from-indigo-700 via-orange-600 to-blue-700 text-white hover:opacity-95 shadow-[0_0_20px_rgba(99,102,241,0.35)] hover:shadow-[0_0_32px_rgba(99,102,241,0.6)] transition-shadow">Comprar <ArrowRight className="ml-2 h-4 w-4 inline" /></Button>
-                 </Link>
+                <Link href={buyHref} className="mt-5 block">
+                  <Button className="w-full h-11 rounded-full bg-gradient-to-r from-indigo-700 via-orange-600 to-blue-700 text-white hover:opacity-95">Comprar <ArrowRight className="ml-2 h-4 w-4 inline" /></Button>
+                </Link>
               </CardContent>
             </Card>
-            <Card className="bg-card/90 backdrop-blur-sm shadow-md ring-1 ring-border border-l-4 border-amber-500">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">Premium Anual</CardTitle>
-              </CardHeader>
-              <CardContent className="p-5">
-                <div className="text-3xl font-bold bg-gradient-to-r from-indigo-700 via-orange-600 to-blue-700 bg-clip-text text-transparent">USD 14.99</div>
-                <ul className="mt-3 space-y-2 text-sm text-black dark:text-white">
+            <Card className="rounded-2xl shadow-lg border border-border bg-card">
+              <CardContent className="p-6">
+                <div className="text-center">
+                  <Image src="/icono_plan_anual_hd.png" alt="Plan ContaPRO Anual" width={80} height={80} className="mx-auto h-35 w-90 object-contain" />
+                  <div className="mt-3 text-lg font-bold uppercase">PREMIUM ANUAL</div>
+                  <div className="mt-1 text-sm text-muted-foreground">Ahorra con facturación anual</div>
+                  <div className="mt-4 text-xs line-through text-muted-foreground">Antes USD 18.99</div>
+                  <div className="mt-1 text-4xl font-bold">USD 14.99<span className="text-base font-medium">/año</span></div>
+                </div>
+                <div className="mt-5 text-center text-sm font-semibold">Incluye</div>
+                <ul className="mt-2 space-y-2 text-sm text-black dark:text-white">
                   <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Acceso a todas las funciones</li>
                   <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Uploads inteligentes</li>
                   <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Extracción con IA</li>
@@ -451,9 +505,9 @@ export default function Home() {
                   <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Soporte por correo</li>
                   <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Renovación anual</li>
                 </ul>
-                 <Link href={buyHref} className="mt-4 inline-block">
-                  <Button className="bg-gradient-to-r from-indigo-700 via-orange-600 to-blue-700 text-white hover:opacity-95 shadow-[0_0_20px_rgba(99,102,241,0.35)] hover:shadow-[0_0_32px_rgba(99,102,241,0.6)] transition-shadow">Comprar <ArrowRight className="ml-2 h-4 w-4 inline" /></Button>
-                 </Link>
+                <Link href={buyHref} className="mt-5 block">
+                  <Button className="w-full h-11 rounded-full bg-gradient-to-r from-indigo-700 via-orange-600 to-blue-700 text-white hover:opacity-95">Comprar <ArrowRight className="ml-2 h-4 w-4 inline" /></Button>
+                </Link>
               </CardContent>
             </Card>
           </RevealList>

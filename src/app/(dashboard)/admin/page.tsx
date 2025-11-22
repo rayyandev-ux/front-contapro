@@ -186,7 +186,7 @@ export default function Page() {
         {plansError && <p className="text-sm text-destructive">{plansError}</p>}
         {!plansLoading && !plansError && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="rounded-md border p-3">
+            <div className="rounded-md border p-3 panel-bg">
               <div className="text-sm font-medium mb-2">Mensual</div>
               <div className="space-y-2 text-sm">
                 <input className="w-full border rounded-md p-2" value={monthly.name} onChange={e => setMonthly(prev => ({ ...prev, name: e.target.value }))} placeholder="Nombre" />
@@ -196,7 +196,7 @@ export default function Page() {
                 <label className="flex items-center gap-2"><input type="checkbox" checked={monthly.active !== false} onChange={e => setMonthly(prev => ({ ...prev, active: e.target.checked }))} /> Activo</label>
               </div>
             </div>
-            <div className="rounded-md border p-3">
+            <div className="rounded-md border p-3 panel-bg">
               <div className="text-sm font-medium mb-2">Anual</div>
               <div className="space-y-2 text-sm">
                 <input className="w-full border rounded-md p-2" value={annual.name} onChange={e => setAnnual(prev => ({ ...prev, name: e.target.value }))} placeholder="Nombre" />

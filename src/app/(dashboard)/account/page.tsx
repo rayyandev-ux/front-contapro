@@ -100,7 +100,7 @@ export default function AccountPage() {
 
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
         {/* Perfil */}
-        <Card className={`bg-card border shadow-sm`}>
+        <Card className={`bg-card border shadow-sm panel-bg`}>
           <CardHeader>
             <div className="flex items-start gap-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted text-indigo-600">
@@ -131,7 +131,7 @@ export default function AccountPage() {
         </Card>
 
         {/* Configuraciones */}
-        <Card className={`bg-card border shadow-sm`}>
+        <Card className={`bg-card border shadow-sm panel-bg`}>
           <CardHeader>
             <div className="flex items-start gap-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted text-blue-600">
@@ -194,7 +194,7 @@ export default function AccountPage() {
         </Card>
 
         {/* Suscripción */}
-        <Card className={`bg-card border shadow-sm`}>
+        <Card className={`bg-card border shadow-sm panel-bg`}>
           <CardHeader>
             <div className="flex items-start gap-3">
               <div className={`flex h-9 w-9 items-center justify-center rounded-lg bg-muted ${subAccent}`}>
@@ -240,7 +240,7 @@ export default function AccountPage() {
         </Card>
 
         {/* Seguridad */}
-        <Card className={`bg-card border shadow-sm`}>
+        <Card className={`bg-card border shadow-sm panel-bg`}>
           <CardHeader>
             <div className="flex items-start gap-3">
               <div className={`flex h-9 w-9 items-center justify-center rounded-lg bg-muted ${secAccent}`}>

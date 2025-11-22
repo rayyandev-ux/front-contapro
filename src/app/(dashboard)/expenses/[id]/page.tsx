@@ -57,7 +57,7 @@ export default async function ExpenseDetail({ params }: { params: Promise<{ id: 
         <Link href="/expenses" className="rounded-md border border-border px-3 py-1 text-sm hover:bg-muted/50">Volver</Link>
       </div>
 
-      <div className="rounded-md border border-border bg-card p-4">
+      <div className="rounded-md border border-border bg-card p-4 panel-bg">
         <div className="mb-3">
           <div className="text-sm text-muted-foreground">Editar gasto</div>
         </div>
@@ -78,27 +78,27 @@ export default async function ExpenseDetail({ params }: { params: Promise<{ id: 
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div className="rounded-md border border-border bg-card p-4">
+        <div className="rounded-md border border-border bg-card p-4 panel-bg">
           <div className="text-sm text-muted-foreground">Fecha del documento</div>
           <div className="text-sm">{fmtDate(it.issuedAt)}</div>
         </div>
-        <div className="rounded-md border border-border bg-card p-4">
+        <div className="rounded-md border border-border bg-card p-4 panel-bg">
           <div className="text-sm text-muted-foreground">Registro del sistema</div>
           <div className="text-sm">{fmtDate(it.createdAt)}</div>
         </div>
-        <div className="rounded-md border border-border bg-card p-4">
+        <div className="rounded-md border border-border bg-card p-4 panel-bg">
           <div className="text-sm text-muted-foreground">Tipo</div>
           <div className="text-sm">{it.type}</div>
         </div>
-        <div className="rounded-md border border-border bg-card p-4">
+        <div className="rounded-md border border-border bg-card p-4 panel-bg">
           <div className="text-sm text-muted-foreground">Proveedor</div>
           <div className="text-sm">{it.provider}</div>
         </div>
-        <div className="rounded-md border border-border bg-card p-4">
+        <div className="rounded-md border border-border bg-card p-4 panel-bg">
           <div className="text-sm text-muted-foreground">Categoría</div>
           <div className="text-sm">{it.category?.name || "—"}</div>
         </div>
-        <div className="rounded-md border border-border bg-card p-4">
+        <div className="rounded-md border border-border bg-card p-4 panel-bg">
           <div className="text-sm text-muted-foreground">Monto</div>
           <div className="text-sm">{Number(it.amount).toFixed(2)} {it.currency}</div>
         </div>
@@ -108,21 +108,21 @@ export default async function ExpenseDetail({ params }: { params: Promise<{ id: 
         </div>
         {details ? (
           <>
-            <div className="rounded-md border border-border bg-card p-4">
+            <div className="rounded-md border border-border bg-card p-4 panel-bg">
               <div className="text-sm text-muted-foreground">N° Documento</div>
               <div className="text-sm">{details.docNumber || "—"}</div>
             </div>
-            <div className="rounded-md border border-border bg-card p-4">
+            <div className="rounded-md border border-border bg-card p-4 panel-bg">
               <div className="text-sm text-muted-foreground">Emisor</div>
               <div className="text-sm">{details.emitter?.name || "—"} ({details.emitter?.idType || "—"}: {details.emitter?.idNumber || "—"})</div>
             </div>
             {details.receiver ? (
-              <div className="rounded-md border border-border bg-card p-4">
+              <div className="rounded-md border border-border bg-card p-4 panel-bg">
                 <div className="text-sm text-muted-foreground">Receptor</div>
                 <div className="text-sm">{details.receiver?.name || "—"} ({details.receiver?.idType || "—"}: {details.receiver?.idNumber || "—"})</div>
               </div>
             ) : null}
-            <div className="rounded-md border border-border bg-card p-4">
+              <div className="rounded-md border border-border bg-card p-4 panel-bg">
               <div className="text-sm text-muted-foreground">Impuestos</div>
               <div className="text-sm">
                 {Array.isArray(details?.totals?.taxes) && details.totals.taxes.length > 0
@@ -145,7 +145,7 @@ export default async function ExpenseDetail({ params }: { params: Promise<{ id: 
       </div>
 
       {document ? (
-        <div className="rounded-md border border-border bg-card p-4">
+        <div className="rounded-md border border-border bg-card p-4 panel-bg">
           <div className="flex items-center justify-between">
             <div>
               <div className="text-sm text-muted-foreground">Documento</div>

@@ -238,7 +238,7 @@ export default async function Page({ searchParams }: { searchParams?: Promise<Re
       {!error && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <Card>
+            <Card className="panel-bg">
               <CardHeader>
                 <CardTitle>Presupuesto</CardTitle>
               </CardHeader>
@@ -246,7 +246,7 @@ export default async function Page({ searchParams }: { searchParams?: Promise<Re
                 <p className="text-xl font-semibold">{formatCurrency(amount)}</p>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="panel-bg">
             <CardHeader>
               <CardTitle>Gastado</CardTitle>
             </CardHeader>
@@ -255,7 +255,7 @@ export default async function Page({ searchParams }: { searchParams?: Promise<Re
               <p className="text-xs text-muted-foreground">Fuente: {source === 'issued' ? 'Fecha real' : 'Registro'}</p>
             </CardContent>
           </Card>
-            <Card>
+            <Card className="panel-bg">
               <CardHeader>
                 <CardTitle>Saldo restante</CardTitle>
               </CardHeader>
@@ -265,7 +265,7 @@ export default async function Page({ searchParams }: { searchParams?: Promise<Re
             </Card>
           </div>
 
-          <Card>
+          <Card className="panel-bg">
             <CardHeader>
               <CardTitle>Actualizar presupuesto del mes</CardTitle>
             </CardHeader>
@@ -296,7 +296,7 @@ export default async function Page({ searchParams }: { searchParams?: Promise<Re
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="panel-bg">
             <CardHeader>
               <CardTitle>Actualizar umbral de alerta</CardTitle>
             </CardHeader>
@@ -314,7 +314,7 @@ export default async function Page({ searchParams }: { searchParams?: Promise<Re
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="panel-bg">
             <CardHeader>
               <CardTitle>Presupuesto por categoría</CardTitle>
             </CardHeader>
@@ -413,7 +413,7 @@ export default async function Page({ searchParams }: { searchParams?: Promise<Re
           </Card>
 
           {byMonthBudget.filter(m => m.month < monthNum).some(m => (m.budget ?? 0) > 0 || (m.spent ?? 0) > 0) && (
-            <Card>
+            <Card className="panel-bg">
               <CardHeader>
                 <CardTitle>Presupuestos de meses anteriores</CardTitle>
               </CardHeader>

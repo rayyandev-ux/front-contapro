@@ -83,7 +83,7 @@ export default function Page() {
         <p className="text-sm text-muted-foreground">Documentos subidos y analizados.</p>
       </div>
 
-      <Card>
+      <Card className="panel-bg">
         <CardHeader>
           <CardTitle>Registros</CardTitle>
         </CardHeader>

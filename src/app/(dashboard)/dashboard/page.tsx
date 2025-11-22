@@ -119,7 +119,7 @@ export default async function Page() {
     <section className="space-y-6">
       {/* Banner de suscripción / trial */}
       {me && (
-        <Card className="shadow-lg ring-1 ring-border">
+        <Card className="shadow-lg ring-1 ring-border panel-bg">
           <CardContent className="p-4">
             {me.plan === 'PREMIUM' ? (
               <div className="flex items-center justify-between text-sm">
@@ -145,7 +145,7 @@ export default async function Page() {
         </Card>
       )}
       {/* Encabezado con acciones rápidas (paleta nueva) */}
-      <Card className="bg-card border border-border dark:bg-gradient-to-r dark:from-primary/10 dark:via-secondary/10 dark:to-primary/10">
+      <Card className="bg-card border border-border panel-bg">
         <CardContent className="p-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -164,7 +164,7 @@ export default async function Page() {
 
       {/* Métricas principales */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-        <Card className="shadow-lg ring-1 ring-border">
+        <Card className="shadow-lg ring-1 ring-border panel-bg">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-semibold">Documentos subidos</CardTitle>
@@ -177,7 +177,7 @@ export default async function Page() {
           </CardContent>
         </Card>
 
-        <Card className="shadow-lg ring-1 ring-border">
+        <Card className="shadow-lg ring-1 ring-border panel-bg">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-semibold">Último archivo</CardTitle>
             <CardDescription className="text-xs">Tu actividad reciente</CardDescription>
@@ -188,7 +188,7 @@ export default async function Page() {
           </CardContent>
         </Card>
 
-        <Card className="shadow-lg ring-1 ring-border">
+        <Card className="shadow-lg ring-1 ring-border panel-bg">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-semibold">Gasto del mes</CardTitle>
@@ -203,7 +203,7 @@ export default async function Page() {
       </div>
 
       {/* Últimos análisis */}
-      <Card className="shadow-lg ring-1 ring-border">
+      <Card className="shadow-lg ring-1 ring-border panel-bg">
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg">Últimos análisis</CardTitle>
@@ -232,7 +232,7 @@ export default async function Page() {
 
       {/* Charts */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-        <Card className="shadow-lg ring-1 ring-border">
+        <Card className="shadow-lg ring-1 ring-border panel-bg">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-semibold">Gastos por categoría (mes actual)</CardTitle>
             <CardDescription className="text-xs">Distribución de tus gastos</CardDescription>
@@ -264,7 +264,7 @@ export default async function Page() {
             )}
           </CardContent>
         </Card>
-        <Card className="shadow-lg ring-1 ring-border">
+        <Card className="shadow-lg ring-1 ring-border panel-bg">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-semibold">Gastos por mes (año actual)</CardTitle>
             <CardDescription className="text-xs">Tendencia mensual</CardDescription>
@@ -291,7 +291,7 @@ export default async function Page() {
             )}
           </CardContent>
         </Card>
-        <Card className="shadow-lg ring-1 ring-border">
+        <Card className="shadow-lg ring-1 ring-border panel-bg">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-semibold">Presupuesto vs Gastos (año actual)</CardTitle>
             <CardDescription className="text-xs">Comparativa mensual</CardDescription>

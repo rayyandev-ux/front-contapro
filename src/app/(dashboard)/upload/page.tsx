@@ -97,7 +97,7 @@ export default function Page() {
 
   return (
     <section>
-      <Card className="overflow-hidden">
+      <Card className="overflow-hidden panel-bg">
         <CardHeader>
           <CardTitle>Subir documento</CardTitle>
           <CardDescription>

@@ -17,6 +17,7 @@ type Props = {
   isAdmin?: boolean;
   onNavigate?: () => void;
   mobileOnly?: boolean;
+  hideAccount?: boolean;
 };
 
 type NavItem = {
@@ -37,32 +38,35 @@ const items: NavItem[] = [
   { href: "/admin", label: "Admin", Icon: Shield, adminOnly: true },
 ];
 
-export default function SidebarNav({ isAdmin, onNavigate, mobileOnly }: Props) {
+export default function SidebarNav({ isAdmin, onNavigate, mobileOnly, hideAccount }: Props) {
   const pathname = usePathname();
   let list = items.filter((i) => !i.adminOnly || isAdmin);
   if (mobileOnly) {
     list = list.filter((i) => i.href === '/integrations' || i.href === '/account' || i.href === '/admin');
   }
+  if (hideAccount) {
+    list = list.filter((i) => i.href !== '/account');
+  }
 
   return (
     <nav className="text-sm">
-      <ul className="divide-y divide-border">
+      <ul className="flex flex-col gap-2">
         {list.map(({ href, label, Icon }) => {
           const isActive = pathname === href || pathname.startsWith(href + "/");
           const base =
-            "group flex items-center gap-2 px-3 py-2 transition-colors duration-150 border-l-4 pl-2";
+            "group flex items-center gap-2 px-3 py-2 rounded-full transition-colors duration-150 text-white";
           const active =
-            "bg-primary/10 text-primary font-medium border-primary";
+            "bg-primary/10 text-white font-medium ring-1 ring-primary/30";
           const inactive =
-            "text-muted-foreground hover:bg-muted hover:text-foreground border-transparent hover:border-primary/30";
+            "text-white hover:bg-muted hover:text-white";
           return (
             <li key={href}>
               <Link href={href} onClick={() => onNavigate?.()} className={`${base} ${isActive ? active : inactive}`}>
                 <Icon
                   className={`h-4 w-4 ${
                     isActive
-                      ? "text-primary"
-                      : "text-muted-foreground group-hover:text-foreground"
+                      ? "text-white"
+                      : "text-white/70 group-hover:text-white"
                   }`}
                 />
                 <span className="flex-1">{label}</span>

@@ -34,7 +34,7 @@ export default function MobileNav({ dashboardHref, showThemeToggle = true }: { d
                   <X className="h-4 w-4" />
                   Cerrar
                 </button>
-                <Image src="/logo.png" alt="ContaPRO" width={140} height={140} className="absolute left-1/2 top-16 -translate-x-1/2 h-28 w-28 rounded-md object-contain" />
+                <Image src="/logo.png" alt="ContaPRO" width={140} height={140} className="absolute left-1/2 top-16 -translate-x-1/2 h-28 w-28 rounded-md object-contain" unoptimized />
               </div>
               <div className="mt-40 space-y-3">
                 <a href="#pricing" className="block rounded-md px-3 py-2 hover:bg-muted" onClick={() => setOpen(false)}>

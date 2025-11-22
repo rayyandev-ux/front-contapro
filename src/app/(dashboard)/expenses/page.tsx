@@ -107,7 +107,7 @@ export default function Page() {
         <Link href="/expenses/new" className="rounded-md bg-gradient-to-r from-fuchsia-600 via-indigo-600 to-blue-600 px-4 py-2 text-white shadow-sm hover:opacity-95">Añadir gasto</Link>
       </div>
 
-      <Card className="mb-4">
+      <Card className="mb-4 panel-bg">
         <CardHeader>
           <CardTitle>Filtros</CardTitle>
         </CardHeader>
@@ -146,7 +146,7 @@ export default function Page() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="panel-bg">
         <CardHeader>
           <CardTitle>Gastos del mes actual</CardTitle>
         </CardHeader>
@@ -267,7 +267,7 @@ export default function Page() {
       </Card>
 
       {pastItems.length > 0 && (
-        <Card className="mt-6">
+        <Card className="mt-6 panel-bg">
           <CardHeader>
             <CardTitle>Gastos de meses anteriores</CardTitle>
           </CardHeader>

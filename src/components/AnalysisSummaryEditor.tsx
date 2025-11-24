@@ -41,9 +41,6 @@ export default function AnalysisSummaryEditor({ documentId, initialSummary }: Pr
           {summary || "—"}
           {status === "saved" ? <span className="ml-2 text-xs text-green-700">Guardado</span> : null}
         </div>
-        <button className="rounded-md border px-2 py-1 text-xs hover:bg-gray-50" onClick={() => setEditing(true)}>
-          Editar
-        </button>
       </div>
     );
   }

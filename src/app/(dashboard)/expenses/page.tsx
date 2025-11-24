@@ -3,9 +3,9 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { apiJson } from "@/lib/api";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent, CardAction } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Eye, Image as ImageIcon, Trash2, Filter, Calendar, Search } from "lucide-react";
+import { Eye, Image as ImageIcon, Trash2, Filter, Calendar, Search, FileText } from "lucide-react";
 import RealtimeRefresh from "@/components/RealtimeRefresh";
 
 type Category = { id: string; name: string };
@@ -32,6 +32,7 @@ export default function Page() {
   const currencyFormatter = useMemo(() =>
     new Intl.NumberFormat("es-PE", { style: "currency", currency: "PEN", minimumFractionDigits: 2 }), []);
   const nowRef = useMemo(() => new Date(), []);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
 
   const formatAmount = (amount: number, currency?: string) => {
     try {
@@ -92,12 +93,59 @@ export default function Page() {
     });
   }, [items, nowRef]);
 
+  const allCurrentIds = useMemo(() => currentItems.map(i => i.id), [currentItems]);
+  const isAllSelected = useMemo(() => allCurrentIds.length > 0 && allCurrentIds.every(id => selected.has(id)), [allCurrentIds, selected]);
+  const selectedCount = useMemo(() => allCurrentIds.filter(id => selected.has(id)).length, [allCurrentIds, selected]);
+  const toggleSelectAll = () => {
+    setSelected(prev => {
+      const next = new Set(prev);
+      if (isAllSelected) {
+        allCurrentIds.forEach(id => next.delete(id));
+      } else {
+        allCurrentIds.forEach(id => next.add(id));
+      }
+      return next;
+    });
+  };
+  const toggleSelect = (id: string) => {
+    setSelected(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+  useEffect(() => {
+    setSelected(prev => {
+      const set = new Set<string>(currentItems.map(i => i.id));
+      const next = new Set<string>();
+      prev.forEach(id => { if (set.has(id)) next.add(id); });
+      return next;
+    });
+  }, [currentItems]);
+
   const onDelete = async (id: string) => {
     const yes = confirm("¿Eliminar este gasto?");
     if (!yes) return;
     const res = await apiJson(`/api/expenses/${id}`, { method: "DELETE" });
-    if (res.ok) setItems(prev => prev.filter(x => x.id !== id));
+    if (res.ok) {
+      setItems(prev => prev.filter(x => x.id !== id));
+      setSelected(prev => { const next = new Set(prev); next.delete(id); return next; });
+    }
     else alert(res.error || "No se pudo eliminar");
+  };
+
+  const onBulkDelete = async () => {
+    const ids = allCurrentIds.filter(id => selected.has(id));
+    if (!ids.length) return;
+    const yes = confirm(`¿Eliminar ${ids.length} gasto(s) seleccionados?`);
+    if (!yes) return;
+    const res = await apiJson(`/api/expenses/bulk-delete`, { method: "POST", body: JSON.stringify({ ids }) });
+    if (!res.ok) {
+      alert(res.error || "No se pudo eliminar seleccionados");
+      return;
+    }
+    setItems(prev => prev.filter(x => !ids.includes(x.id)));
+    setSelected(new Set());
   };
 
   return (
@@ -155,12 +203,25 @@ export default function Page() {
       <Card className="panel-bg">
         <CardHeader>
           <CardTitle>Gastos del mes actual</CardTitle>
+          <CardAction className="hidden md:flex col-span-2 justify-self-center row-start-2 w-full">
+            <div className="w-full flex flex-wrap items-center justify-center gap-3">
+              <label className="inline-flex items-center gap-2 text-xs text-muted-foreground">
+                <input type="checkbox" role="checkbox" className="h-4 w-4 rounded border-input checkbox-gray" checked={isAllSelected} onChange={toggleSelectAll} />
+                Seleccionar todos
+              </label>
+              <span className="text-xs text-muted-foreground">Seleccionados: {selectedCount}</span>
+              <Button size="sm" variant="panel" onClick={onBulkDelete} disabled={selectedCount === 0}>Eliminar seleccionados</Button>
+            </div>
+          </CardAction>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto hidden md:block">
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted">
+                  <TableHead>
+                    <input type="checkbox" role="checkbox" className="h-4 w-4 rounded border-input checkbox-gray" checked={isAllSelected} onChange={toggleSelectAll} />
+                  </TableHead>
                   <TableHead>Fecha real</TableHead>
                   <TableHead>Registro</TableHead>
                   <TableHead>Tipo</TableHead>
@@ -173,21 +234,24 @@ export default function Page() {
               <TableBody>
                 {loading && (
                   <TableRow>
-                    <TableCell colSpan={6}>Cargando...</TableCell>
+                    <TableCell colSpan={8}>Cargando...</TableCell>
                   </TableRow>
                 )}
                 {error && (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-red-600">{error}</TableCell>
+                    <TableCell colSpan={8} className="text-red-600">{error}</TableCell>
                   </TableRow>
                 )}
                 {!loading && !error && currentItems.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={6}>No hay gastos</TableCell>
+                    <TableCell colSpan={8}>No hay gastos</TableCell>
                   </TableRow>
                 )}
                 {currentItems.map(it => (
                   <TableRow key={it.id} className="hover:bg-muted/50">
+                    <TableCell>
+                      <input type="checkbox" role="checkbox" className="h-4 w-4 rounded border-input checkbox-gray" checked={selected.has(it.id)} onChange={() => toggleSelect(it.id)} />
+                    </TableCell>
                     <TableCell className="whitespace-nowrap">{new Date(it.issuedAt).toLocaleDateString('es-PE')}</TableCell>
                     <TableCell className="whitespace-nowrap">{new Date(it.createdAt).toLocaleDateString('es-PE')}</TableCell>
                     <TableCell>
@@ -210,15 +274,26 @@ export default function Page() {
                       <Link href={`/expenses/${it.id}`} className="mr-2 inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm hover:bg-muted">
                         <Eye className="h-4 w-4" /> Ver
                       </Link>
-                      {it.document?.mimeType?.startsWith("image/") && (
-                        <a
-                          href={`/api/proxy/documents/${it.document.id}/preview`}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="mr-2 inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm hover:bg-muted"
-                        >
-                          <ImageIcon className="h-4 w-4" /> Foto
-                        </a>
+                      {it.document && (
+                        it.document.mimeType?.startsWith("image/") ? (
+                          <a
+                            href={`/api/proxy/documents/${it.document.id}/preview`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="mr-2 inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm hover:bg-muted"
+                          >
+                            <ImageIcon className="h-4 w-4" /> Foto
+                          </a>
+                        ) : it.document.mimeType?.startsWith("application/pdf") ? (
+                          <a
+                            href={`/api/proxy/documents/${it.document.id}/preview`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="mr-2 inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm hover:bg-muted"
+                          >
+                            <FileText className="h-4 w-4" /> PDF
+                          </a>
+                        ) : null
                       )}
                       <button
                         className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm text-destructive hover:bg-destructive/10"
@@ -234,13 +309,26 @@ export default function Page() {
           </div>
 
           <div className="md:hidden space-y-3">
+            {currentItems.length > 0 && (
+              <div className="flex items-center justify-center gap-3">
+                <label className="inline-flex items-center gap-2 text-xs text-muted-foreground">
+                  <input type="checkbox" role="checkbox" className="h-4 w-4 rounded border-input checkbox-gray" checked={isAllSelected} onChange={toggleSelectAll} />
+                  Seleccionar todos
+                </label>
+                <span className="text-xs text-muted-foreground">Seleccionados: {selectedCount}</span>
+                <Button size="sm" variant="panel" onClick={onBulkDelete} disabled={selectedCount === 0}>Eliminar</Button>
+              </div>
+            )}
             {loading && <div className="text-sm">Cargando...</div>}
             {error && <div className="text-sm text-red-600">{error}</div>}
             {!loading && !error && currentItems.length === 0 && <div className="text-sm">No hay gastos</div>}
             {currentItems.map(it => (
               <div key={it.id} className="rounded-lg border p-3 shadow-sm">
                 <div className="flex items-center justify-between">
-                  <div className="text-sm font-medium">{it.provider || '—'}</div>
+                  <div className="flex items-center gap-2">
+                    <input type="checkbox" role="checkbox" className="h-4 w-4 rounded border-input checkbox-gray" checked={selected.has(it.id)} onChange={() => toggleSelect(it.id)} />
+                    <div className="text-sm font-medium">{it.provider || '—'}</div>
+                  </div>
                   <div className="text-xs text-muted-foreground">{new Date(it.issuedAt).toLocaleDateString('es-PE')}</div>
                 </div>
                 <div className="mt-1 flex items-center gap-2">
@@ -257,10 +345,16 @@ export default function Page() {
                   <Link href={`/expenses/${it.id}`} className="inline-flex items-center gap-1 rounded-md border px-3 py-1 text-sm hover:bg-muted">
                     <Eye className="h-4 w-4" /> Ver
                   </Link>
-                  {it.document?.mimeType?.startsWith('image/') && (
-                    <a href={`/api/proxy/documents/${it.document.id}/preview`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 rounded-md border px-3 py-1 text-sm hover:bg-muted">
-                      <ImageIcon className="h-4 w-4" /> Foto
-                    </a>
+                  {it.document && (
+                    it.document.mimeType?.startsWith('image/') ? (
+                      <a href={`/api/proxy/documents/${it.document.id}/preview`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 rounded-md border px-3 py-1 text-sm hover:bg-muted">
+                        <ImageIcon className="h-4 w-4" /> Foto
+                      </a>
+                    ) : it.document.mimeType?.startsWith('application/pdf') ? (
+                      <a href={`/api/proxy/documents/${it.document.id}/preview`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 rounded-md border px-3 py-1 text-sm hover:bg-muted">
+                        <FileText className="h-4 w-4" /> PDF
+                      </a>
+                    ) : null
                   )}
                   <button className="inline-flex items-center gap-1 rounded-md border px-3 py-1 text-sm text-destructive hover:bg-destructive/10" onClick={() => onDelete(it.id)}>
                     <Trash2 className="h-4 w-4" /> Eliminar
@@ -312,15 +406,26 @@ export default function Page() {
                         <Link href={`/expenses/${it.id}`} className="mr-2 inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm hover:bg-muted">
                           <Eye className="h-4 w-4" /> Ver
                         </Link>
-                        {it.document?.mimeType?.startsWith("image/") && (
-                          <a
-                            href={`/api/proxy/documents/${it.document.id}/preview`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="mr-2 inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm hover:bg-muted"
-                          >
-                            <ImageIcon className="h-4 w-4" /> Foto
-                          </a>
+                        {it.document && (
+                          it.document.mimeType?.startsWith("image/") ? (
+                            <a
+                              href={`/api/proxy/documents/${it.document.id}/preview`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="mr-2 inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm hover:bg-muted"
+                            >
+                              <ImageIcon className="h-4 w-4" /> Foto
+                            </a>
+                          ) : it.document.mimeType?.startsWith("application/pdf") ? (
+                            <a
+                              href={`/api/proxy/documents/${it.document.id}/preview`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="mr-2 inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm hover:bg-muted"
+                            >
+                              <FileText className="h-4 w-4" /> PDF
+                            </a>
+                          ) : null
                         )}
                         <button
                           className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm text-destructive hover:bg-destructive/10"

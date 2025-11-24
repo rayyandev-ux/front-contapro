@@ -1,7 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { apiJson } from "@/lib/api";
+import { apiJson, apiMultipart } from "@/lib/api";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { UploadCloud } from "lucide-react";
 
 type Category = { id: string; name: string; userId?: string | null };
 
@@ -16,12 +18,15 @@ export default function Page() {
     amount: "",
     currency: "PEN",
     categoryId: "",
+    emitterIdNumber: "",
+    editReason: "",
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [newCatName, setNewCatName] = useState("");
   const [creatingCat, setCreatingCat] = useState(false);
   const [showCatManager, setShowCatManager] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -40,16 +45,18 @@ export default function Page() {
     e.preventDefault();
     setSaving(true);
     setError(null);
-    const payload = {
-      type: form.type as any,
-      issuedAt: form.issuedAt,
-      provider: form.provider,
-      description: form.description || undefined,
-      amount: Number(form.amount),
-      currency: form.currency,
-      categoryId: form.categoryId || undefined,
-    };
-    const res = await apiJson(`/api/expenses`, { method: "POST", body: JSON.stringify(payload) });
+    const fd = new FormData();
+    fd.append("type", form.type);
+    fd.append("issuedAt", form.issuedAt);
+    fd.append("provider", form.provider);
+    if (form.description) fd.append("description", form.description);
+    fd.append("amount", String(Number(form.amount)));
+    fd.append("currency", form.currency);
+    if (form.categoryId) fd.append("categoryId", form.categoryId);
+    if (form.emitterIdNumber) fd.append("emitterIdNumber", form.emitterIdNumber);
+    if (form.editReason) fd.append("editReason", form.editReason);
+    if (file) fd.append("file", file);
+    const res = await apiMultipart(`/api/expenses`, fd);
     setSaving(false);
     if (!res.ok) {
       setError(res.error || "No se pudo guardar");
@@ -89,19 +96,23 @@ export default function Page() {
 
   return (
     <section>
-      <h1 className="text-2xl font-semibold mb-4">Nuevo gasto</h1>
-      <form className="space-y-4 max-w-2xl" onSubmit={submit}>
+      <Card className="panel-bg">
+        <CardHeader>
+          <CardTitle>Nuevo gasto</CardTitle>
+        </CardHeader>
+        <CardContent>
+      <form className="space-y-4" onSubmit={submit}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label className="block text-sm">Tipo</label>
-            <select className="border rounded-md p-2 w-full" value={form.type} onChange={e => setForm(f => ({ ...f, type: e.target.value }))}>
+            <select className="border border-border rounded-md p-2 w-full bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" value={form.type} onChange={e => setForm(f => ({ ...f, type: e.target.value }))}>
               <option value="FACTURA">Factura</option>
               <option value="BOLETA">Boleta</option>
             </select>
           </div>
           <div>
             <label className="block text-sm">Fecha</label>
-            <input type="date" className="border rounded-md p-2 w-full" value={form.issuedAt} onChange={e => setForm(f => ({ ...f, issuedAt: e.target.value }))} />
+            <input type="date" className="border border-border rounded-md p-2 w-full bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" value={form.issuedAt} onChange={e => setForm(f => ({ ...f, issuedAt: e.target.value }))} />
             <p className="mt-1 text-xs text-muted-foreground">La fecha real no afecta el mes del gasto (se usa la fecha de registro).</p>
           </div>
         </div>
@@ -109,12 +120,12 @@ export default function Page() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label className="block text-sm">Proveedor</label>
-            <input className="border rounded-md p-2 w-full" value={form.provider} onChange={e => setForm(f => ({ ...f, provider: e.target.value }))} />
+            <input className="border border-border rounded-md p-2 w-full bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" value={form.provider} onChange={e => setForm(f => ({ ...f, provider: e.target.value }))} />
           </div>
           <div>
             <label className="block text-sm">Categoría</label>
             <div className="flex gap-2">
-              <select className="border rounded-md p-2 w-full" value={form.categoryId} onChange={e => setForm(f => ({ ...f, categoryId: e.target.value }))}>
+              <select className="border border-border rounded-md p-2 w-full bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" value={form.categoryId} onChange={e => setForm(f => ({ ...f, categoryId: e.target.value }))}>
                 <option value="">—</option>
                 <optgroup label="Tus categorías">
                   {categories.filter(c => c.userId).map(c => (
@@ -127,7 +138,7 @@ export default function Page() {
                   ))}
                 </optgroup>
               </select>
-              <button type="button" className="rounded-md border px-3 py-2 whitespace-nowrap hover:bg-gray-50" onClick={() => setShowCatManager(s => !s)}>
+              <button type="button" className="rounded-md border border-border px-3 py-2 whitespace-nowrap hover:bg-muted/50" onClick={() => setShowCatManager(s => !s)}>
                 Administrar
               </button>
             </div>
@@ -138,8 +149,8 @@ export default function Page() {
           <div className="sm:col-span-2">
             <label className="block text-sm">Crear categoría</label>
             <div className="flex gap-2">
-              <input className="border rounded-md p-2 w-full" placeholder="Nueva categoría" value={newCatName} onChange={e => setNewCatName(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); createCategory(); } }} />
-              <button type="button" disabled={creatingCat || !newCatName.trim()} onClick={createCategory} className="rounded-md border px-4 py-2 hover:bg-gray-50 disabled:opacity-60">{creatingCat ? 'Creando...' : 'Crear'}</button>
+              <input className="border border-border rounded-md p-2 w-full bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="Nueva categoría" value={newCatName} onChange={e => setNewCatName(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); createCategory(); } }} />
+              <button type="button" disabled={creatingCat || !newCatName.trim()} onClick={createCategory} className="rounded-md border border-border px-4 py-2 hover:bg-muted/50 disabled:opacity-60">{creatingCat ? 'Creando...' : 'Crear'}</button>
             </div>
             {showCatManager && (
               <div className="mt-3 rounded-md border p-3">
@@ -161,33 +172,67 @@ export default function Page() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label className="block text-sm">Monto</label>
-            <input type="number" step="0.01" className="border rounded-md p-2 w-full" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} />
-          </div>
-          <div>
-            <label className="block text-sm">Moneda</label>
-            <select className="border rounded-md p-2 w-full" value={form.currency} onChange={e => setForm(f => ({ ...f, currency: e.target.value }))}>
-              <option value="PEN">Soles (PEN)</option>
-              <option value="USD">Dólares (USD)</option>
-              <option value="EUR">Euros (EUR)</option>
-            </select>
-          </div>
-        </div>
-
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
-          <label className="block text-sm">Descripción</label>
-          <input className="border rounded-md p-2 w-full" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
+            <label className="block text-sm">Monto</label>
+            <input type="number" step="0.01" className="border border-border rounded-md p-2 w-full bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} />
         </div>
+        <div>
+            <label className="block text-sm">Moneda</label>
+            <select className="border border-border rounded-md p-2 w-full bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" value={form.currency} onChange={e => setForm(f => ({ ...f, currency: e.target.value }))}>
+            <option value="PEN">Soles (PEN)</option>
+            <option value="USD">Dólares (USD)</option>
+            <option value="EUR">Euros (EUR)</option>
+          </select>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label className="block text-sm">RUC/DNI del emisor</label>
+          <input className="border border-border rounded-md p-2 w-full bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" value={form.emitterIdNumber} onChange={e => setForm(f => ({ ...f, emitterIdNumber: e.target.value }))} />
+        </div>
+        <div>
+          <label className="block text-sm">Motivo de edición</label>
+          <input className="border border-border rounded-md p-2 w-full bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" value={form.editReason} onChange={e => setForm(f => ({ ...f, editReason: e.target.value }))} />
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-sm">Descripción</label>
+        <input className="border border-border rounded-md p-2 w-full bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
+      </div>
+
+      <div>
+        <label className="block text-sm">Adjunto (imagen o PDF opcional)</label>
+        <div
+          onDragOver={e => { e.preventDefault(); e.stopPropagation(); }}
+          onDrop={e => { e.preventDefault(); const f = e.dataTransfer.files?.[0]; if (f) setFile(f); }}
+          className="relative rounded-xl border-2 border-dashed p-6 transition-colors border-input bg-card"
+        >
+          <div className="flex flex-col items-center justify-center text-center">
+            <UploadCloud className="mb-2 h-8 w-8 text-primary" aria-hidden="true" />
+            <p className="text-sm text-foreground">
+              Arrastra tu archivo aquí o
+              <label className="mx-1 cursor-pointer font-medium text-primary underline">
+                <input className="sr-only" accept="image/*,application/pdf" type="file" onChange={e => setFile(e.target.files?.[0] || null)} />
+                selecciónalo
+              </label>
+            </p>
+            <p className="text-xs text-muted-foreground">Acepta imágenes y PDF</p>
+          </div>
+        </div>
+      </div>
 
         {error && <p className="text-red-600">{error}</p>}
 
         <div className="flex gap-2">
-          <button type="submit" disabled={saving || !form.provider.trim() || !(Number(form.amount) > 0)} className="btn-important">Guardar</button>
-          <button type="button" className="rounded-md border px-4 py-2" onClick={() => history.back()}>Cancelar</button>
+          <button type="submit" disabled={saving || !form.provider.trim() || !(Number(form.amount) > 0)} className="btn-panel">Guardar</button>
+          <button type="button" className="rounded-md border border-border px-4 py-2 hover:bg-muted/50" onClick={() => history.back()}>Cancelar</button>
         </div>
       </form>
+        </CardContent>
+      </Card>
     </section>
   );
 }

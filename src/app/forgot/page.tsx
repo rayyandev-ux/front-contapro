@@ -10,7 +10,6 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
 export default function ForgotPasswordPage() {
-  const LANDING_URL = `https://${process.env.NEXT_PUBLIC_LANDING_HOST || "contapro.lat"}`;
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [emailError, setEmailError] = useState<string | null>(null);
@@ -46,7 +45,7 @@ export default function ForgotPasswordPage() {
     <div className="hero-dark relative min-h-svh w-full overflow-hidden">
       <section className="mx-auto max-w-xl w-full px-6 pt-40 pb-32 grid place-items-center">
         <div className="fixed top-6 left-6 z-10">
-          <Link href={LANDING_URL} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+          <Link href="/" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
             <ChevronLeft className="h-4 w-4" />
             Home
           </Link>

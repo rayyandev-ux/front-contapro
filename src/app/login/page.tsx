@@ -7,13 +7,12 @@ import { apiJson } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Home, ArrowRight, Eye, EyeOff, ChevronLeft } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, ChevronLeft } from "lucide-react";
 import { motion } from "framer-motion";
 const API_BASE = (process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8080").replace(/\/+$/, "");
 
 export default function Page() {
   const router = useRouter();
-  const LANDING_URL = `https://${process.env.NEXT_PUBLIC_LANDING_HOST || "contapro.lat"}`;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
@@ -64,7 +63,7 @@ export default function Page() {
     <div className="hero-dark relative min-h-svh w-full overflow-hidden">
       <section className="mx-auto max-w-xl w-full px-6 pt-40 pb-32 grid place-items-center">
         <div className="fixed top-6 left-6 z-10">
-          <Link href={LANDING_URL} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+          <Link href="/" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
             <ChevronLeft className="h-4 w-4" />
             Home
           </Link>

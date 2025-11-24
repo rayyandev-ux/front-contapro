@@ -1,8 +1,10 @@
 import { cookies } from "next/headers";
 import Link from "next/link";
+import RealtimeRefresh from "@/components/RealtimeRefresh";
 import ImagePreview from "@/components/ImagePreview";
 import AnalysisSummaryEditor from "@/components/AnalysisSummaryEditor";
-import ExpenseEditForm from "@/components/ExpenseEditForm";
+import AnalysisItemsEditor from "@/components/AnalysisItemsEditor";
+import DetailEditable from "./DetailEditable";
 
 export default async function ExpenseDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -51,101 +53,23 @@ export default async function ExpenseDetail({ params }: { params: Promise<{ id: 
   const xml = details?.xml as string | undefined;
 
   return (
-    <section className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Detalle de gasto</h1>
-        <Link href="/expenses" className="rounded-md border border-border px-3 py-1 text-sm hover:bg-muted/50">Volver</Link>
-      </div>
-
-      <div className="rounded-md border border-border bg-card p-4 panel-bg">
-        <div className="mb-3">
-          <div className="text-sm text-muted-foreground">Editar gasto</div>
-        </div>
-        {isCurrentMonth ? (
-          <ExpenseEditForm item={{
-            id: it.id,
-            type: it.type,
-            issuedAt: it.issuedAt,
-            provider: it.provider,
-            description: it.description,
-            amount: it.amount,
-            currency: it.currency,
-            category: it.category || null,
-          }} />
-        ) : (
-          <div className="inline-flex items-center rounded-md border px-3 py-2 text-xs bg-slate-100 text-slate-800 border-slate-200">Bloqueado para edición (mes anterior)</div>
-        )}
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div className="rounded-md border border-border bg-card p-4 panel-bg">
-          <div className="text-sm text-muted-foreground">Fecha del documento</div>
-          <div className="text-sm">{fmtDate(it.issuedAt)}</div>
-        </div>
-        <div className="rounded-md border border-border bg-card p-4 panel-bg">
-          <div className="text-sm text-muted-foreground">Registro del sistema</div>
-          <div className="text-sm">{fmtDate(it.createdAt)}</div>
-        </div>
-        <div className="rounded-md border border-border bg-card p-4 panel-bg">
-          <div className="text-sm text-muted-foreground">Tipo</div>
-          <div className="text-sm">{it.type}</div>
-        </div>
-        <div className="rounded-md border border-border bg-card p-4 panel-bg">
-          <div className="text-sm text-muted-foreground">Proveedor</div>
-          <div className="text-sm">{it.provider}</div>
-        </div>
-        <div className="rounded-md border border-border bg-card p-4 panel-bg">
-          <div className="text-sm text-muted-foreground">Categoría</div>
-          <div className="text-sm">{it.category?.name || "—"}</div>
-        </div>
-        <div className="rounded-md border border-border bg-card p-4 panel-bg">
-          <div className="text-sm text-muted-foreground">Monto</div>
-          <div className="text-sm">{Number(it.amount).toFixed(2)} {it.currency}</div>
-        </div>
-        <div className="rounded-md border border-border bg-card p-4">
-          <div className="text-sm text-muted-foreground">Descripción</div>
-          <div className="text-sm">{it.description || "—"}</div>
-        </div>
-        {details ? (
-          <>
-            <div className="rounded-md border border-border bg-card p-4 panel-bg">
-              <div className="text-sm text-muted-foreground">N° Documento</div>
-              <div className="text-sm">{details.docNumber || "—"}</div>
-            </div>
-            <div className="rounded-md border border-border bg-card p-4 panel-bg">
-              <div className="text-sm text-muted-foreground">Emisor</div>
-              <div className="text-sm">{details.emitter?.name || "—"} ({details.emitter?.idType || "—"}: {details.emitter?.idNumber || "—"})</div>
-            </div>
-            {details.receiver ? (
-              <div className="rounded-md border border-border bg-card p-4 panel-bg">
-                <div className="text-sm text-muted-foreground">Receptor</div>
-                <div className="text-sm">{details.receiver?.name || "—"} ({details.receiver?.idType || "—"}: {details.receiver?.idNumber || "—"})</div>
-              </div>
-            ) : null}
-              <div className="rounded-md border border-border bg-card p-4 panel-bg">
-              <div className="text-sm text-muted-foreground">Impuestos</div>
-              <div className="text-sm">
-                {Array.isArray(details?.totals?.taxes) && details.totals.taxes.length > 0
-                  ? details.totals.taxes.map((t: any, i: number) => (
-                      <span key={i} className="mr-2 inline-block">{t.name}: {t.amount ?? 0} ({t.rate ?? "—"}%)</span>
-                    ))
-                  : "—"}
-              </div>
-            </div>
-            <div className="rounded-md border border-border bg-card p-4">
-              <div className="text-sm text-muted-foreground">Fecha del documento (IA)</div>
-              <div className="text-sm">{details.fecha_emision || details.issuedAt || "—"}</div>
-            </div>
-            <div className="rounded-md border border-border bg-card p-4">
-              <div className="text-sm text-muted-foreground">Registro del sistema</div>
-              <div className="text-sm">{details.fecha_registro || (new Date(it.createdAt).toISOString().slice(0,10))}</div>
-            </div>
-          </>
-        ) : null}
-      </div>
+    <>
+      <RealtimeRefresh />
+      <DetailEditable item={{
+        id: it.id,
+        type: it.type,
+        issuedAt: it.issuedAt,
+        createdAt: it.createdAt,
+        provider: it.provider,
+        description: it.description,
+        amount: it.amount,
+        currency: it.currency,
+        category: it.category || null,
+        emitterIdNumber: it.emitterIdNumber || null,
+      }} isCurrentMonth={isCurrentMonth} />
 
       {document ? (
-        <div className="rounded-md border border-border bg-card p-4 panel-bg">
+        <div className="mt-2 mb-4 rounded-md border border-border bg-card p-3 panel-bg">
           <div className="flex items-center justify-between">
             <div>
               <div className="text-sm text-muted-foreground">Documento</div>
@@ -166,20 +90,7 @@ export default async function ExpenseDetail({ params }: { params: Promise<{ id: 
                 rel="noreferrer"
                 className="btn-panel"
               >Descargar</a>
-              {details ? (
-                <a
-                  href={`data:application/json;charset=utf-8,${encodeURIComponent(JSON.stringify(details, null, 2))}`}
-                  download={`extraction-${document.id}.json`}
-                  className="rounded-md border border-border px-3 py-2 text-sm hover:bg-muted/50"
-                >JSON</a>
-              ) : null}
-              {xml ? (
-                <a
-                  href={`data:application/xml;charset=utf-8,${encodeURIComponent(xml)}`}
-                  download={`extraction-${document.id}.xml`}
-                  className="rounded-md border border-border px-3 py-2 text-sm hover:bg-muted/50"
-                >XML</a>
-              ) : null}
+              
             </div>
           </div>
           <div className="mt-4">
@@ -201,23 +112,14 @@ export default async function ExpenseDetail({ params }: { params: Promise<{ id: 
               </div>
             </div>
           )}
-          {details && Array.isArray(details.items) && details.items.length > 0 ? (
-            <div className="mt-4">
-              <div className="text-sm text-muted-foreground">Ítems</div>
-              <ul className="list-disc pl-5 text-sm">
-                {details.items.map((it: any, i: number) => (
-                  <li key={i}>{it.description} — {it.quantity ?? ""} x {it.unitPrice ?? ""} = {it.lineTotal ?? ""}</li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
+          <AnalysisItemsEditor documentId={document.id} initialItems={(details && Array.isArray(details.items) ? details.items : [])} />
         </div>
       ) : (
-        <div className="rounded-md border border-border bg-card p-4">
+        <div className="mt-2 mb-4 rounded-md border border-border bg-card p-3 panel-bg">
           <div className="text-sm text-muted-foreground">Documento</div>
           <div className="text-sm">No disponible</div>
         </div>
       )}
-    </section>
+    </>
   );
 }

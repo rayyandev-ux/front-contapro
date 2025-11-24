@@ -1,4 +1,4 @@
-const BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8080";
+const BASE = (process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8080").replace(/\/+$/, "");
 
 // Caché simple en memoria (sólo en cliente) para GETs
 const g: any = globalThis as any;
@@ -50,7 +50,7 @@ export async function apiJson<T = any>(path: string, init: RequestInit = {}): Pr
       try {
         if (typeof window !== 'undefined') {
           clearApiCache();
-          window.location.href = '/premium';
+          window.location.href = '/billing';
         }
       } catch {}
       return { ok: false, error: msg402 };
@@ -81,7 +81,7 @@ export async function apiMultipart<T = any>(path: string, formData: FormData): P
       try {
         if (typeof window !== 'undefined') {
           clearApiCache();
-          window.location.href = '/premium';
+          window.location.href = '/billing';
         }
       } catch {}
       return { ok: false, error: msg402 };

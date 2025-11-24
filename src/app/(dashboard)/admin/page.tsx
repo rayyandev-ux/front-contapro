@@ -118,7 +118,7 @@ export default function Page() {
       <h1 className="text-2xl font-semibold mb-4">Panel de administrador</h1>
       <div className="mb-6 flex items-center justify-between">
         <p className="text-sm text-muted-foreground">Gestión de usuarios y suscripciones (Free/Premium).</p>
-        <Button size="sm" variant="outline" onClick={clearCache} disabled={clearingCache}>
+        <Button size="sm" variant="panel" onClick={clearCache} disabled={clearingCache}>
           {clearingCache ? "Limpiando…" : "Borrar caché"}
         </Button>
       </div>
@@ -171,7 +171,7 @@ export default function Page() {
                     <option value="FREE">FREE</option>
                     <option value="PREMIUM">PREMIUM</option>
                   </select>
-                  <Button size="sm" variant="outline" onClick={() => applyUpdate(u.id)}>Aplicar</Button>
+                  <Button size="sm" variant="panel" onClick={() => applyUpdate(u.id)}>Aplicar</Button>
                   <Button size="sm" variant="destructive" onClick={() => deleteUser(u.id)}>Eliminar</Button>
                 </div>
               </TableCell>
@@ -209,12 +209,12 @@ export default function Page() {
           </div>
         )}
         <div className="mt-4 flex items-center gap-2">
-          <Button size="sm" onClick={async () => {
+          <Button size="sm" variant="panel" onClick={async () => {
             const res = await apiJson("/api/admin/plans", { method: "PATCH", body: JSON.stringify({ monthly, annual }) });
             if (!res.ok) alert(res.error || "No se pudo guardar");
             else alert("Actualizado");
           }}>Guardar</Button>
-          <Button size="sm" variant="outline" disabled={syncing} onClick={async () => {
+          <Button size="sm" variant="panel" disabled={syncing} onClick={async () => {
             if (syncing) return;
             setSyncing(true);
             const res = await apiJson("/api/admin/plans/sync", { method: "POST" });

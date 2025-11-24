@@ -1,7 +1,9 @@
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { Upload, FileText, TrendingUp } from "lucide-react";
+import { Upload, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import ChartPanel from "../_components/ChartPanel";
 
 export default async function Page() {
   const cookieStore = await cookies();
@@ -94,6 +96,7 @@ export default async function Page() {
   const fmt = (n: number) => new Intl.NumberFormat('es-PE', { style: 'currency', currency }).format(n);
   const maxCat = byCategory.length > 0 ? Math.max(...byCategory.map(c => c.total)) : 0;
   const maxMonth = byMonth.length > 0 ? Math.max(...byMonth.map(m => m.total)) : 0;
+  const monthNames = ["ENE","FEB","MAR","ABR","MAY","JUN","JUL","AGO","SEP","OCT","NOV","DIC"];
   
 
   const fmtDate = (iso?: string | null) => {
@@ -117,33 +120,7 @@ export default async function Page() {
 
   return (
     <section className="space-y-6">
-      {/* Banner de suscripción / trial */}
-      {me && (
-        <Card className="shadow-lg ring-1 ring-border panel-bg">
-          <CardContent className="p-4">
-            {me.plan === 'PREMIUM' ? (
-              <div className="flex items-center justify-between text-sm">
-                <div>
-                  <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">Premium activo</span>
-                  <span className="ml-2 text-muted-foreground">Vence: {fmtDate(me.planExpires)}</span>
-                </div>
-                <Link href="/premium" className="underline">Gestionar</Link>
-              </div>
-            ) : (
-              <div className="flex items-center justify-between text-sm">
-                <div>
-                  <span className="inline-flex items-center rounded-full bg-secondary px-2 py-0.5 text-xs font-medium">Plan GRATIS</span>
-                  <span className="ml-2 text-muted-foreground">Tu trial termina: {fmtDate(me.trialEnds)}</span>
-                  {typeof daysUntil(me.trialEnds) === 'number' && daysUntil(me.trialEnds)! <= 3 && (
-                    <span className="ml-2 inline-flex items-center rounded-full bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent-foreground">Quedan {daysUntil(me.trialEnds)} días</span>
-                  )}
-                </div>
-                <Link href="/premium" className="underline">Mejorar</Link>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
+      
       {/* Encabezado con acciones rápidas (paleta nueva) */}
       <Card className="bg-card border border-border panel-bg">
         <CardContent className="p-4">
@@ -152,174 +129,32 @@ export default async function Page() {
               <h1 className="text-2xl font-semibold tracking-tight">Resumen</h1>
               <p className="text-sm text-muted-foreground">Tu actividad y gastos recientes</p>
             </div>
-            <Link
-              href="/upload"
-              className="btn-important w-full sm:w-auto"
-            >
-              <Upload className="h-4 w-4" /> Subir documento
-            </Link>
+            <Button asChild variant="panel" className="w-full sm:w-auto">
+              <Link href="/upload">
+                <Upload className="h-4 w-4" /> Subir documento
+              </Link>
+            </Button>
           </div>
         </CardContent>
       </Card>
 
-      {/* Métricas principales */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-        <Card className="shadow-lg ring-1 ring-border panel-bg">
-          <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-semibold">Documentos subidos</CardTitle>
-              <FileText className="h-4 w-4 text-blue-600" />
-            </div>
-            <CardDescription className="text-xs">Últimos 30 días</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-semibold">{items.length}</div>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-lg ring-1 ring-border panel-bg">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-semibold">Último archivo</CardTitle>
-            <CardDescription className="text-xs">Tu actividad reciente</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="truncate text-sm font-medium text-foreground" title={items[0]?.filename || "—"}>{items[0]?.filename || "—"}</div>
-            <div className="mt-1 text-xs text-muted-foreground">{items[0]?.uploadedAt ? new Date(items[0].uploadedAt).toLocaleString() : ""}</div>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-lg ring-1 ring-border panel-bg">
-          <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-semibold">Gasto del mes</CardTitle>
-              <TrendingUp className="h-4 w-4 text-blue-600" />
-            </div>
-            <CardDescription className="text-xs">Fuente: gastos creados</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-semibold">{formatCurrency(totalMonth)}</div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Últimos análisis */}
       <Card className="shadow-lg ring-1 ring-border panel-bg">
         <CardHeader className="pb-2">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Últimos análisis</CardTitle>
-            <Link href="/history" className="text-sm underline">Ver todo</Link>
-          </div>
-          <CardDescription className="text-sm">Tus documentos más recientes</CardDescription>
+          <CardTitle className="text-lg font-semibold">Resumen y Gráficos</CardTitle>
+          <CardDescription className="text-xs">Explora tus datos y métricas</CardDescription>
         </CardHeader>
         <CardContent>
-          {items.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Aún no tienes análisis. Sube tu primer documento.</p>
-          ) : (
-            <ul className="divide-y">
-              {items.slice(0, 5).map((it) => (
-                <li key={it.id} className="flex items-center justify-between px-2 py-2 text-sm hover:bg-muted/50 rounded">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <FileText className="h-4 w-4 text-blue-600 flex-shrink-0" />
-                    <span className="max-w-[50%] truncate text-foreground" title={it.summary || it.filename}>{it.filename}</span>
-                  </div>
-                  <span className="text-muted-foreground">{new Date(it.uploadedAt).toLocaleString()}</span>
-                </li>
-              ))}
-            </ul>
-          )}
+          <ChartPanel
+            byCategory={byCategory}
+            byMonth={byMonth}
+            byMonthBudget={byMonthBudget}
+            currency={currency}
+            totalMonth={totalMonth}
+            itemsCount={items.length}
+            lastItem={items[0] ? { filename: items[0].filename, uploadedAt: items[0].uploadedAt } : undefined}
+          />
         </CardContent>
       </Card>
-
-      {/* Charts */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-        <Card className="shadow-lg ring-1 ring-border panel-bg">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-semibold">Gastos por categoría (mes actual)</CardTitle>
-            <CardDescription className="text-xs">Distribución de tus gastos</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {byCategory.length === 0 ? (
-              <p className="text-xs text-muted-foreground">Sin datos</p>
-            ) : (
-              <div className="space-y-2">
-                {byCategory.map((c) => {
-                  const pct = maxCat > 0 ? Math.round((c.total / maxCat) * 100) : 0;
-                  return (
-                    <div key={c.category} className="text-xs">
-                      <div className="flex justify-between">
-                        <span className="text-foreground">{c.category}</span>
-                        <span className="text-muted-foreground">{formatCurrency(c.total)}</span>
-                      </div>
-                      <div className="h-2 w-full rounded bg-muted">
-                        <div
-                          className="h-2 rounded bg-gradient-to-r from-indigo-700 via-orange-600 to-blue-700 transition-all duration-300 ease-out"
-                          style={{ width: `${pct}%` }}
-                          title={`${formatCurrency(c.total)} (${pct}%)`}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-        <Card className="shadow-lg ring-1 ring-border panel-bg">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-semibold">Gastos por mes (año actual)</CardTitle>
-            <CardDescription className="text-xs">Tendencia mensual</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {byMonth.length === 0 ? (
-              <p className="text-xs text-muted-foreground">Sin datos</p>
-            ) : (
-              <div className="grid grid-cols-12 gap-2">
-                {byMonth.map((m) => {
-                  const pct = maxMonth > 0 ? Math.round((m.total / maxMonth) * 100) : 0;
-                  return (
-                    <div key={m.month} className="flex flex-col items-center">
-                      <div
-                        className="w-4 rounded bg-gradient-to-b from-indigo-700 via-orange-600 to-blue-700 transition-all duration-300 ease-out"
-                        style={{ height: `${Math.max(pct, 2)}px` }}
-                        title={`${formatCurrency(m.total)} (${pct}%)`}
-                      />
-                      <span className="mt-1 text-[10px] text-muted-foreground">{m.month}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-        <Card className="shadow-lg ring-1 ring-border panel-bg">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-semibold">Presupuesto vs Gastos (año actual)</CardTitle>
-            <CardDescription className="text-xs">Comparativa mensual</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {byMonthBudget.length === 0 ? (
-              <p className="text-xs text-muted-foreground">Sin datos</p>
-            ) : (
-              <div className="grid grid-cols-1 gap-1 text-xs">
-                <div className="grid grid-cols-4 font-medium text-muted-foreground">
-                  <div>Mes</div>
-                  <div>Presupuesto</div>
-                  <div>Gastos</div>
-                  <div>Saldo</div>
-                </div>
-                {byMonthBudget.map((m) => (
-                  <div key={m.month} className="grid grid-cols-4">
-                    <div>{String(m.month).padStart(2, '0')}</div>
-                    <div className="text-indigo-700">{fmt(m.budget)}</div>
-                    <div className="text-slate-700">{fmt(m.spent)}</div>
-                    <div className={m.remaining < 0 ? 'text-red-700' : 'text-emerald-700'}>{fmt(m.remaining)}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
     </section>
   );
 }

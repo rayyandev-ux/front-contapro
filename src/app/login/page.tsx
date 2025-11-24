@@ -2,14 +2,14 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { apiJson } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from "@/components/ui/card";
-import { Home, ArrowRight, Eye, EyeOff } from "lucide-react";
+import { Home, ArrowRight, Eye, EyeOff, ChevronLeft } from "lucide-react";
 import { motion } from "framer-motion";
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8080";
+const API_BASE = (process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8080").replace(/\/+$/, "");
 
 export default function Page() {
   const router = useRouter();
@@ -60,51 +60,51 @@ export default function Page() {
     }
   };
   return (
-    <div className="relative min-h-svh w-full overflow-hidden">
-      {/* Fondo con gradientes elegantes y halos orgánicos (paleta nueva) */}
-      <div className="pointer-events-none absolute inset-0 -z-10 dark:opacity-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-white via-gray-50 to-blue-50" />
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage:
-              "radial-gradient(800px 400px at 10% 15%, rgba(99,102,241,0.20), transparent 60%), radial-gradient(700px 350px at 85% 20%, rgba(234,88,12,0.18), transparent 60%), radial-gradient(600px 300px at 20% 85%, rgba(37,99,235,0.18), transparent 60%)",
-          }}
-        />
-        <div className="absolute -top-24 -left-24 h-80 w-80 rounded-full bg-indigo-400/25 blur-3xl" />
-        <div className="absolute -bottom-28 -right-28 h-96 w-96 rounded-full bg-orange-400/25 blur-3xl" />
-      </div>
-      <section className="mx-auto max-w-md px-6 py-16">
+    <div className="hero-dark relative min-h-svh w-full overflow-hidden">
+      <section className="mx-auto max-w-xl w-full px-6 pt-40 pb-32 grid place-items-center">
         <div className="fixed top-6 left-6 z-10">
-          <Link href={LANDING_URL} aria-label="Ir a la landing">
-            <Button variant="outline" size="icon" className="rounded-full bg-card/80 backdrop-blur-sm shadow-md ring-1 ring-border hover:bg-card">
-              <Home className="h-4 w-4" />
-            </Button>
+          <Link href={LANDING_URL} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+            <ChevronLeft className="h-4 w-4" />
+            Home
           </Link>
         </div>
-        {/* Halo suave detrás de la tarjeta */}
-        <div className="absolute left-1/2 -translate-x-1/2 top-[10%] -z-10 h-72 w-72 rounded-[60%] bg-indigo-300/20 blur-3xl" />
-        <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-          <Card className="shadow-lg ring-1 ring-border">
-            <CardHeader>
-              <CardTitle className="bg-gradient-to-r from-indigo-800 via-orange-700 to-blue-600 bg-clip-text text-transparent">Bienvenido de nuevo a ContaPRO!</CardTitle>
-              <CardDescription>Accede a tu cuenta</CardDescription>
-            </CardHeader>
-            <CardContent>
+        <div className="absolute left-1/2 -translate-x-1/2 top-[10%] -z-10 h-72 w-72 rounded-[60%] bg-white/5 blur-3xl" />
+        <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="w-full">
+          <div className="flex w-full flex-col items-center text-center gap-4">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-white/10 ring-1 ring-white/15">
+              <Image src="/icono_carpeta_premium_hd.png" alt="ContaPRO" width={28} height={28} className="rounded-sm" />
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Ingresar a ContaPRO</h1>
+            <p className="text-sm text-muted-foreground">¿No tienes cuenta? <Link href="/register" className="underline">Crear cuenta</Link></p>
+            <div className="w-full max-w-[720px] mx-auto">
+              <div className="mt-2">
+                <a href={`${API_BASE}/api/auth/google`}>
+                  <Button variant="panel" className="w-full">
+                    <span className="inline-flex items-center gap-2">
+                      <span className="size-5 rounded-full bg-white/10 inline-flex items-center justify-center">G</span>
+                      Continuar con Google
+                    </span>
+                  </Button>
+                </a>
+              </div>
+              <div className="relative my-2">
+                <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
+                <div className="relative flex justify-center text-xs"><span className="bg-card/90 px-2 text-muted-foreground">o</span></div>
+              </div>
               <form className="space-y-4" onSubmit={onSubmit} aria-busy={loading}>
                 <div className="space-y-2">
                   <Label htmlFor="email">Correo</Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    placeholder="tu@correo.com"
-                    aria-invalid={!!emailError}
-                    onChange={() => setEmailError(null)}
-                    className={`${emailError ? "ring-2 ring-red-500" : ""} focus-visible:ring-blue-600/60 focus-visible:ring-2 focus-visible:outline-none`}
-                  />
-                  {emailError && <p className="text-xs text-red-600">{emailError}</p>}
+                   <Input
+                     id="email"
+                     name="email"
+                     type="email"
+                     autoComplete="email"
+                     placeholder="tu@correo.com"
+                     aria-invalid={!!emailError}
+                     onChange={() => setEmailError(null)}
+                     className={`input-hero rounded-full h-12 px-4 ${emailError ? "ring-2 ring-destructive" : ""} focus-visible:border-input focus-visible:ring-input/60 focus-visible:ring-2 focus-visible:outline-none`}
+                   />
+                  {emailError && <p className="text-xs text-destructive">{emailError}</p>}
                 </div>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
@@ -120,7 +120,7 @@ export default function Page() {
                       placeholder="••••••••"
                       aria-invalid={!!passwordError}
                       onChange={() => setPasswordError(null)}
-                      className={`${passwordError ? "ring-2 ring-red-500" : ""} pr-10 focus-visible:ring-blue-600/60 focus-visible:ring-2 focus-visible:outline-none`}
+                      className={`input-hero rounded-full h-12 pr-10 px-4 ${passwordError ? "ring-2 ring-destructive" : ""} focus-visible:border-input focus-visible:ring-input/60 focus-visible:ring-2 focus-visible:outline-none`}
                     />
                     <button
                       type="button"
@@ -131,49 +131,27 @@ export default function Page() {
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
-                  {passwordError && <p className="text-xs text-red-600">{passwordError}</p>}
+                  {passwordError && <p className="text-xs text-destructive">{passwordError}</p>}
                   <div className="mt-2 flex items-center justify-between">
                     <label className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <input type="checkbox" name="remember" className="h-4 w-4 rounded border-input" />
+                      <input type="checkbox" name="remember" className="h-4 w-4 rounded border-input checkbox-gray" />
                       Recordarme
                     </label>
                   </div>
                 </div>
-                <motion.button
-                  type="submit"
-                  disabled={loading}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="w-full rounded-md bg-gradient-to-r from-indigo-700 via-orange-600 to-blue-700 px-4 py-2.5 text-white shadow-md hover:shadow-lg disabled:opacity-60"
-                >
-                  {loading ? "Accediendo..." : (
-                    <span className="inline-flex items-center gap-2">Acceder <ArrowRight className="h-4 w-4" /></span>
-                  )}
-                </motion.button>
+                <Button asChild variant="panel" className="w-full h-12">
+                  <motion.button type="submit" disabled={loading} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                    {loading ? "Accediendo..." : (
+                      <span className="inline-flex items-center gap-2">Acceder <ArrowRight className="h-4 w-4" /></span>
+                    )}
+                  </motion.button>
+                </Button>
                 {error && (
-                  <p className="text-sm text-red-600" aria-live="polite">{error}</p>
+                  <p className="text-sm text-destructive" aria-live="polite">{error}</p>
                 )}
               </form>
-              <div className="mt-4">
-                <div className="relative my-3">
-                  <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t" />
-                  </div>
-                  <div className="relative flex justify-center text-xs">
-                    <span className="bg-card/90 px-2 text-muted-foreground">o</span>
-                  </div>
-                </div>
-                <a href={`${API_BASE}/api/auth/google`}>
-                  <Button variant="outline" className="w-full bg-background">Continuar con Google</Button>
-                </a>
-              </div>
-            </CardContent>
-            <CardFooter>
-              <p className="w-full text-center text-sm text-muted-foreground">
-                ¿No tienes cuenta? <Link href="/register" className="underline">Crear cuenta</Link>
-              </p>
-            </CardFooter>
-          </Card>
+            </div>
+          </div>
         </motion.div>
       </section>
     </div>

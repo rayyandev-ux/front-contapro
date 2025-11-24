@@ -72,7 +72,7 @@ export default function MobileSidebar({ isAdmin, user }: { isAdmin?: boolean; us
                   <div className="mt-2 w-full rounded-2xl border border-border bg-card shadow-sm">
                     <div className="px-3 py-2 text-sm">
                       <Link href="/account" className="block rounded-md px-2 py-1 hover:bg-muted" onClick={() => { setOpen(false); setProfileOpen(false); }}>Mi Cuenta</Link>
-                      <Link href="/premium" className="mt-1 block rounded-md px-2 py-1 hover:bg-muted" onClick={() => { setOpen(false); setProfileOpen(false); }}>Facturación</Link>
+                      <Link href="/billing" className="mt-1 block rounded-md px-2 py-1 hover:bg-muted" onClick={() => { setOpen(false); setProfileOpen(false); }}>Facturación</Link>
                       <div className="mt-2">
                         <LogoutButton className="w-full rounded-md border px-3 py-2 text-sm" />
                       </div>

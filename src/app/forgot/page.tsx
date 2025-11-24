@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
-import { Home, Mail, Loader2, CheckCircle2, ArrowRight } from "lucide-react";
+import { Mail, Loader2, CheckCircle2, ArrowRight, ChevronLeft } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
@@ -43,104 +43,69 @@ export default function ForgotPasswordPage() {
     }
   };
   return (
-    <div className="relative min-h-svh w-full overflow-hidden">
-      {/* Fondo con gradientes elegantes y halos orgánicos (paleta nueva) */}
-      <div className="pointer-events-none absolute inset-0 -z-10 dark:opacity-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-white via-gray-50 to-blue-50" />
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage:
-              "radial-gradient(800px 400px at 10% 15%, rgba(99,102,241,0.20), transparent 60%), radial-gradient(700px 350px at 85% 20%, rgba(234,88,12,0.18), transparent 60%), radial-gradient(600px 300px at 20% 85%, rgba(37,99,235,0.18), transparent 60%)",
-          }}
-        />
-        <div className="absolute -top-24 -left-24 h-80 w-80 rounded-full bg-indigo-400/25 blur-3xl" />
-        <div className="absolute -bottom-28 -right-28 h-96 w-96 rounded-full bg-orange-400/25 blur-3xl" />
-      </div>
-
-      {/* Botón icónico de volver al dashboard */}
-      <div className="fixed left-4 top-4 z-20">
-        <Link href={LANDING_URL} aria-label="Ir a la landing">
-          <Button
-            variant="outline"
-            size="icon"
-            className="rounded-full bg-card/80 backdrop-blur-sm shadow-md ring-1 ring-border hover:bg-card"
-          >
-            <Home className="h-4 w-4" />
-          </Button>
-        </Link>
-      </div>
-
-      {/* Contenedor centrado */}
-      <div className="container relative mx-auto flex min-h-svh items-center justify-center px-4 py-12">
-        {/* Halo suave detrás de la tarjeta */}
-        <div className="absolute left-1/2 -translate-x-1/2 top-[20%] -z-10 h-72 w-72 rounded-[60%] bg-indigo-300/20 blur-3xl dark:opacity-0" />
-        <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-          <Card className="w-full max-w-md bg-card/90 backdrop-blur-sm shadow-lg ring-1 ring-border">
-          <CardHeader>
-            <CardTitle className="bg-gradient-to-r from-indigo-800 via-orange-700 to-blue-600 bg-clip-text text-transparent">Recuperar contraseña</CardTitle>
-            <CardDescription>
-              Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form className="grid gap-4" onSubmit={handleSubmit} aria-busy={loading}>
-              <div className="grid gap-2">
-                <Label htmlFor="email" className="inline-flex items-center gap-2">
-                  <Mail className="h-4 w-4 text-muted-foreground" /> Correo electrónico
-                </Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  placeholder="tucorreo@ejemplo.com"
-                  aria-invalid={!!emailError}
-                  onChange={() => setEmailError(null)}
-                  className={`${emailError ? "ring-2 ring-destructive" : ""} focus-visible:ring-primary/60 focus-visible:ring-2 focus-visible:outline-none`}
-                />
-                {emailError && <p className="text-xs text-destructive">{emailError}</p>}
-              </div>
-
-              <motion.button
-                type="submit"
-                disabled={loading}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-primary px-4 py-2.5 text-primary-foreground shadow-md hover:bg-primary/90 disabled:opacity-60"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Enviando...
-                  </>
-                ) : (
-                  <>
-                    Enviar enlace de recuperación <ArrowRight className="h-4 w-4" />
-                  </>
-                )}
-              </motion.button>
-
-              {sent && (
-                <div role="status" aria-live="polite" className="mt-2 flex items-center gap-2 rounded-md bg-muted px-3 py-2 text-foreground ring-1 ring-border">
-                  <CheckCircle2 className="h-4 w-4" />
-                  <span>
-                    Si el correo está registrado, te enviaremos un enlace para restablecer tu contraseña.
-                  </span>
+    <div className="hero-dark relative min-h-svh w-full overflow-hidden">
+      <section className="mx-auto max-w-xl w-full px-6 pt-40 pb-32 grid place-items-center">
+        <div className="fixed top-6 left-6 z-10">
+          <Link href={LANDING_URL} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+            <ChevronLeft className="h-4 w-4" />
+            Home
+          </Link>
+        </div>
+        <div className="absolute left-1/2 -translate-x-1/2 top-[10%] -z-10 h-72 w-72 rounded-[60%] bg-white/5 blur-3xl" />
+        <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="w-full">
+          <div className="flex w-full flex-col items-center text-center gap-4">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-white/10 ring-1 ring-white/15">
+              <Image src="/icono_carpeta_premium_hd.png" alt="ContaPRO" width={28} height={28} className="rounded-sm" />
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Recuperar contraseña</h1>
+            <p className="text-sm text-muted-foreground">Ingresa tu correo y te enviaremos un enlace para restablecerla.</p>
+            <div className="w-full max-w-[720px] mx-auto">
+              <form className="space-y-4" onSubmit={handleSubmit} aria-busy={loading}>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Correo</Label>
+                  <div className="relative">
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      autoComplete="email"
+                      placeholder="tu@correo.com"
+                      aria-invalid={!!emailError}
+                      onChange={() => setEmailError(null)}
+                      className={`input-hero rounded-full h-12 pl-10 pr-4 ${emailError ? "ring-2 ring-destructive" : ""} focus-visible:border-input focus-visible:ring-input/60 focus-visible:ring-2 focus-visible:outline-none`}
+                    />
+                    <Mail className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                  </div>
+                  {emailError && <p className="text-xs text-destructive">{emailError}</p>}
                 </div>
-              )}
-
-              <div className="mt-2 text-center text-xs text-muted-foreground">
-                ¿Recordaste tu contraseña? {" "}
-                <Link href="/login" className="font-medium hover:text-foreground">
-                  Inicia sesión
-                </Link>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
+                <Button asChild variant="panel" className="w-full h-12">
+                  <motion.button type="submit" disabled={loading} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                    {loading ? (
+                      <span className="inline-flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Enviando...</span>
+                    ) : (
+                      <span className="inline-flex items-center gap-2">Enviar enlace de recuperación <ArrowRight className="h-4 w-4" /></span>
+                    )}
+                  </motion.button>
+                </Button>
+                {sent && (
+                  <div role="status" aria-live="polite" className="mt-2 flex items-center gap-2 rounded-md bg-muted px-3 py-2 text-foreground ring-1 ring-border">
+                    <CheckCircle2 className="h-4 w-4" />
+                    <span>
+                      Si el correo está registrado, te enviaremos un enlace para restablecer tu contraseña.
+                    </span>
+                  </div>
+                )}
+                <div className="mt-2 text-center text-xs text-muted-foreground">
+                  ¿Recordaste tu contraseña? {" "}
+                  <Link href="/login" className="font-medium hover:text-foreground">
+                    Inicia sesión
+                  </Link>
+                </div>
+              </form>
+            </div>
+          </div>
         </motion.div>
-      </div>
+      </section>
     </div>
   );
 }

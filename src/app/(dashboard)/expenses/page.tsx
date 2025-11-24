@@ -1,10 +1,11 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { apiJson } from "@/lib/api";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Eye, Image as ImageIcon, Trash2 } from "lucide-react";
+import { Eye, Image as ImageIcon, Trash2, Filter, Calendar, Search } from "lucide-react";
 import RealtimeRefresh from "@/components/RealtimeRefresh";
 
 type Category = { id: string; name: string };
@@ -104,43 +105,48 @@ export default function Page() {
       <RealtimeRefresh />
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-semibold">Gastos</h1>
-        <Link href="/expenses/new" className="rounded-md bg-gradient-to-r from-fuchsia-600 via-indigo-600 to-blue-600 px-4 py-2 text-white shadow-sm hover:opacity-95">Añadir gasto</Link>
+        <Button asChild variant="panel">
+          <Link href="/expenses/new">Añadir gasto</Link>
+        </Button>
       </div>
 
       <Card className="mb-4 panel-bg">
         <CardHeader>
-          <CardTitle>Filtros</CardTitle>
+          <div className="flex items-center gap-2">
+            <Filter className="h-4 w-4 text-muted-foreground" />
+            <CardTitle>Filtros</CardTitle>
+          </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-y-3 gap-x-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-y-3 gap-x-5">
             <div className="space-y-1 lg:col-span-2">
-              <label className="text-xs font-medium text-muted-foreground">Tipo</label>
-              <select className="border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-primary/30" value={filters.type || ""} onChange={e => setFilters(f => ({ ...f, type: e.target.value || undefined }))}>
+              <label className="block text-xs font-medium text-muted-foreground">Tipo</label>
+              <select className="border rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-primary/30" value={filters.type || ""} onChange={e => setFilters(f => ({ ...f, type: e.target.value || undefined }))}>
                 <option value="">Todos</option>
                 <option value="FACTURA">Factura</option>
                 <option value="BOLETA">Boleta</option>
               </select>
             </div>
-            <div className="space-y-1 lg:col-span-2">
-              <label className="text-xs font-medium text-muted-foreground">Categoría</label>
-              <select className="border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-primary/30" value={filters.categoryId || ""} onChange={e => setFilters(f => ({ ...f, categoryId: e.target.value || undefined }))}>
-                <option value="">Todas</option>
-                {categories.map(c => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
-                ))}
-              </select>
-            </div>
-            <div className="space-y-1 lg:col-span-2">
+            <div className="space-y-1 lg:col-span-4">
               <label className="text-xs font-medium text-muted-foreground">Proveedor</label>
-              <input className="border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="Proveedor" value={filters.provider || ""} onChange={e => setFilters(f => ({ ...f, provider: e.target.value || undefined }))} />
+              <div className="relative">
+                <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <input className="border rounded-md p-2 pl-8 w-full focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="Buscar" value={filters.provider || ""} onChange={e => setFilters(f => ({ ...f, provider: e.target.value || undefined }))} />
+              </div>
             </div>
-            <div className="space-y-1 lg:col-span-1">
-              <label className="text-xs font-medium text-muted-foreground">Desde (fecha real)</label>
-              <input type="date" className="border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-primary/30" value={filters.start || ""} onChange={e => setFilters(f => ({ ...f, start: e.target.value || undefined }))} />
+            <div className="space-y-1 lg:col-span-3">
+              <label className="text-xs font-medium text-muted-foreground">Desde</label>
+              <div className="relative">
+                <Calendar className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <input type="date" className="border rounded-md p-2 pl-8 w-full focus:outline-none focus:ring-2 focus:ring-primary/30" value={filters.start || ""} onChange={e => setFilters(f => ({ ...f, start: e.target.value || undefined }))} />
+              </div>
             </div>
-            <div className="space-y-1 lg:col-span-1 sm:ml-4 lg:ml-6">
-              <label className="text-xs font-medium text-muted-foreground">Hasta (fecha real)</label>
-              <input type="date" className="border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-primary/30" value={filters.end || ""} onChange={e => setFilters(f => ({ ...f, end: e.target.value || undefined }))} />
+            <div className="space-y-1 lg:col-span-3">
+              <label className="text-xs font-medium text-muted-foreground">Hasta</label>
+              <div className="relative">
+                <Calendar className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <input type="date" className="border rounded-md p-2 pl-8 w-full focus:outline-none focus:ring-2 focus:ring-primary/30" value={filters.end || ""} onChange={e => setFilters(f => ({ ...f, end: e.target.value || undefined }))} />
+              </div>
             </div>
           </div>
         </CardContent>

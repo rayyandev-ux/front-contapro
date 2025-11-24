@@ -164,7 +164,7 @@ export default async function ExpenseDetail({ params }: { params: Promise<{ id: 
                 href={`${BASE}/api/documents/${document.id}/download`}
                 target="_blank"
                 rel="noreferrer"
-                className="rounded-md bg-gradient-to-r from-indigo-700 via-orange-600 to-blue-700 px-3 py-2 text-white hover:opacity-95 shadow-sm"
+                className="btn-panel"
               >Descargar</a>
               {details ? (
                 <a

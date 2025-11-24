@@ -26,6 +26,8 @@ export default function DashboardShell({ isAdmin, user, children }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const [isNavigating, setIsNavigating] = useState(false);
+  const [headerScrolled, setHeaderScrolled] = useState(false);
+  const scrollRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!isNavigating) return;
@@ -36,18 +38,30 @@ export default function DashboardShell({ isAdmin, user, children }: Props) {
     if (isNavigating) setTimeout(() => setIsNavigating(false), 300);
   }, [pathname]);
 
+  useEffect(() => {
+    const el = scrollRef.current;
+    const onScroll = () => {
+      try { setHeaderScrolled((el?.scrollTop ?? 0) > 0); } catch {}
+    };
+    onScroll();
+    el?.addEventListener('scroll', onScroll, { passive: true });
+    return () => { el?.removeEventListener('scroll', onScroll); };
+  }, []);
+
   
   const gridColsClass = hidden
     ? 'md:grid-cols-[0px_minmax(0,1fr)] md:gap-0'
-    : 'md:grid-cols-[260px_minmax(0,1fr)] md:gap-[15px]';
+    : 'md:grid-cols-[260px_minmax(0,1fr)] md:gap-0';
   return (
-    <div className="relative h-svh w-full overflow-hidden">
+    <div className="relative min-h-dvh w-full">
       
 
-      <div className={`grid w-full grid-cols-1 ${gridColsClass} h-svh`}>
-        <aside className={`hidden md:flex md:flex-col sticky top-0 h-svh overflow-y-auto border-r border-border bg-card p-3 ${hidden ? 'md:w-0 md:p-0 md:border-0 md:opacity-0 md:pointer-events-none md:overflow-hidden' : ''}`}>
+      <div className={`grid w-full grid-cols-1 ${gridColsClass} h-dvh md:h-screen overflow-hidden`}>
+        <aside className={`hidden md:flex md:flex-col sticky top-0 h-dvh md:h-screen border-r border-border bg-card p-3 ${hidden ? 'md:w-0 md:p-0 md:border-0 md:opacity-0 md:pointer-events-none md:overflow-hidden' : ''}`}>
           <div className="flex items-center gap-2 px-2 py-2">
-            <Image src="/logo.png" width={320} height={120} alt="ContaPRO" className="h-20 w-auto object-contain" unoptimized />
+            <Link href={`https://${process.env.NEXT_PUBLIC_LANDING_HOST || 'contapro.lat'}`} aria-label="Ir a la landing">
+              <Image src="/logo.png" width={320} height={120} alt="ContaPRO" className="h-20 w-auto object-contain" unoptimized />
+            </Link>
           </div>
           <div className="mt-2 px-2 text-xs font-medium text-muted-foreground">Plataforma</div>
           <div className="mt-1">
@@ -116,7 +130,7 @@ export default function DashboardShell({ isAdmin, user, children }: Props) {
                       </div>
                       <div className="py-1">
                         <Link href="/account" onClick={() => { setIsNavigating(true); setProfileOpen(false); }} className="block px-3 py-2 text-sm hover:bg-muted">Mi Cuenta</Link>
-                        <Link href="/premium" onClick={() => { setIsNavigating(true); setProfileOpen(false); }} className="block px-3 py-2 text-sm hover:bg-muted">Facturación</Link>
+                        <Link href="/billing" onClick={() => { setIsNavigating(true); setProfileOpen(false); }} className="block px-3 py-2 text-sm hover:bg-muted">Facturación</Link>
                         <div className="px-3 py-2">
                           <LogoutButton className="w-full rounded-md border px-3 py-2 text-sm" />
                         </div>
@@ -129,9 +143,9 @@ export default function DashboardShell({ isAdmin, user, children }: Props) {
           </div>
         </aside>
 
-        <main className="h-svh overflow-hidden">
-          <div className="relative h-full rounded-2xl border border-border bg-card shadow-sm grid grid-rows-[auto_1fr]">
-            <div className="flex items-center justify-between gap-2 px-3 py-2 border-b border-border rounded-t-2xl">
+        <main className="h-dvh md:h-screen overflow-hidden min-h-0">
+          <div className="relative flex flex-col h-full">
+            <div className={`sticky top-0 z-20 flex items-center justify-between gap-2 px-3 py-2 shrink-0 ${headerScrolled ? 'border-b border-border bg-card/80 backdrop-blur-[10px] shadow-sm' : ''} transition-[background,backdrop-filter] duration-200 ease-in-out`}>
               <div className="flex items-center gap-2">
                 <button
                   type="button"
@@ -154,7 +168,7 @@ export default function DashboardShell({ isAdmin, user, children }: Props) {
                 <ThemeToggle />
               </div>
             </div>
-            <div className="overflow-y-auto p-4 pb-24 md:p-6 md:pb-6">
+            <div ref={scrollRef} className="overflow-y-auto p-4 pb-24 md:p-6 md:pb-0 min-h-0 flex-1">
               <RealtimeRefresh />
               {children}
             </div>
@@ -168,7 +182,9 @@ export default function DashboardShell({ isAdmin, user, children }: Props) {
             <div className="fixed inset-0 z-40 bg-black/50" aria-hidden="true" onClick={() => setMobileOpen(false)} />
             <div className="fixed inset-y-0 left-0 z-50 h-full w-[84vw] max-w-xs bg-card/95 p-3 shadow-xl ring-1 ring-border backdrop-blur flex flex-col" role="dialog" aria-modal="true">
               <div className="mb-3 flex items-center justify-between">
-                <Image src="/logo.png" width={160} height={60} alt="ContaPRO" className="h-12 w-auto object-contain" unoptimized />
+                <Link href={`https://${process.env.NEXT_PUBLIC_LANDING_HOST || 'contapro.lat'}`} aria-label="Ir a la landing" onClick={() => setMobileOpen(false)}>
+                  <Image src="/logo.png" width={160} height={60} alt="ContaPRO" className="h-12 w-auto object-contain" unoptimized />
+                </Link>
                 <button type="button" aria-label="Cerrar menú" className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm hover:bg-muted" onClick={() => setMobileOpen(false)}>
                   <X className="h-4 w-4" />
                   Cerrar

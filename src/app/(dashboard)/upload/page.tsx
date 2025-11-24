@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { apiJson, apiMultipart } from "@/lib/api";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { UploadCloud, FileText, Image as ImageIcon, AlertTriangle, Loader2, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function Page() {
   const [file, setFile] = useState<File | null>(null);
@@ -182,14 +183,10 @@ export default function Page() {
 
             {/* Acciones */}
             <div className="flex items-center gap-3">
-              <button
-                type="submit"
-                disabled={loading}
-                className="inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-indigo-700 via-orange-600 to-blue-700 px-4 py-2 text-white shadow-md hover:shadow-lg disabled:opacity-60"
-              >
+              <Button type="submit" disabled={loading} className="gap-2" variant="panel">
                 {loading && <Loader2 className="h-4 w-4 animate-spin" />}
                 {loading ? "Subiendo..." : "Subir y analizar"}
-              </button>
+              </Button>
               {error && (
                 <span className="inline-flex items-center gap-1 text-xs text-destructive">
                   <AlertTriangle className="h-3 w-3" /> {error}

@@ -1,15 +1,22 @@
 "use client";
 import { Suspense, useEffect, useRef, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import Image from "next/image";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { apiJson, invalidateApiCache } from "@/lib/api";
 
 export default function Page() {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [user, setUser] = useState<{ plan?: string; planExpires?: string | null } | null>(null);
+  const [orderId, setOrderId] = useState<string>("");
+  const [paymentMethod, setPaymentMethod] = useState<string>("Flow");
+  const [paymentPeriod, setPaymentPeriod] = useState<string>("");
+  const [showConfetti, setShowConfetti] = useState(true);
+  const [pieces, setPieces] = useState<{ x: string; w: string; h: string; rot: string; dur: string; delay: string; col: string }[]>([]);
+  const [secondsLeft, setSecondsLeft] = useState<number>(10);
 
   useEffect(() => {
     (async () => {
@@ -63,6 +70,7 @@ export default function Page() {
         }
         let lastOrderId = '';
         try { lastOrderId = orderIdFromQuery || localStorage.getItem('contapro:lastOrderId') || ''; } catch {}
+        if (orderIdFromQuery || lastOrderId) setOrderId(orderIdFromQuery || lastOrderId);
         if (lastOrderId) {
           try {
             const key = `contapro:confirm:oid:${lastOrderId}`;
@@ -79,6 +87,11 @@ export default function Page() {
             }
           }
         }
+        const hist = await apiJson<{ ok: boolean; items?: { createdAt: string; period: string; status: string }[] }>("/api/payments/history");
+        if (hist.ok && Array.isArray(hist.data?.items) && hist.data!.items!.length) {
+          const latest = hist.data!.items![0];
+          if (latest?.period) setPaymentPeriod(latest.period);
+        }
       })();
     }, []);
     return null;
@@ -92,41 +105,91 @@ export default function Page() {
 
   const isPremium = String(user?.plan || '').toUpperCase() === 'PREMIUM';
 
+  useEffect(() => {
+    const colors = ["#000000", "#ffffff", "#9ca3af", "#6b7280"];
+    const arr: { x: string; w: string; h: string; rot: string; dur: string; delay: string; col: string }[] = [];
+    for (let i = 0; i < 100; i++) {
+      const x = `${Math.round(Math.random() * 100)}%`;
+      const w = `${4 + Math.round(Math.random() * 8)}px`;
+      const h = `${8 + Math.round(Math.random() * 14)}px`;
+      const rot = `${Math.round(Math.random() * 90)}deg`;
+      const dur = `${1600 + Math.round(Math.random() * 1600)}ms`;
+      const delay = `${Math.round(Math.random() * 400)}ms`;
+      const col = colors[Math.floor(Math.random() * colors.length)];
+      arr.push({ x, w, h, rot, dur, delay, col });
+    }
+    setPieces(arr);
+    const to = setTimeout(() => { setShowConfetti(false); }, 2800);
+    return () => { clearTimeout(to); };
+  }, []);
+
+  useEffect(() => {
+    if (loading || error) return;
+    setSecondsLeft(10);
+    const iv = setInterval(() => {
+      setSecondsLeft(s => (s > 0 ? s - 1 : 0));
+    }, 1000);
+    const to = setTimeout(() => { try { router.push('/dashboard'); } catch {} }, 10000);
+    return () => { clearInterval(iv); clearTimeout(to); };
+  }, [loading, error, router]);
+
   return (
-    <div className="relative min-h-svh w-full overflow-hidden">
-      <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 via-white to-cyan-50" />
-      </div>
-      <section className="mx-auto max-w-xl px-8 py-20">
+    <div className="hero-dark min-h-svh w-full overflow-hidden">
+      <header className="fixed top-0 left-0 right-0 z-50 border-b border-border backdrop-blur-[10px] bg-black/20">
+        <div className="flex h-14 items-center justify-center px-3">
+          <Link href="/" aria-label="Ir a la landing">
+            <Image src="/logo.png" width={520} height={200} alt="ContaPRO" className="h-10 w-auto object-contain" unoptimized />
+          </Link>
+        </div>
+      </header>
+      <section className="mx-auto max-w-4xl w-full px-4 sm:px-6 md:px-8 pt-16 min-h-svh grid items-center justify-items-center md:justify-items-stretch">
+        {showConfetti && (
+          <div className="confetti-container">
+            {pieces.map((p, idx) => (
+              <span key={idx} className="confetti-piece" style={{
+                ['--x' as any]: p.x,
+                ['--w' as any]: p.w,
+                ['--h' as any]: p.h,
+                ['--rot' as any]: p.rot,
+                ['--dur' as any]: p.dur,
+                ['--delay' as any]: p.delay,
+                ['--col' as any]: p.col,
+              }} />
+            ))}
+          </div>
+        )}
         <Suspense fallback={null}><TokenConfirm /></Suspense>
-        <Card className="bg-white/90 backdrop-blur-sm shadow-lg ring-1 ring-black/5">
-          <CardHeader>
-            <CardTitle className="bg-gradient-to-r from-indigo-800 via-fuchsia-700 to-cyan-600 bg-clip-text text-transparent">
-              Pago completado
-            </CardTitle>
-            <CardDescription>
-              Gracias por tu compra. Estamos confirmando tu suscripción.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {loading && <p className="text-sm text-slate-700">Verificando tu suscripción...</p>}
-            {error && <p className="text-sm text-red-600">{error}</p>}
-            {!loading && !error && (
-              <div className="space-y-2 text-sm text-slate-700">
-                <p><span className="font-semibold">Plan:</span> {isPremium ? 'PREMIUM' : (user?.plan || 'GRATIS')}</p>
-                <p><span className="font-semibold">Vencimiento:</span> {fmtDate(user?.planExpires)}</p>
-                {!isPremium && (
-                  <p className="text-xs text-slate-500">Si aún no ves PREMIUM, espera unos segundos; el proveedor enviará el webhook de confirmación.</p>
-                )}
-                <div className="mt-4">
-                  <Link href="/dashboard">
-                    <Button className="bg-slate-900 text-white hover:bg-slate-800">Ir al Dashboard</Button>
-                  </Link>
+        <div className="w-full grid grid-cols-1 md:grid-cols-2 items-center gap-4 sm:gap-6 justify-items-center md:justify-items-stretch">
+          <div className="text-center md:text-left max-w-md w-full mx-auto">
+            <h1 className="font-baskerville text-2xl sm:text-3xl font-bold tracking-tight text-white">Pago completado</h1>
+            <p className="mt-1 text-base sm:text-lg font-medium leading-relaxed text-white/80">Gracias por tu compra. Estamos confirmando tu suscripción.</p>
+            <div className="mt-2">
+              {loading && <p className="text-sm text-white/80">Verificando tu suscripción...</p>}
+              {error && <p className="text-sm text-rose-400">{error}</p>}
+              {!loading && !error && (
+                <div className="space-y-2 text-sm text-white/90 font-plex-mono">
+                  <p><span className="font-semibold">Plan:</span> {isPremium ? 'PREMIUM' : (user?.plan || 'GRATIS')}</p>
+                  <p><span className="font-semibold">Vencimiento:</span> {fmtDate(user?.planExpires)}</p>
+                  {orderId && <p><span className="font-semibold">Order ID:</span> {orderId}</p>}
+                  <p><span className="font-semibold">Método de pago:</span> {paymentMethod}</p>
+                  <p><span className="font-semibold">Periodo comprado:</span> {paymentPeriod === 'ANNUAL' ? 'Anual' : paymentPeriod === 'MONTHLY' ? 'Mensual' : '—'}</p>
+                  {!isPremium && (
+                    <p className="text-xs text-white/60">Si aún no ves PREMIUM, espera unos segundos; el proveedor enviará el webhook de confirmación.</p>
+                  )}
+                  <div className="mt-4 flex justify-center md:justify-start">
+                    <Link href="/dashboard">
+                      <Button variant="panel" className="h-9 px-4">Ir al Dashboard</Button>
+                    </Link>
+                  </div>
+                  <div className="mt-2 text-xs text-white/60 font-plex-mono">Redirigiendo en {secondsLeft}s…</div>
                 </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+              )}
+            </div>
+          </div>
+          <div className="flex justify-center md:justify-end w-full">
+            <Image src="/icono_carpeta_anual.png" alt="ContaPRO Premium" width={512} height={512} className="h-56 w-56 sm:h-72 sm:w-72 md:h-80 md:w-80 lg:h-[22rem] lg:w-[22rem] object-contain" />
+          </div>
+        </div>
       </section>
     </div>
   );

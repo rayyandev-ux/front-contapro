@@ -101,7 +101,7 @@ export default function ExpenseEditForm({ item }: { item: Expense }) {
   return (
     <div className="space-y-3">
       {!open ? (
-        <button type="button" onClick={() => setOpen(true)} className="rounded-md border border-border px-4 py-2 hover:bg-muted/50">Editar gasto</button>
+        <button type="button" onClick={() => setOpen(true)} className="btn-panel">Editar gasto</button>
       ) : (
         <form className="space-y-4" onSubmit={submit}>
           <div className="flex justify-between">

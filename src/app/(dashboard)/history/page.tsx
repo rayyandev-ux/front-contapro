@@ -4,6 +4,7 @@ import { apiJson } from "@/lib/api";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { ChevronLeft, ChevronRight, FileImage, FileText, FileQuestion } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 type Item = { id: string; filename: string; uploadedAt: string; summary?: string };
 
@@ -142,40 +143,21 @@ export default function Page() {
                 Mostrando <span className="font-medium">{startIndex + 1}</span>–<span className="font-medium">{endIndex}</span> de <span className="font-medium">{items.length}</span>
               </p>
               <nav className="flex items-center gap-1">
-                <button
-                  type="button"
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  disabled={page <= 1}
-                  className="inline-flex items-center gap-1 rounded-md border border-input px-2 py-1 text-sm text-foreground hover:bg-muted disabled:opacity-50"
-                >
+                <Button size="sm" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1} className="gap-1 px-2">
                   <ChevronLeft className="h-4 w-4" /> Prev
-                </button>
+                </Button>
                 {getVisiblePages(page, totalPages).map((p, idx) =>
                   typeof p === "number" ? (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => setPage(p)}
-                      className={`rounded-md px-3 py-1 text-sm ${
-                        p === page
-                          ? "bg-primary text-primary-foreground"
-                          : "border border-input text-foreground hover:bg-muted"
-                      }`}
-                    >
+                    <Button key={idx} size="sm" onClick={() => setPage(p)} className="px-3">
                       {p}
-                    </button>
+                    </Button>
                   ) : (
                     <span key={idx} className="px-2 text-sm text-muted-foreground">{p}</span>
                   )
                 )}
-                <button
-                  type="button"
-                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={page >= totalPages}
-                  className="inline-flex items-center gap-1 rounded-md border border-input px-2 py-1 text-sm text-foreground hover:bg-muted disabled:opacity-50"
-                >
+                <Button size="sm" onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page >= totalPages} className="gap-1 px-2">
                   Siguiente <ChevronRight className="h-4 w-4" />
-                </button>
+                </Button>
               </nav>
             </div>
           )}

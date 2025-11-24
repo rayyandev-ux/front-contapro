@@ -2,15 +2,20 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import {
   LayoutDashboard,
   Upload,
-  History,
   Wallet,
   PiggyBank,
   Puzzle,
   User,
   Shield,
+  ChevronDown,
+  MessageCircle,
+  Send,
+  CalendarDays,
+  Tag,
 } from "lucide-react";
 
 type Props = {
@@ -30,7 +35,6 @@ type NavItem = {
 const items: NavItem[] = [
   { href: "/dashboard", label: "Resumen", Icon: LayoutDashboard },
   { href: "/upload", label: "Subir", Icon: Upload },
-  { href: "/history", label: "Historial", Icon: History },
   { href: "/expenses", label: "Gastos", Icon: Wallet },
   { href: "/budget", label: "Presupuesto", Icon: PiggyBank },
   { href: "/integrations", label: "Integraciones", Icon: Puzzle },
@@ -40,6 +44,10 @@ const items: NavItem[] = [
 
 export default function SidebarNav({ isAdmin, onNavigate, mobileOnly, hideAccount }: Props) {
   const pathname = usePathname();
+  const isBudgetActive = pathname === "/budget" || pathname.startsWith("/budget/");
+  const [openBudget, setOpenBudget] = useState(isBudgetActive);
+  const isIntegrationsActive = pathname === "/integrations" || pathname.startsWith("/integrations/");
+  const [openIntegrations, setOpenIntegrations] = useState(isIntegrationsActive);
   let list = items.filter((i) => !i.adminOnly || isAdmin);
   if (mobileOnly) {
     list = list.filter((i) => i.href === '/integrations' || i.href === '/account' || i.href === '/admin');
@@ -54,27 +62,76 @@ export default function SidebarNav({ isAdmin, onNavigate, mobileOnly, hideAccoun
         {list.map(({ href, label, Icon }) => {
           const isActive = pathname === href || pathname.startsWith(href + "/");
           const base =
-            "group flex items-center gap-2 px-3 py-2 rounded-full transition-colors duration-150 text-white";
+            "group flex items-center gap-2 px-3 py-2 rounded-full transition-colors duration-150 text-sidebar-foreground";
           const active =
-            "bg-primary/10 text-white font-medium ring-1 ring-primary/30";
+            "border border-border bg-card shadow-sm text-sidebar-foreground";
           const inactive =
-            "text-white hover:bg-muted hover:text-white";
+            "text-sidebar-foreground hover:bg-muted hover:text-sidebar-foreground";
+          if (href === "/budget") {
+            return (
+              <li key={href}>
+                <button type="button" onClick={() => setOpenBudget((o) => !o)} className={`${base} ${isBudgetActive ? active : inactive} w-full text-left`}>
+                  <Icon className={`h-4 w-4 ${isBudgetActive ? "text-sidebar-foreground" : "text-sidebar-foreground/70 group-hover:text-sidebar-foreground"}`} />
+                  <span className="flex-1">{label}</span>
+                  <ChevronDown className={`h-4 w-4 ${isBudgetActive ? "text-sidebar-foreground" : "text-sidebar-foreground/70 group-hover:text-sidebar-foreground"} transition-transform ${openBudget ? "rotate-180" : "rotate-0"}`} />
+                </button>
+                {openBudget && (
+                  <ul className="mt-1 ml-8 flex flex-col gap-1">
+                    <li>
+                      <Link href="/budget" onClick={() => { setOpenBudget(false); onNavigate?.(); }} className="group flex items-center gap-2 px-3 py-1.5 rounded-md transition-colors duration-150 text-sidebar-foreground hover:bg-muted">
+                        <CalendarDays className="h-4 w-4 text-sidebar-foreground/70 group-hover:text-sidebar-foreground" />
+                        <span className="flex-1">Presupuesto mensual</span>
+                      </Link>
+                    </li>
+                    <li>
+                      <Link href="/budget/category" onClick={() => onNavigate?.()} className="group flex items-center gap-2 px-3 py-1.5 rounded-md transition-colors duration-150 text-sidebar-foreground hover:bg-muted">
+                        <Tag className="h-4 w-4 text-sidebar-foreground/70 group-hover:text-sidebar-foreground" />
+                        <span className="flex-1">Presupuesto por categoría</span>
+                      </Link>
+                    </li>
+                  </ul>
+                )}
+              </li>
+            );
+          }
+          if (href === "/integrations") {
+            return (
+              <li key={href}>
+                <button type="button" onClick={() => setOpenIntegrations((o) => !o)} className={`${base} ${isIntegrationsActive ? active : inactive} w-full text-left`}>
+                  <Icon className={`h-4 w-4 ${isIntegrationsActive ? "text-sidebar-foreground" : "text-sidebar-foreground/70 group-hover:text-sidebar-foreground"}`} />
+                  <span className="flex-1">{label}</span>
+                  <ChevronDown className={`h-4 w-4 ${isIntegrationsActive ? "text-sidebar-foreground" : "text-sidebar-foreground/70 group-hover:text-sidebar-foreground"} transition-transform ${openIntegrations ? "rotate-180" : "rotate-0"}`} />
+                </button>
+                {openIntegrations && (
+                  <ul className="mt-1 ml-8 flex flex-col gap-1">
+                    <li>
+                      <Link href="/integrations/whatsapp" onClick={() => { setOpenIntegrations(false); onNavigate?.(); }} className="group flex items-center gap-2 px-3 py-1.5 rounded-md transition-colors duration-150 text-sidebar-foreground hover:bg-muted">
+                        <MessageCircle className="h-4 w-4 text-sidebar-foreground/70 group-hover:text-sidebar-foreground" />
+                        <span className="flex-1">WhatsApp</span>
+                      </Link>
+                    </li>
+                    <li>
+                      <Link href="/integrations/telegram" onClick={() => { setOpenIntegrations(false); onNavigate?.(); }} className="group flex items-center gap-2 px-3 py-1.5 rounded-md transition-colors duration-150 text-sidebar-foreground hover:bg-muted">
+                        <Send className="h-4 w-4 text-sidebar-foreground/70 group-hover:text-sidebar-foreground" />
+                        <span className="flex-1">Telegram</span>
+                      </Link>
+                    </li>
+                  </ul>
+                )}
+              </li>
+            );
+          }
           return (
             <li key={href}>
               <Link href={href} onClick={() => onNavigate?.()} className={`${base} ${isActive ? active : inactive}`}>
                 <Icon
                   className={`h-4 w-4 ${
                     isActive
-                      ? "text-white"
-                      : "text-white/70 group-hover:text-white"
+                      ? "text-sidebar-foreground"
+                      : "text-sidebar-foreground/70 group-hover:text-sidebar-foreground"
                   }`}
                 />
                 <span className="flex-1">{label}</span>
-                <span
-                  className={`ml-auto h-2 w-2 rounded-full ${
-                    isActive ? "bg-primary" : "bg-transparent group-hover:bg-muted-foreground"
-                  }`}
-                />
               </Link>
             </li>
           );

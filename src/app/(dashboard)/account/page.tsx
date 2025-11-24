@@ -98,9 +98,9 @@ export default function AccountPage() {
         </div>
         {error && <p className="mb-6 text-sm text-red-600" aria-live="polite">{error}</p>}
 
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4">
         {/* Perfil */}
-        <Card className={`bg-card border shadow-sm panel-bg`}>
+        <Card className={`bg-card border shadow-sm ring-1 ring-border rounded-2xl panel-bg`}>
           <CardHeader>
             <div className="flex items-start gap-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted text-indigo-600">
@@ -131,7 +131,7 @@ export default function AccountPage() {
         </Card>
 
         {/* Configuraciones */}
-        <Card className={`bg-card border shadow-sm panel-bg`}>
+        <Card className={`bg-card border shadow-sm ring-1 ring-border rounded-2xl panel-bg`}>
           <CardHeader>
             <div className="flex items-start gap-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted text-blue-600">
@@ -171,6 +171,7 @@ export default function AccountPage() {
             </div>
             <div className="flex items-center gap-3">
               <Button
+                variant="panel"
                 disabled={saving || !dirty}
                 onClick={async () => {
                   if (!user) return;
@@ -194,7 +195,7 @@ export default function AccountPage() {
         </Card>
 
         {/* Suscripción */}
-        <Card className={`bg-card border shadow-sm panel-bg`}>
+        <Card className={`bg-card border shadow-sm ring-1 ring-border rounded-2xl panel-bg`}>
           <CardHeader>
             <div className="flex items-start gap-3">
               <div className={`flex h-9 w-9 items-center justify-center rounded-lg bg-muted ${subAccent}`}>
@@ -230,8 +231,8 @@ export default function AccountPage() {
               </div>
             </div>
             <div className="pt-2">
-              <Link href="/premium">
-                <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
+              <Link href="/billing">
+                <Button variant="panel">
                   <Crown className="mr-2 h-4 w-4" /> Gestionar suscripción
                 </Button>
               </Link>
@@ -240,7 +241,7 @@ export default function AccountPage() {
         </Card>
 
         {/* Seguridad */}
-        <Card className={`bg-card border shadow-sm panel-bg`}>
+        <Card className={`bg-card border shadow-sm ring-1 ring-border rounded-2xl panel-bg`}>
           <CardHeader>
             <div className="flex items-start gap-3">
               <div className={`flex h-9 w-9 items-center justify-center rounded-lg bg-muted ${secAccent}`}>
@@ -270,7 +271,7 @@ export default function AccountPage() {
             )}
             <div className="pt-1">
               <Link href="/forgot">
-                <Button variant="ghost">
+                <Button variant="panel">
                   <ShieldCheck className="mr-2 h-4 w-4" /> Cambiar contraseña
                 </Button>
               </Link>

@@ -1,17 +1,27 @@
-import TelegramLinkCard from "@/components/TelegramLinkCard";
 import WhatsAppLinkCard from "@/components/WhatsAppLinkCard";
-import Link from "next/link";
+import TelegramLinkCard from "@/components/TelegramLinkCard";
+import Image from "next/image";
+ 
 
 export default async function IntegrationsPage() {
   return (
     <section className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Integraciones</h1>
-        <Link href="/upload" className="btn-important">Subir documento</Link>
       </div>
       <div className="grid gap-4 md:grid-cols-2">
-        <TelegramLinkCard />
-        <WhatsAppLinkCard />
+        <div id="whatsapp">
+          <WhatsAppLinkCard />
+          <div className="mt-2 flex items-center justify-center gap-2">
+            <span className="text-xs text-muted-foreground">Powered by</span>
+            <a href="https://wazend.net/" target="_blank" rel="noreferrer" className="inline-flex items-center">
+              <Image src="/sponsors/Logos-7.png" alt="Wazend" width={300} height={64} className="h-5 md:h-6 w-auto opacity-90 hover:opacity-100 transition-opacity" />
+            </a>
+          </div>
+        </div>
+        <div id="telegram">
+          <TelegramLinkCard />
+        </div>
       </div>
     </section>
   );

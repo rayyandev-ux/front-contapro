@@ -29,6 +29,15 @@ export default function DashboardShell({ isAdmin, user, children }: Props) {
   const [headerScrolled, setHeaderScrolled] = useState(false);
   const scrollRef = useRef<HTMLDivElement | null>(null);
 
+  const rawLanding = (process.env.NEXT_PUBLIC_LANDING_HOST || 'contapro.lat').trim();
+  const landingHref = (() => {
+    const v = rawLanding.toLowerCase();
+    if (v.startsWith('https//')) return `https://${rawLanding.slice('https//'.length)}`;
+    if (v.startsWith('http//')) return `http://${rawLanding.slice('http//'.length)}`;
+    if (v.startsWith('http://') || v.startsWith('https://')) return rawLanding;
+    return `https://${rawLanding}`;
+  })();
+
   useEffect(() => {
     if (!isNavigating) return;
     const t = setTimeout(() => setIsNavigating(false), 800);
@@ -59,7 +68,7 @@ export default function DashboardShell({ isAdmin, user, children }: Props) {
       <div className={`grid w-full grid-cols-1 ${gridColsClass} h-dvh md:h-screen overflow-hidden`}>
         <aside className={`hidden md:flex md:flex-col sticky top-0 h-dvh md:h-screen border-r border-border bg-card p-3 ${hidden ? 'md:w-0 md:p-0 md:border-0 md:opacity-0 md:pointer-events-none md:overflow-hidden' : ''}`}>
           <div className="flex items-center gap-2 px-2 py-2">
-            <Link href={`https://${process.env.NEXT_PUBLIC_LANDING_HOST || 'contapro.lat'}`} aria-label="Ir a la landing">
+            <Link href={landingHref} aria-label="Ir a la landing">
               <Image src="/logo.png" width={320} height={120} alt="ContaPRO" className="h-20 w-auto object-contain" unoptimized />
             </Link>
           </div>
@@ -182,7 +191,7 @@ export default function DashboardShell({ isAdmin, user, children }: Props) {
             <div className="fixed inset-0 z-40 bg-black/50" aria-hidden="true" onClick={() => setMobileOpen(false)} />
             <div className="fixed inset-y-0 left-0 z-50 h-full w-[84vw] max-w-xs bg-card/95 p-3 shadow-xl ring-1 ring-border backdrop-blur flex flex-col" role="dialog" aria-modal="true">
               <div className="mb-3 flex items-center justify-between">
-                <Link href={`https://${process.env.NEXT_PUBLIC_LANDING_HOST || 'contapro.lat'}`} aria-label="Ir a la landing" onClick={() => setMobileOpen(false)}>
+                <Link href={landingHref} aria-label="Ir a la landing" onClick={() => setMobileOpen(false)}>
                   <Image src="/logo.png" width={160} height={60} alt="ContaPRO" className="h-12 w-auto object-contain" unoptimized />
                 </Link>
                 <button type="button" aria-label="Cerrar menú" className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm hover:bg-muted" onClick={() => setMobileOpen(false)}>

@@ -51,7 +51,8 @@ export default function Page() {
       if (!ok) {
         setError(error || "Error al iniciar sesión");
       } else {
-        router.push("/dashboard");
+        try { (window as any).postMessage({ t: 'contapro:mutated' }, '*'); } catch {}
+        window.location.assign('/dashboard');
       }
     } catch (err) {
       setError("Error inesperado");

@@ -112,7 +112,7 @@ export default async function Page({ searchParams }: { searchParams?: Promise<Re
     if (currency) payload.currency = currency;
     payload.alertThreshold = threshold;
     try {
-      const res = await fetch(`${BASE}/api/budget/category`, { method: "POST", headers: { "Content-Type": "application/json", cookie: cookieHeader }, body: JSON.stringify(payload) });
+      const res = await fetch(`${BASE}/api/budget/category`, { method: "POST", headers: { "Content-Type": "application/json", cookie: cookieHeader }, body: JSON.stringify(payload), duplex: 'half' });
       if (!res.ok) {
         const errJson: { error?: string; message?: string } = await res.json().catch(() => ({} as { error?: string; message?: string }));
         const msg = String((errJson && (errJson.error || errJson.message)) || `Error ${res.status}`);
@@ -172,7 +172,7 @@ export default async function Page({ searchParams }: { searchParams?: Promise<Re
               <p className="mt-1 text-xs text-gray-500">Monto o porcentaje (0.8 = 80%). Se alerta cuando el saldo ≤ umbral.</p>
             </div>
             <div className="sm:col-span-1 flex items-end justify-end gap-2">
-              <button type="submit" className="w-full sm:w-auto btn-important" disabled={!canAddMore}>Guardar</button>
+              <button type="submit" className="w-full sm:w-auto btn-panel" disabled={!canAddMore}>Guardar</button>
             </div>
           </form>
           {!canAddMore && (

@@ -36,7 +36,9 @@ export async function apiJson<T = any>(path: string, init: RequestInit = {}): Pr
       }
     }
 
-    const res = await fetch(`${BASE}${path}`, {
+    const isProxy = path.startsWith('/api/proxy');
+    const url = isProxy ? path : `${BASE}${path}`;
+    const res = await fetch(url, {
       ...init,
       headers: {
         ...(init.headers || {}),
@@ -70,7 +72,9 @@ export async function apiJson<T = any>(path: string, init: RequestInit = {}): Pr
 
 export async function apiMultipart<T = any>(path: string, formData: FormData): Promise<{ ok: boolean; data?: T; error?: string }>{
   try {
-    const res = await fetch(`${BASE}${path}`, {
+    const isProxy = path.startsWith('/api/proxy');
+    const url = isProxy ? path : `${BASE}${path}`;
+    const res = await fetch(url, {
       method: "POST",
       body: formData,
       credentials: "include",

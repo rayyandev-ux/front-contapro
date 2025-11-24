@@ -72,15 +72,21 @@ export default async function Page({ searchParams }: { searchParams?: Promise<Re
     const currency = String(formData.get("currency") || "");
     const payload: { month: number; year: number; amount: number; currency?: string } = { month: now.getMonth() + 1, year: now.getFullYear(), amount };
     if (currency) payload.currency = currency;
+    let errorMsg: string | null = null;
     try {
-      const res = await fetch(`${origin}/api/proxy/budget`, { method: "POST", headers: { "Content-Type": "application/json", cookie: cookieHeader }, body: JSON.stringify(payload) });
+      const res = await fetch(`${BASE}/api/budget`, { method: "POST", headers: { "Content-Type": "application/json", cookie: cookieHeader }, body: JSON.stringify(payload), duplex: 'half' });
       if (!res.ok) {
-        const errJson: { error?: string; message?: string } = await res.json().catch(() => ({ } as { error?: string; message?: string }));
-        const msg = String((errJson && (errJson.error || errJson.message)) || `Error ${res.status}`);
-        return redirect(`/budget?error=${encodeURIComponent(msg)}`);
+        const errJson: { error?: string; message?: string } = await res.json().catch(async () => {
+          const txt = await res.text().catch(() => "");
+          try { return JSON.parse(txt); } catch { return {}; }
+        });
+        errorMsg = String((errJson && (errJson.error || errJson.message)) || `Error ${res.status}`);
       }
     } catch {
-      return redirect(`/budget?error=${encodeURIComponent('Error de red al guardar presupuesto')}`);
+      errorMsg = 'Error de red al guardar presupuesto';
+    }
+    if (errorMsg) {
+      return redirect(`/budget?error=${encodeURIComponent(errorMsg)}`);
     }
     revalidatePath('/budget');
     return redirect('/budget');
@@ -95,7 +101,7 @@ export default async function Page({ searchParams }: { searchParams?: Promise<Re
     const now = new Date();
     // Incluimos solo el umbral; el backend usa valores actuales para los demás campos
     const payload: { month: number; year: number; alertThreshold: number } = { month: now.getMonth() + 1, year: now.getFullYear(), alertThreshold: threshold };
-    await fetch(`${origin}/api/proxy/budget`, { method: "POST", headers: { "Content-Type": "application/json", cookie: cookieHeader }, body: JSON.stringify(payload) });
+    await fetch(`${BASE}/api/budget`, { method: "POST", headers: { "Content-Type": "application/json", cookie: cookieHeader }, body: JSON.stringify(payload), duplex: 'half' });
     // Invalidar cachés relacionadas
     revalidatePath("/budget");
   }

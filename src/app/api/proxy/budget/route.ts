@@ -19,7 +19,7 @@ export async function POST(req: Request) {
   const BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8080";
   let body: unknown;
   try { body = await req.json(); } catch { body = undefined; }
-  const upstream = await fetch(`${BASE}/api/budget`, { method: "POST", headers: { cookie: cookieHeader, "content-type": "application/json" }, body: body ? JSON.stringify(body) : undefined, duplex: 'half' });
+  const upstream = await fetch(`${BASE}/api/budget`, { method: "POST", headers: { cookie: cookieHeader, "content-type": "application/json" }, body: body ? JSON.stringify(body) : undefined });
   const status = upstream.status;
   if (status === 204 || status === 205 || status === 304) {
     return new Response(null, { status });

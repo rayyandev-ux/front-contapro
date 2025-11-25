@@ -112,7 +112,7 @@ export default async function Page({ searchParams }: { searchParams?: Promise<Re
     if (currency) payload.currency = currency;
     payload.alertThreshold = threshold;
     try {
-      const res = await fetch(`${BASE}/api/budget/category`, { method: "POST", headers: { "Content-Type": "application/json", cookie: cookieHeader }, body: JSON.stringify(payload), duplex: 'half' });
+      const res = await fetch(`${BASE}/api/budget/category`, { method: "POST", headers: { "Content-Type": "application/json", cookie: cookieHeader }, body: JSON.stringify(payload) });
       if (!res.ok) {
         const errJson: { error?: string; message?: string } = await res.json().catch(() => ({} as { error?: string; message?: string }));
         const msg = String((errJson && (errJson.error || errJson.message)) || `Error ${res.status}`);

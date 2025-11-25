@@ -74,7 +74,7 @@ export default async function Page({ searchParams }: { searchParams?: Promise<Re
     if (currency) payload.currency = currency;
     let errorMsg: string | null = null;
     try {
-      const res = await fetch(`${BASE}/api/budget`, { method: "POST", headers: { "Content-Type": "application/json", cookie: cookieHeader }, body: JSON.stringify(payload), duplex: 'half' });
+      const res = await fetch(`${BASE}/api/budget`, { method: "POST", headers: { "Content-Type": "application/json", cookie: cookieHeader }, body: JSON.stringify(payload) });
       if (!res.ok) {
         const errJson: { error?: string; message?: string } = await res.json().catch(async () => {
           const txt = await res.text().catch(() => "");
@@ -101,7 +101,7 @@ export default async function Page({ searchParams }: { searchParams?: Promise<Re
     const now = new Date();
     // Incluimos solo el umbral; el backend usa valores actuales para los demás campos
     const payload: { month: number; year: number; alertThreshold: number } = { month: now.getMonth() + 1, year: now.getFullYear(), alertThreshold: threshold };
-    await fetch(`${BASE}/api/budget`, { method: "POST", headers: { "Content-Type": "application/json", cookie: cookieHeader }, body: JSON.stringify(payload), duplex: 'half' });
+    await fetch(`${BASE}/api/budget`, { method: "POST", headers: { "Content-Type": "application/json", cookie: cookieHeader }, body: JSON.stringify(payload) });
     // Invalidar cachés relacionadas
     revalidatePath("/budget");
   }

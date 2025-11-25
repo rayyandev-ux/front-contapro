@@ -17,14 +17,12 @@ export async function POST(req: Request) {
         method: "POST",
         headers: { cookie: cookieHeader, "content-type": "application/json" },
         body: bodyJson ? JSON.stringify(bodyJson) : undefined,
-        duplex: 'half',
       });
     } else {
       upstream = await fetch(`${BASE}/api/expenses`, {
         method: "POST",
         headers: { cookie: cookieHeader, "content-type": contentType },
-        body: req.body,
-        duplex: 'half',
+        body: await req.arrayBuffer(),
       });
     }
     const text = await upstream.text();

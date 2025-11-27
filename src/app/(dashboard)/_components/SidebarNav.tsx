@@ -48,6 +48,8 @@ export default function SidebarNav({ isAdmin, onNavigate, mobileOnly, hideAccoun
   const [openBudget, setOpenBudget] = useState(isBudgetActive);
   const isIntegrationsActive = pathname === "/integrations" || pathname.startsWith("/integrations/");
   const [openIntegrations, setOpenIntegrations] = useState(isIntegrationsActive);
+  const isAdminActive = pathname === "/admin" || pathname.startsWith("/admin/");
+  const [openAdmin, setOpenAdmin] = useState(isAdminActive);
   let list = items.filter((i) => !i.adminOnly || isAdmin);
   if (mobileOnly) {
     list = list.filter((i) => i.href === '/integrations' || i.href === '/account' || i.href === '/admin');
@@ -87,6 +89,39 @@ export default function SidebarNav({ isAdmin, onNavigate, mobileOnly, hideAccoun
                       <Link href="/budget/category" onClick={() => onNavigate?.()} className="group flex items-center gap-2 px-3 py-1.5 rounded-md transition-colors duration-150 text-sidebar-foreground hover:bg-muted">
                         <Tag className="h-4 w-4 text-sidebar-foreground/70 group-hover:text-sidebar-foreground" />
                         <span className="flex-1">Presupuesto por categoría</span>
+                      </Link>
+                    </li>
+                  </ul>
+                )}
+              </li>
+            );
+          }
+          if (href === "/admin") {
+            return (
+              <li key={href}>
+                <button type="button" onClick={() => setOpenAdmin((o) => !o)} className={`${base} ${isAdminActive ? active : inactive} w-full text-left`}>
+                  <Icon className={`h-4 w-4 ${isAdminActive ? "text-sidebar-foreground" : "text-sidebar-foreground/70 group-hover:text-sidebar-foreground"}`} />
+                  <span className="flex-1">{label}</span>
+                  <ChevronDown className={`h-4 w-4 ${isAdminActive ? "text-sidebar-foreground" : "text-sidebar-foreground/70 group-hover:text-sidebar-foreground"} transition-transform ${openAdmin ? "rotate-180" : "rotate-0"}`} />
+                </button>
+                {openAdmin && (
+                  <ul className="mt-1 ml-8 flex flex-col gap-1">
+                    <li>
+                      <Link href="/admin" onClick={() => { setOpenAdmin(false); onNavigate?.(); }} className="group flex items-center gap-2 px-3 py-1.5 rounded-md transition-colors duration-150 text-sidebar-foreground hover:bg-muted">
+                        <LayoutDashboard className="h-4 w-4 text-sidebar-foreground/70 group-hover:text-sidebar-foreground" />
+                        <span className="flex-1">Panel de administrador</span>
+                      </Link>
+                    </li>
+                    <li>
+                      <Link href="/admin/plans" onClick={() => { setOpenAdmin(false); onNavigate?.(); }} className="group flex items-center gap-2 px-3 py-1.5 rounded-md transition-colors duration-150 text-sidebar-foreground hover:bg-muted">
+                        <Wallet className="h-4 w-4 text-sidebar-foreground/70 group-hover:text-sidebar-foreground" />
+                        <span className="flex-1">Planes y precios</span>
+                      </Link>
+                    </li>
+                    <li>
+                      <Link href="/admin/promo" onClick={() => { setOpenAdmin(false); onNavigate?.(); }} className="group flex items-center gap-2 px-3 py-1.5 rounded-md transition-colors duration-150 text-sidebar-foreground hover:bg-muted">
+                        <Tag className="h-4 w-4 text-sidebar-foreground/70 group-hover:text-sidebar-foreground" />
+                        <span className="flex-1">Códigos promocionales</span>
                       </Link>
                     </li>
                   </ul>

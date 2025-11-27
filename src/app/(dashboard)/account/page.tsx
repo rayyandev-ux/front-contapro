@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { apiJson, invalidateApiCache } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -27,6 +28,10 @@ export default function AccountPage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState<string | null>(null);
   const [original, setOriginal] = useState<{ preferredCurrency?: 'PEN' | 'USD' | 'EUR'; dateFormat?: 'DMY' | 'MDY' } | null>(null);
+  const [redeemOpen, setRedeemOpen] = useState(false);
+  const [code, setCode] = useState("");
+  const [redeeming, setRedeeming] = useState(false);
+  const [redeemMsg, setRedeemMsg] = useState<string | null>(null);
   
 
   useEffect(() => {
@@ -236,6 +241,31 @@ export default function AccountPage() {
                   <Crown className="mr-2 h-4 w-4" /> Gestionar suscripción
                 </Button>
               </Link>
+              <div className="mt-2">
+                <Button variant="outline" className="hover:bg-muted" onClick={() => setRedeemOpen(v => !v)}>
+                  Código promocional
+                </Button>
+              </div>
+              {redeemOpen && (
+                <div className="mt-3 space-y-2">
+                  <Label>Canjear código</Label>
+                  <div className="flex items-center gap-2">
+                    <Input value={code} onChange={(e) => setCode(e.target.value)} placeholder="Ingresa tu código" className="flex-1" />
+                    <Button variant="panel" disabled={redeeming || !code.trim()} onClick={async () => {
+                      setRedeeming(true); setRedeemMsg(null);
+                      const res = await apiJson<{ ok: boolean; user: MeUser; days: number }>("/api/promo/redeem", { method: "POST", body: JSON.stringify({ code }) });
+                      setRedeeming(false);
+                      if (!res.ok) { setRedeemMsg(res.error || "No se pudo canjear"); return; }
+                      setRedeemMsg(`Código aplicado (+${(res.data as any)?.days ?? ''} días)`);
+                      setUser(prev => ({ ...(prev || {}), ...(res.data as any)?.user } as MeUser));
+                      try { invalidateApiCache('/api/auth'); } catch {}
+                      setTimeout(() => setRedeemMsg(null), 3000);
+                    }}>Canjear</Button>
+                  </div>
+                  {redeeming && <div className="text-xs text-muted-foreground">Aplicando…</div>}
+                  {redeemMsg && <div className="text-xs text-muted-foreground">{redeemMsg}</div>}
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>

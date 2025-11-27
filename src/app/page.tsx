@@ -180,14 +180,14 @@ export default function Home() {
   const activeFaq = faqOpen !== null ? faqs[faqOpen] : null;
   const featuresList = [
     { key: "uploads", name: "Uploads inteligentes", Icon: UploadCloud, color: "text-indigo-600", desc: "Arrastra y suelta, soporte para imágenes y PDFs." },
-    { key: "extract", name: "Extracción con IA", Icon: Receipt, color: "text-fuchsia-600", desc: "RUC, total, fecha y más automáticamente." },
+    { key: "extract", name: "Extracción con IA", Icon: Receipt, color: "text-fuchsia-600", desc: "Comercio, total, fecha y categoría automáticamente." },
     { key: "metrics", name: "Métricas y reportes", Icon: BarChart3, color: "text-cyan-600", desc: "Gráficos por categoría y por mes para entender tus gastos." },
-    { key: "chat", name: "Integraciones por chat", Icon: Bot, color: "text-sky-600", desc: "Conecta Telegram y WhatsApp para enviar comprobantes y audios. En WhatsApp crea gastos sin comprobante usando lenguaje natural (p. ej. \"gaste 50 soles en la barbería\")." },
+    { key: "chat", name: "Integraciones por chat", Icon: Bot, color: "text-sky-600", desc: "Conecta Telegram y WhatsApp para enviar comprobantes y audios. En WhatsApp crea gastos sin comprobante usando lenguaje natural (p. ej. \"gasté 50 soles en la barbería\")." },
     { key: "budget", name: "Presupuesto y alertas", Icon: BarChart3, color: "text-blue-600", desc: "Define presupuesto mensual y recibe alertas al acercarte al límite." },
     { key: "multi", name: "Multi-moneda", Icon: Receipt, color: "text-emerald-600", desc: "PEN, USD y EUR para registrar y analizar tus gastos." },
     { key: "security", name: "Seguridad", Icon: ShieldCheck, color: "text-indigo-700", desc: "Autenticación segura, datos encriptados y control de acceso." },
   ];
-  const [activeFeature, setActiveFeature] = useState<string>(featuresList[0].key);
+  const [activeFeature, setActiveFeature] = useState<string>('chat');
   const selectedFeature = featuresList.find(f => f.key === activeFeature) || featuresList[0];
   const renderFeatureContent = (key: string) => {
     if (key === "uploads") {
@@ -215,18 +215,18 @@ export default function Home() {
       return (
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="rounded-xl border p-4 font-mono text-sm">
-            <div>Proveedor: &quot;ABC SAC&quot;</div>
-            <div>{`RUC: 20123456789`}</div>
+            <div>Comercio: &quot;Supermercado XYZ&quot;</div>
             <div>{`Total: 145.90 PEN`}</div>
             <div>{`Fecha: 2025-01-12`}</div>
+            <div>{`Categoría: supermercado`}</div>
           </div>
           <div className="rounded-xl border p-4">
             <div className="text-xs text-muted-foreground">Campos detectados</div>
             <ul className="mt-2 space-y-1 text-sm">
-              <li className="flex items-center gap-2"><Receipt className="h-4 w-4 text-fuchsia-600" /> RUC</li>
+              <li className="flex items-center gap-2"><Receipt className="h-4 w-4 text-fuchsia-600" /> Comercio</li>
               <li className="flex items-center gap-2"><Receipt className="h-4 w-4 text-fuchsia-600" /> Total</li>
               <li className="flex items-center gap-2"><Receipt className="h-4 w-4 text-fuchsia-600" /> Fecha</li>
-              <li className="flex items-center gap-2"><Receipt className="h-4 w-4 text-fuchsia-600" /> Proveedor</li>
+              <li className="flex items-center gap-2"><Receipt className="h-4 w-4 text-fuchsia-600" /> Categoría</li>
             </ul>
           </div>
         </div>
@@ -262,16 +262,22 @@ export default function Home() {
           <div className="rounded-xl border p-4">
             <div className="text-xs text-muted-foreground">Canales conectados</div>
             <div className="mt-3 flex flex-wrap gap-2">
-              <Button variant="panel" size="sm" className="text-sky-600">Telegram</Button>
               <Button variant="panel" size="sm" className="text-green-600">WhatsApp</Button>
+              <Button variant="panel" size="sm" className="text-sky-600">Telegram</Button>
             </div>
           </div>
-          <div className="rounded-xl border p-4 font-mono text-sm">
-            <div>{`/upload factura_mayo.pdf → OK`}</div>
-            <div>{`/status #123 → Procesando`}</div>
-            <div>{`/report mensual → Enviado`}</div>
-            <div>{`audio: reconocimiento de voz → Gasto creado`}</div>
-            <div>{`texto libre: "gaste 50 soles en la barbería" → Gasto creado`}</div>
+          <div className="rounded-xl border p-4">
+            <div className="text-xs text-muted-foreground">Ejemplos de mensajes</div>
+            <ul className="mt-2 space-y-2 text-sm font-mono">
+              <li>{`"Gasté 5 soles en la bodega" → Gasto creado`}</li>
+              <li>{`"Pagué 25 por taxi" → Gasto creado`}</li>
+              <li>{`"Almuerzo 12.50" → Gasto creado`}</li>
+            </ul>
+            <div className="mt-4 text-xs text-muted-foreground">También soporta</div>
+            <ul className="mt-2 space-y-2 text-sm">
+              <li className="flex items-center gap-2"><Bot className="h-4 w-4 text-sky-600" /> Audios (transcripción automática)</li>
+              <li className="flex items-center gap-2"><UploadCloud className="h-4 w-4 text-indigo-600" /> Fotos (tickets, boletas)</li>
+            </ul>
           </div>
         </div>
       );
@@ -290,7 +296,7 @@ export default function Home() {
             <div className="text-xs text-muted-foreground">Alertas</div>
             <ul className="mt-2 space-y-2 text-sm">
               <li className="flex items-center gap-2"><BarChart3 className="h-4 w-4 text-blue-600" /> Cerca del límite en &quot;Servicios&quot;</li>
-              <li className="flex items-center gap-2"><BarChart3 className="h-4 w-4 text-blue-600" /> Aumento atípico en &quot;Marketing&quot;</li>
+              <li className="flex items-center gap-2"><BarChart3 className="h-4 w-4 text-blue-600" /> Aumento atípico en &quot;Entretenimiento&quot;</li>
             </ul>
           </div>
         </div>
@@ -414,27 +420,28 @@ export default function Home() {
             className="md:-mt-6"
           >
             <p className="text-left text-5xl sm:text-7xl font-bold tracking-tight leading-tight">
-              <span className="font-baskerville text-white">Gestión de gastos</span>
+              <span className="font-baskerville text-white">Finanzas personales</span>
             </p>
             <h1 className="mt-2 text-left text-4xl sm:text-7xl font-bold tracking-tight leading-tight">
               <span className="font-baskerville text-white">{typedText}</span>
               <span className="inline-block w-2">{caretOn ? "|" : " "}</span>
             </h1>
             <p className="mt-4 text-left max-w-xl text-[rgb(131,132,134)] text-base sm:text-lg font-medium leading-relaxed">
-              Procesa comprobantes con IA y controla tus gastos con métricas claras, presupuesto con alertas, integraciones por WhatsApp y Telegram y seguridad avanzada.
+              Registra tus gastos con ayuda de IA. Organiza por categorías, controla tu presupuesto con alertas y crea gastos al instante desde WhatsApp o Telegram.
             </p>
             
             <div className="mt-7 flex flex-wrap items-center justify-start gap-4">
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Button asChild variant="panel" className="px-6 py-3">
                   <Link href="/register">
-                    Comenzar gratis
+                    Empieza 7 días gratis
                     <ArrowRight className="ml-2 h-4 w-4 inline" />
                   </Link>
                 </Button>
               </motion.div>
               <Link href="/dashboard" className="text-sm font-medium text-black dark:text-white hover:underline underline-offset-4">Ver demo</Link>
             </div>
+            <div className="mt-2 text-xs text-[rgb(131,132,134)]">Registra gastos por WhatsApp y Telegram con texto, audios y fotos.</div>
             
           </motion.div>
           <div className="mt-6 md:mt-0 flex items-center justify-center md:justify-end md:ml-auto">
@@ -676,7 +683,7 @@ export default function Home() {
         <div className="mx-auto max-w-5xl px-6 text-center">
           <Reveal>
             <h2 className="font-baskerville text-3xl sm:text-5xl md:text-6xl font-bold leading-snug">
-              Contabilidad reimaginada.
+              Finanzas personales reimaginadas.
               <br />
               Disponible hoy.
             </h2>

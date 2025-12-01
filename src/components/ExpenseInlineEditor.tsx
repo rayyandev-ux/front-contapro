@@ -1,12 +1,14 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { apiJson, invalidateApiCache } from "@/lib/api";
+import { revalidateBudget } from "@/app/actions";
 import { Pencil, Save, X } from "lucide-react";
 
 type Category = { id: string; name: string; userId?: string | null };
 type ExpenseItem = {
   id: string;
-  type: "FACTURA" | "BOLETA";
+  type: "FACTURA" | "BOLETA" | "INFORMAL" | "YAPE" | "PLIN" | "TUNKI" | "LEMONPAY" | "BCP" | "INTERBANK" | "SCOTIABANK" | "BBVA";
   issuedAt: string;
   createdAt: string;
   provider: string;
@@ -18,6 +20,7 @@ type ExpenseItem = {
 };
 
 export default function ExpenseInlineEditor({ item, isCurrentMonth, editing: editingProp, onEditingChange, showCornerButton = true }: { item: ExpenseItem; isCurrentMonth: boolean; editing?: boolean; onEditingChange?: (v: boolean) => void; showCornerButton?: boolean }) {
+  const router = useRouter();
   const [editingLocal, setEditingLocal] = useState(false);
   const editing = typeof editingProp === 'boolean' ? editingProp : editingLocal;
   const setEditing = (v: boolean) => { if (typeof editingProp === 'boolean' && onEditingChange) onEditingChange(v); else setEditingLocal(v); };
@@ -87,7 +90,14 @@ export default function ExpenseInlineEditor({ item, isCurrentMonth, editing: edi
     }
     setSuccess("Gasto actualizado");
     setEditing(false);
+    try {
+       const bc = new BroadcastChannel('contapro:mutated');
+       bc.postMessage('updated');
+       bc.close();
+    } catch {}
     try { invalidateApiCache('/api'); } catch {}
+    await revalidateBudget();
+    router.refresh();
   }
 
   function cancel() {
@@ -153,14 +163,18 @@ export default function ExpenseInlineEditor({ item, isCurrentMonth, editing: edi
           <div className="text-sm">{new Date(item.createdAt).toISOString().slice(0,10)}</div>
         </div>
         <div className="rounded-md border border-border bg-card p-4 panel-bg">
-          <div className="text-sm text-muted-foreground">Tipo</div>
+          <div className="text-sm text-muted-foreground">Tipo de documento</div>
           <div className="text-sm">
             {!editing ? (
-              <span>{form.type}</span>
+              <span>{(form.type === 'FACTURA' || form.type === 'BOLETA') ? form.type : 'INFORMAL'}</span>
             ) : (
-              <select className="border border-border rounded-md p-2 w-full bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" value={form.type} onChange={e => setForm(f => ({ ...f, type: e.target.value as any }))}>
+              <select className="border border-border rounded-md p-2 w-full bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" value={(form.type === 'FACTURA' || form.type === 'BOLETA') ? form.type : 'INFORMAL'} onChange={e => {
+                const v = e.target.value as any;
+                setForm(f => ({ ...f, type: v }));
+              }}>
                 <option value="FACTURA">Factura</option>
                 <option value="BOLETA">Boleta</option>
+                <option value="INFORMAL">Informal</option>
               </select>
             )}
           </div>

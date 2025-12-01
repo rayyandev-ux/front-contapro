@@ -7,7 +7,7 @@ import ExpenseInlineEditor from "@/components/ExpenseInlineEditor";
 type Category = { id: string; name: string } | null;
 type ExpenseItem = {
   id: string;
-  type: "FACTURA" | "BOLETA";
+  type: "FACTURA" | "BOLETA" | "INFORMAL" | "YAPE" | "PLIN" | "TUNKI" | "LEMONPAY" | "BCP" | "INTERBANK" | "SCOTIABANK" | "BBVA";
   issuedAt: string;
   createdAt: string;
   provider: string;

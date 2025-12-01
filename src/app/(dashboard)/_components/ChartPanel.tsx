@@ -20,7 +20,7 @@ type Props = {
 
 type View = "category" | "month" | "budget" | "summary";
 type ChartType = "bars" | "donut";
-type ExpenseListItem = { id: string; type: "FACTURA" | "BOLETA"; createdAt: string; provider?: string; description?: string; amount: number; currency?: string };
+type ExpenseListItem = { id: string; type: "FACTURA" | "BOLETA" | "INFORMAL" | "YAPE" | "PLIN" | "TUNKI" | "LEMONPAY" | "BCP" | "INTERBANK" | "SCOTIABANK" | "BBVA"; createdAt: string; provider?: string; description?: string; amount: number; currency?: string };
 
 export default function ChartPanel({ byCategory, byMonth, byMonthBudget, currency, totalMonth = 0, itemsCount = 0, lastItem }: Props) {
   const [view, setView] = useState<View>("category");

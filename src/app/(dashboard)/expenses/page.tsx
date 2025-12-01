@@ -1,17 +1,20 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { apiJson } from "@/lib/api";
+import { apiJson, invalidateApiCache } from "@/lib/api";
+import { revalidateBudget } from "@/app/actions";
 import { Card, CardHeader, CardTitle, CardContent, CardAction } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Eye, Image as ImageIcon, Trash2, Filter, Calendar, Search, FileText } from "lucide-react";
 import RealtimeRefresh from "@/components/RealtimeRefresh";
+import { motion, AnimatePresence } from "framer-motion";
 
 type Category = { id: string; name: string };
 type Expense = {
   id: string;
-  type: "FACTURA" | "BOLETA";
+  type: "FACTURA" | "BOLETA" | "INFORMAL" | "YAPE" | "PLIN" | "TUNKI" | "LEMONPAY" | "BCP" | "INTERBANK" | "SCOTIABANK" | "BBVA";
   issuedAt: string;
   createdAt: string;
   provider: string;
@@ -20,9 +23,11 @@ type Expense = {
   currency: string;
   category?: Category | null;
   document?: { id: string; filename: string; mimeType?: string } | null;
+  paymentMethod?: { provider: string; name: string } | null;
 };
 
 export default function Page() {
+  const router = useRouter();
   const BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8080";
   const [items, setItems] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
@@ -70,10 +75,25 @@ export default function Page() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
 
-  const typeBadge = (type: Expense["type"]) =>
-    type === "FACTURA"
-      ? "bg-blue-500/10 text-blue-500 ring-1 ring-blue-500/20"
-      : "bg-orange-500/10 text-orange-500 ring-1 ring-orange-500/20";
+  const typeBadge = (type: Expense["type"]) => {
+    if (type === "FACTURA") return "bg-blue-500/10 text-blue-500 ring-1 ring-blue-500/20";
+    if (type === "BOLETA") return "bg-orange-500/10 text-orange-500 ring-1 ring-orange-500/20";
+    return "bg-muted text-foreground ring-1 ring-border";
+  };
+
+  const paymentBadge = (provider?: string) => {
+    const p = String(provider || '').toUpperCase();
+    if (p === 'YAPE') return 'bg-violet-500/10 text-violet-600 ring-1 ring-violet-500/20';
+    if (p === 'PLIN') return 'bg-emerald-500/10 text-emerald-600 ring-1 ring-emerald-500/20';
+    if (p === 'TUNKI') return 'bg-pink-500/10 text-pink-600 ring-1 ring-pink-500/20';
+    if (p === 'LEMONPAY') return 'bg-yellow-500/10 text-yellow-700 ring-1 ring-yellow-500/20';
+    if (p === 'BCP') return 'bg-blue-500/10 text-blue-600 ring-1 ring-blue-500/20';
+    if (p === 'INTERBANK') return 'bg-teal-500/10 text-teal-600 ring-1 ring-teal-500/20';
+    if (p === 'SCOTIABANK') return 'bg-red-500/10 text-red-600 ring-1 ring-red-500/20';
+    if (p === 'BBVA') return 'bg-indigo-500/10 text-indigo-600 ring-1 ring-indigo-500/20';
+    if (p === 'EFECTIVO') return 'bg-gray-500/10 text-gray-700 ring-1 ring-gray-500/20';
+    return 'bg-muted text-foreground ring-1 ring-border';
+  };
 
   const currentItems = useMemo(() => {
     const m = nowRef.getMonth();
@@ -92,6 +112,25 @@ export default function Page() {
       return !(d.getMonth() === m && d.getFullYear() === y);
     });
   }, [items, nowRef]);
+
+  const prevMonths = useMemo(() => {
+    const y = nowRef.getFullYear();
+    const currentM = nowRef.getMonth() + 1;
+    const set = new Set<number>();
+    for (const it of items) {
+      const d = new Date(it.createdAt);
+      const mm = d.getMonth() + 1;
+      const yy = d.getFullYear();
+      if (yy === y && mm < currentM) set.add(mm);
+    }
+    return Array.from(set).sort((a, b) => b - a);
+  }, [items, nowRef]);
+
+  const [openPrev, setOpenPrev] = useState(false);
+  const [prevMonth, setPrevMonth] = useState<number | null>(null);
+  const [prevLoading, setPrevLoading] = useState(false);
+  const [prevError, setPrevError] = useState<string | null>(null);
+  const [prevList, setPrevList] = useState<Expense[]>([]);
 
   const allCurrentIds = useMemo(() => currentItems.map(i => i.id), [currentItems]);
   const isAllSelected = useMemo(() => allCurrentIds.length > 0 && allCurrentIds.every(id => selected.has(id)), [allCurrentIds, selected]);
@@ -130,6 +169,12 @@ export default function Page() {
     if (res.ok) {
       setItems(prev => prev.filter(x => x.id !== id));
       setSelected(prev => { const next = new Set(prev); next.delete(id); return next; });
+      // Notificar cambios para refrescar presupuestos
+      try { new BroadcastChannel("contapro:mutated").postMessage("deleted"); } catch {}
+      // Refrescar explícitamente el router para actualizar Server Components (como budget)
+      try { invalidateApiCache('/api'); } catch {}
+      await revalidateBudget();
+      router.refresh();
     }
     else alert(res.error || "No se pudo eliminar");
   };
@@ -146,6 +191,10 @@ export default function Page() {
     }
     setItems(prev => prev.filter(x => !ids.includes(x.id)));
     setSelected(new Set());
+    try { new BroadcastChannel("contapro:mutated").postMessage("deleted"); } catch {}
+    try { invalidateApiCache('/api'); } catch {}
+    await revalidateBudget();
+    router.refresh();
   };
 
   return (
@@ -173,6 +222,7 @@ export default function Page() {
                 <option value="">Todos</option>
                 <option value="FACTURA">Factura</option>
                 <option value="BOLETA">Boleta</option>
+                <option value="INFORMAL">Informal</option>
               </select>
             </div>
             <div className="space-y-1 lg:col-span-4">
@@ -224,8 +274,9 @@ export default function Page() {
                   </TableHead>
                   <TableHead>Fecha real</TableHead>
                   <TableHead>Registro</TableHead>
-                  <TableHead>Tipo</TableHead>
-                  <TableHead>Proveedor</TableHead>
+                    <TableHead>Tipo</TableHead>
+                    <TableHead>Método de pago</TableHead>
+                    <TableHead>Proveedor</TableHead>
                   <TableHead>Categoría</TableHead>
                   <TableHead className="text-right">Monto</TableHead>
                   <TableHead className="text-right">Acciones</TableHead>
@@ -255,9 +306,16 @@ export default function Page() {
                     <TableCell className="whitespace-nowrap">{new Date(it.issuedAt).toLocaleDateString('es-PE')}</TableCell>
                     <TableCell className="whitespace-nowrap">{new Date(it.createdAt).toLocaleDateString('es-PE')}</TableCell>
                     <TableCell>
-                      <span className={`inline-flex rounded-md px-2 py-0.5 text-xs ring-1 ${typeBadge(it.type)}`}>
-                        {it.type}
+                      <span className={`inline-flex rounded-md px-2 py-0.5 text-xs ${typeBadge(it.type)}`}>
+                        {(it.type === 'FACTURA' || it.type === 'BOLETA') ? it.type : 'INFORMAL'}
                       </span>
+                    </TableCell>
+                    <TableCell className="whitespace-nowrap">
+                      {it.paymentMethod ? (
+                        <span className={`inline-flex rounded-md px-2 py-0.5 text-xs ${paymentBadge(it.paymentMethod.provider)}`}>
+                          {it.paymentMethod.provider}{it.paymentMethod.name ? ` — ${it.paymentMethod.name}` : ''}
+                        </span>
+                      ) : '—'}
                     </TableCell>
                     <TableCell>{it.provider}</TableCell>
                     <TableCell>
@@ -332,13 +390,20 @@ export default function Page() {
                   <div className="text-xs text-muted-foreground">{new Date(it.issuedAt).toLocaleDateString('es-PE')}</div>
                 </div>
                 <div className="mt-1 flex items-center gap-2">
-                  <span className={`inline-flex rounded-md px-2 py-0.5 text-xs ring-1 ${typeBadge(it.type)}`}>{it.type}</span>
+                  <span className={`inline-flex rounded-md px-2 py-0.5 text-xs ring-1 ${typeBadge(it.type)}`}>{(it.type === 'FACTURA' || it.type === 'BOLETA') ? it.type : 'INFORMAL'}</span>
                   {it.category?.name ? (
                     <span className="inline-flex rounded-md bg-muted px-2 py-0.5 text-xs text-foreground ring-1 ring-border">{it.category.name}</span>
                   ) : (
                     <span className="text-xs text-muted-foreground">Sin categoría</span>
                   )}
                 </div>
+                {it.paymentMethod && (
+                  <div className="mt-1">
+                    <span className={`inline-flex rounded-md px-2 py-0.5 text-xs ${paymentBadge(it.paymentMethod.provider)}`}>
+                      {it.paymentMethod.provider}{it.paymentMethod.name ? ` — ${it.paymentMethod.name}` : ""}
+                    </span>
+                  </div>
+                )}
                 <div className="mt-2 text-base font-semibold">{formatAmount(it.amount, it.currency)}</div>
                 <div className="mt-1 text-xs text-muted-foreground">Fecha real: {new Date(it.issuedAt).toLocaleDateString('es-PE')} · Registro: {new Date(it.createdAt).toLocaleDateString('es-PE')}</div>
                 <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -366,114 +431,160 @@ export default function Page() {
         </CardContent>
       </Card>
 
-      {pastItems.length > 0 && (
+      {prevMonths.length > 0 && (
         <Card className="mt-6 panel-bg">
           <CardHeader>
-            <CardTitle>Gastos de meses anteriores</CardTitle>
+            <CardTitle className="flex items-center justify-between">
+              Gastos de meses anteriores
+              <Button variant="panel" size="sm" className="transition-transform active:scale-95" onClick={() => setOpenPrev(v => !v)}>
+                {openPrev ? "Ocultar" : "Mostrar"}
+              </Button>
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto hidden md:block">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-muted">
-                    <TableHead>Fecha real</TableHead>
-                    <TableHead>Registro</TableHead>
-                    <TableHead>Tipo</TableHead>
-                    <TableHead>Proveedor</TableHead>
-                    <TableHead>Categoría</TableHead>
-                    <TableHead className="text-right">Monto</TableHead>
-                    <TableHead className="text-right">Acciones</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {pastItems.map(it => (
-                    <TableRow key={it.id} className="hover:bg-muted/50">
-                      <TableCell className="whitespace-nowrap">{new Date(it.issuedAt).toLocaleDateString('es-PE')}</TableCell>
-                      <TableCell className="whitespace-nowrap">{new Date(it.createdAt).toLocaleDateString('es-PE')}</TableCell>
-                      <TableCell>
-                        <span className={`inline-flex rounded-md px-2 py-0.5 text-xs ring-1 ${typeBadge(it.type)}`}>{it.type}</span>
-                      </TableCell>
-                      <TableCell>{it.provider}</TableCell>
-                      <TableCell>
-                        {it.category?.name ? (
-                          <span className="inline-flex rounded-md bg-muted px-2 py-0.5 text-xs text-foreground ring-1 ring-border">{it.category.name}</span>
-                        ) : (
-                          "—"
-                        )}
-                      </TableCell>
-                      <TableCell className="text-right">{formatAmount(it.amount, it.currency)}</TableCell>
-                      <TableCell className="text-right">
-                        <Link href={`/expenses/${it.id}`} className="mr-2 inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm hover:bg-muted">
-                          <Eye className="h-4 w-4" /> Ver
-                        </Link>
-                        {it.document && (
-                          it.document.mimeType?.startsWith("image/") ? (
-                            <a
-                              href={`/api/proxy/documents/${it.document.id}/preview`}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="mr-2 inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm hover:bg-muted"
-                            >
-                              <ImageIcon className="h-4 w-4" /> Foto
-                            </a>
-                          ) : it.document.mimeType?.startsWith("application/pdf") ? (
-                            <a
-                              href={`/api/proxy/documents/${it.document.id}/preview`}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="mr-2 inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm hover:bg-muted"
-                            >
-                              <FileText className="h-4 w-4" /> PDF
-                            </a>
-                          ) : null
-                        )}
-                        <button
-                          className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm text-destructive hover:bg-destructive/10"
-                          onClick={() => onDelete(it.id)}
-                        >
-                          <Trash2 className="h-4 w-4" /> Eliminar
-                        </button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-
-            <div className="md:hidden space-y-3">
-              {pastItems.map(it => (
-                <div key={it.id} className="rounded-lg border p-3 shadow-sm">
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm font-medium">{it.provider || '—'}</div>
-                    <div className="text-xs text-muted-foreground">{new Date(it.issuedAt).toLocaleDateString('es-PE')}</div>
-                  </div>
-                  <div className="mt-1 flex items-center gap-2">
-                    <span className={`inline-flex rounded-md px-2 py-0.5 text-xs ring-1 ${typeBadge(it.type)}`}>{it.type}</span>
-                    {it.category?.name ? (
-                      <span className="inline-flex rounded-md bg-muted px-2 py-0.5 text-xs text-foreground ring-1 ring-border">{it.category.name}</span>
-                    ) : (
-                      <span className="text-xs text-muted-foreground">Sin categoría</span>
-                    )}
-                  </div>
-                  <div className="mt-2 text-base font-semibold">{formatAmount(it.amount, it.currency)}</div>
-                  <div className="mt-1 text-xs text-muted-foreground">Fecha real: {new Date(it.issuedAt).toLocaleDateString('es-PE')} · Registro: {new Date(it.createdAt).toLocaleDateString('es-PE')}</div>
-                  <div className="mt-3 flex flex-wrap items-center gap-2">
-                    <Link href={`/expenses/${it.id}`} className="inline-flex items-center gap-1 rounded-md border px-3 py-1 text-sm hover:bg-muted">
-                      <Eye className="h-4 w-4" /> Ver
-                    </Link>
-                    {it.document?.mimeType?.startsWith('image/') && (
-                      <a href={`/api/proxy/documents/${it.document.id}/preview`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 rounded-md border px-3 py-1 text-sm hover:bg-muted">
-                        <ImageIcon className="h-4 w-4" /> Foto
-                      </a>
-                    )}
-                    <button className="inline-flex items-center gap-1 rounded-md border px-3 py-1 text-sm text-destructive hover:bg-destructive/10" onClick={() => onDelete(it.id)}>
-                      <Trash2 className="h-4 w-4" /> Eliminar
-                    </button>
-                  </div>
+          <AnimatePresence initial={false}>
+          {openPrev && (
+            <motion.div initial={{ height: 0, opacity: 0, y: -8 }} animate={{ height: 'auto', opacity: 1, y: 0 }} exit={{ height: 0, opacity: 0, y: -6 }} transition={{ duration: 0.25 }} className="overflow-hidden">
+            <CardContent>
+              <div className="text-xs text-muted-foreground mb-2">Selecciona un mes</div>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {prevMonths.map(m => (
+                  <Button
+                    key={`prev-exp-${m}`}
+                    variant="panel"
+                    size="sm"
+                    className={prevMonth === m ? "ring-1 ring-border" : ""}
+                    onClick={async () => {
+                      setPrevMonth(m);
+                      setPrevLoading(true);
+                      setPrevError(null);
+                      setPrevList([]);
+                      const y = nowRef.getFullYear();
+                      const start = new Date(y, m - 1, 1).toISOString().slice(0, 10);
+                      const end = new Date(y, m, 0).toISOString().slice(0, 10);
+                      const qs = new URLSearchParams({ start, end }).toString();
+                      const res = await apiJson<{ items: Expense[] }>(`/api/expenses?${qs}`);
+                      if (!res.ok) {
+                        setPrevError(res.error || "Error al cargar gastos");
+                        setPrevLoading(false);
+                        return;
+                      }
+                      const arr = (res.data?.items || []).slice().sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+                      setPrevList(arr as Expense[]);
+                      setPrevLoading(false);
+                    }}
+                  >
+                    {String(m).padStart(2, "0")}
+                  </Button>
+                ))}
+              </div>
+              {prevMonth != null && (
+                <div className="space-y-2">
+                  {prevLoading && (<div className="text-sm text-muted-foreground">Cargando…</div>)}
+                  {prevError && (<div className="text-sm text-red-700">{prevError}</div>)}
+                  {!prevLoading && !prevError && prevList.length === 0 && (<div className="text-sm text-muted-foreground">Sin datos</div>)}
+                  {!prevLoading && !prevError && prevList.length > 0 && (
+                    <div className="overflow-x-auto hidden md:block">
+                      <Table>
+                        <TableHeader>
+                          <TableRow className="bg-muted">
+                            <TableHead>Fecha real</TableHead>
+                            <TableHead>Registro</TableHead>
+                            <TableHead>Tipo</TableHead>
+                            <TableHead>Proveedor</TableHead>
+                            <TableHead>Categoría</TableHead>
+                            <TableHead className="text-right">Monto</TableHead>
+                            <TableHead className="text-right">Acciones</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {prevList.map(it => (
+                            <TableRow key={it.id} className="hover:bg-muted/50">
+                              <TableCell className="whitespace-nowrap">{new Date(it.issuedAt).toLocaleDateString('es-PE')}</TableCell>
+                              <TableCell className="whitespace-nowrap">{new Date(it.createdAt).toLocaleDateString('es-PE')}</TableCell>
+                              <TableCell>
+                                <span className={`inline-flex rounded-md px-2 py-0.5 text-xs ring-1 ${typeBadge(it.type)}`}>{it.type}</span>
+                              </TableCell>
+                              <TableCell>{it.provider}</TableCell>
+                              <TableCell>
+                                {it.category?.name ? (
+                                  <span className="inline-flex rounded-md bg-muted px-2 py-0.5 text-xs text-foreground ring-1 ring-border">{it.category.name}</span>
+                                ) : (
+                                  "—"
+                                )}
+                              </TableCell>
+                              <TableCell className="text-right">{formatAmount(it.amount, it.currency)}</TableCell>
+                              <TableCell className="text-right">
+                                <Link href={`/expenses/${it.id}`} className="mr-2 inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm hover:bg-muted">
+                                  <Eye className="h-4 w-4" /> Ver
+                                </Link>
+                                {it.document && (
+                                  it.document.mimeType?.startsWith("image/") ? (
+                                    <a href={`/api/proxy/documents/${it.document.id}/preview`} target="_blank" rel="noreferrer" className="mr-2 inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm hover:bg-muted">
+                                      <ImageIcon className="h-4 w-4" /> Foto
+                                    </a>
+                                  ) : it.document.mimeType?.startsWith("application/pdf") ? (
+                                    <a href={`/api/proxy/documents/${it.document.id}/preview`} target="_blank" rel="noreferrer" className="mr-2 inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm hover:bg-muted">
+                                      <FileText className="h-4 w-4" /> PDF
+                                    </a>
+                                  ) : null
+                                )}
+                                <button className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm text-destructive hover:bg-destructive/10" onClick={() => onDelete(it.id)}>
+                                  <Trash2 className="h-4 w-4" /> Eliminar
+                                </button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
+                  {!prevLoading && !prevError && prevList.length > 0 && (
+                    <div className="md:hidden space-y-3">
+                      {prevList.map(it => (
+                        <div key={it.id} className="rounded-lg border p-3 shadow-sm">
+                          <div className="flex items-center justify-between">
+                            <div className="text-sm font-medium">{it.provider || '—'}</div>
+                            <div className="text-xs text-muted-foreground">{new Date(it.issuedAt).toLocaleDateString('es-PE')}</div>
+                          </div>
+                          <div className="mt-1 flex items-center gap-2">
+                            <span className={`inline-flex rounded-md px-2 py-0.5 text-xs ring-1 ${typeBadge(it.type)}`}>{it.type}</span>
+                            {it.category?.name ? (
+                              <span className="inline-flex rounded-md bg-muted px-2 py-0.5 text-xs text-foreground ring-1 ring-border">{it.category.name}</span>
+                            ) : (
+                              <span className="text-xs text-muted-foreground">Sin categoría</span>
+                            )}
+                          </div>
+                          <div className="mt-2 text-base font-semibold">{formatAmount(it.amount, it.currency)}</div>
+                          <div className="mt-1 text-xs text-muted-foreground">Fecha real: {new Date(it.issuedAt).toLocaleDateString('es-PE')} · Registro: {new Date(it.createdAt).toLocaleDateString('es-PE')}</div>
+                          <div className="mt-3 flex flex-wrap items-center gap-2">
+                            <Link href={`/expenses/${it.id}`} className="inline-flex items-center gap-1 rounded-md border px-3 py-1 text-sm hover:bg-muted">
+                              <Eye className="h-4 w-4" /> Ver
+                            </Link>
+                            {it.document && (
+                              it.document.mimeType?.startsWith('image/') ? (
+                                <a href={`/api/proxy/documents/${it.document.id}/preview`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 rounded-md border px-3 py-1 text-sm hover:bg-muted">
+                                  <ImageIcon className="h-4 w-4" /> Foto
+                                </a>
+                              ) : it.document.mimeType?.startsWith('application/pdf') ? (
+                                <a href={`/api/proxy/documents/${it.document.id}/preview`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 rounded-md border px-3 py-1 text-sm hover:bg-muted">
+                                  <FileText className="h-4 w-4" /> PDF
+                                </a>
+                              ) : null
+                            )}
+                            <button className="inline-flex items-center gap-1 rounded-md border px-3 py-1 text-sm text-destructive hover:bg-destructive/10" onClick={() => onDelete(it.id)}>
+                              <Trash2 className="h-4 w-4" /> Eliminar
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              ))}
-            </div>
-          </CardContent>
+              )}
+            </CardContent>
+            </motion.div>
+          )}
+          </AnimatePresence>
         </Card>
       )}
     </section>

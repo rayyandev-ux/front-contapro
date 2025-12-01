@@ -1,11 +1,14 @@
 "use client";
 import { useEffect, useState } from "react";
-import { apiJson, apiMultipart } from "@/lib/api";
+import { useRouter } from "next/navigation";
+import { apiJson, apiMultipart, invalidateApiCache } from "@/lib/api";
+import { revalidateBudget } from "@/app/actions";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { UploadCloud, FileText, Image as ImageIcon, AlertTriangle, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Page() {
+  const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
@@ -64,6 +67,15 @@ export default function Page() {
         }
 
         if (expenseId) {
+          // Invalidate cache and revalidate budget before navigating
+          try {
+             const bc = new BroadcastChannel('contapro:mutated');
+             bc.postMessage('created');
+             bc.close();
+          } catch {}
+          try { invalidateApiCache('/api'); } catch {}
+          await revalidateBudget();
+          router.refresh();
           // Redirigir automáticamente al detalle del gasto creado
           window.location.href = `/expenses/${expenseId}`;
         }

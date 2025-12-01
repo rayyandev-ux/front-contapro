@@ -9,7 +9,7 @@ export default function MobileActionBar({ isAdmin, onNavigate }: { isAdmin?: boo
   const pathname = usePathname();
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + "/");
   const [openBudget, setOpenBudget] = useState(false);
-  const budgetActive = isActive("/budget") || isActive("/budget/category");
+  const budgetActive = isActive("/budget") || isActive("/budget/category") || isActive("/budget/payment-method");
 
   const itemBase =
     "flex flex-col items-center justify-center gap-1 text-[11px] leading-none";
@@ -55,6 +55,10 @@ export default function MobileActionBar({ isAdmin, onNavigate }: { isAdmin?: boo
                 </Link>
                 <Link href="/budget/category" onClick={() => { setOpenBudget(false); onNavigate?.(); }} className="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-muted">
                   <span className="flex-1">Presupuesto por categoría</span>
+                  <ChevronDown className="h-4 w-4 rotate-180" />
+                </Link>
+                <Link href="/budget/payment-method" onClick={() => { setOpenBudget(false); onNavigate?.(); }} className="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-muted">
+                  <span className="flex-1">Presupuesto por método de pago</span>
                   <ChevronDown className="h-4 w-4 rotate-180" />
                 </Link>
               </div>

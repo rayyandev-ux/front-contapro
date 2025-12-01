@@ -5,7 +5,7 @@ import { apiJson, invalidateApiCache } from "@/lib/api";
 type Category = { id: string; name: string; userId?: string | null };
 type Expense = {
   id: string;
-  type: "FACTURA" | "BOLETA";
+  type: "FACTURA" | "BOLETA" | "INFORMAL" | "YAPE" | "PLIN" | "TUNKI" | "LEMONPAY" | "BCP" | "INTERBANK" | "SCOTIABANK" | "BBVA";
   issuedAt: string;
   provider: string;
   description?: string | null;
@@ -110,10 +110,14 @@ export default function ExpenseEditForm({ item }: { item: Expense }) {
           </div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div>
-          <label className="block text-sm">Tipo</label>
-          <select className="border border-border rounded-md p-2 w-full bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" value={form.type} onChange={e => setForm(f => ({ ...f, type: e.target.value as any }))}>
+          <label className="block text-sm">Tipo de documento</label>
+          <select className="border border-border rounded-md p-2 w-full bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" value={(form.type === 'FACTURA' || form.type === 'BOLETA') ? form.type : 'INFORMAL'} onChange={e => {
+            const v = e.target.value as any;
+            setForm(f => ({ ...f, type: v }));
+          }}>
             <option value="FACTURA">Factura</option>
             <option value="BOLETA">Boleta</option>
+            <option value="INFORMAL">Informal</option>
           </select>
         </div>
         <div>

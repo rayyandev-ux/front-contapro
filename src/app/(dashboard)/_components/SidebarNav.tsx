@@ -16,6 +16,7 @@ import {
   Send,
   CalendarDays,
   Tag,
+  CreditCard,
 } from "lucide-react";
 
 type Props = {
@@ -36,6 +37,7 @@ const items: NavItem[] = [
   { href: "/dashboard", label: "Resumen", Icon: LayoutDashboard },
   { href: "/upload", label: "Subir", Icon: Upload },
   { href: "/expenses", label: "Gastos", Icon: Wallet },
+  { href: "/payment-methods", label: "Métodos de pago", Icon: CreditCard },
   { href: "/budget", label: "Presupuesto", Icon: PiggyBank },
   { href: "/integrations", label: "Integraciones", Icon: Puzzle },
   { href: "/account", label: "Cuenta", Icon: User },
@@ -89,6 +91,12 @@ export default function SidebarNav({ isAdmin, onNavigate, mobileOnly, hideAccoun
                       <Link href="/budget/category" onClick={() => onNavigate?.()} className="group flex items-center gap-2 px-3 py-1.5 rounded-md transition-colors duration-150 text-sidebar-foreground hover:bg-muted">
                         <Tag className="h-4 w-4 text-sidebar-foreground/70 group-hover:text-sidebar-foreground" />
                         <span className="flex-1">Presupuesto por categoría</span>
+                      </Link>
+                    </li>
+                    <li>
+                      <Link href="/budget/payment-method" onClick={() => onNavigate?.()} className="group flex items-center gap-2 px-3 py-1.5 rounded-md transition-colors duration-150 text-sidebar-foreground hover:bg-muted">
+                        <CreditCard className="h-4 w-4 text-sidebar-foreground/70 group-hover:text-sidebar-foreground" />
+                        <span className="flex-1">Presupuesto por método de pago</span>
                       </Link>
                     </li>
                   </ul>

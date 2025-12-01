@@ -26,8 +26,12 @@ export default function EditCategoryBudgetButton({
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [amount, setAmount] = useState<string>(String(currentAmount ?? ''));
+  const initialIsPercent = typeof currentThreshold === 'number' && currentThreshold > 0 && currentThreshold <= 1;
+  const [thresholdType, setThresholdType] = useState<'amount' | 'percent'>(initialIsPercent ? 'percent' : 'amount');
   const [threshold, setThreshold] = useState<string>(
-    typeof currentThreshold === 'number' ? String(currentThreshold) : ''
+    typeof currentThreshold === 'number'
+      ? (initialIsPercent ? String((currentThreshold || 0) * 100) : String(currentThreshold))
+      : ''
   );
   const maxAllowed = useMemo(() => Math.max(0, generalAmount - Math.max(0, totalAssigned - (currentAmount || 0))), [generalAmount, totalAssigned, currentAmount]);
   const canSubmit = useMemo(() => {
@@ -46,12 +50,14 @@ export default function EditCategoryBudgetButton({
     if (!canSubmit || saving) return;
     setSaving(true);
     try {
+      let thr = Number(threshold);
+      if (thresholdType === 'percent' && !Number.isNaN(thr)) thr = thr / 100;
       const payload = {
         categoryId,
         month,
         year,
         amount: Number(amount),
-        alertThreshold: Number(threshold),
+        alertThreshold: thr,
         currency,
       };
       const res = await fetch('/api/proxy/budget/category', {
@@ -79,15 +85,15 @@ export default function EditCategoryBudgetButton({
   }, [amount, threshold, canSubmit, saving, categoryId, currency, router]);
 
   return (
-    <div className="absolute right-2 top-10">
+    <div className="absolute right-10 top-2 z-10">
       <button
         type="button"
         onClick={() => setOpen(o => !o)}
-        className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 text-white text-xs hover:bg-indigo-700"
+        className="btn-icon btn-icon-primary"
         title="Editar presupuesto"
         aria-label="Editar presupuesto"
       >
-        <Pencil className="h-3 w-3" />
+        <Pencil />
       </button>
       {open && (
         <>
@@ -103,12 +109,22 @@ export default function EditCategoryBudgetButton({
                 </div>
                 <div>
                   <label className="block text-xs text-gray-600 mb-1">Umbral</label>
-                  <input type="number" step="0.01" className="w-full border rounded-md p-2" value={threshold} onChange={e => setThreshold(e.target.value)} />
+                  <div className="flex items-center gap-2">
+                    <div className="inline-flex items-center rounded-md ring-1 ring-border overflow-hidden">
+                      <button type="button" className={`px-2 py-1 text-xs ${thresholdType === 'amount' ? 'bg-primary/20 text-primary font-medium' : 'text-muted-foreground'}`} onClick={() => setThresholdType('amount')}>Monto ($)</button>
+                      <div className="w-px h-5 bg-border"></div>
+                      <button type="button" className={`px-2 py-1 text-xs ${thresholdType === 'percent' ? 'bg-primary/20 text-primary font-medium' : 'text-muted-foreground'}`} onClick={() => setThresholdType('percent')}>Porcentaje (%)</button>
+                    </div>
+                    <div className="relative flex-1">
+                      <input type="number" step="0.01" className="w-full border rounded-md p-2" value={threshold} onChange={e => setThreshold(e.target.value)} placeholder={thresholdType === 'percent' ? '20' : '100.00'} />
+                      {thresholdType === 'percent' && <span className="absolute right-2 top-2 text-xs text-muted-foreground">%</span>}
+                    </div>
+                  </div>
                 </div>
               </div>
               <div className="mt-4 flex items-center justify-end gap-2">
-                <button type="button" className="rounded-md border px-3 py-2 hover:bg-muted" onClick={() => setOpen(false)}>Cancelar</button>
-                <button type="button" className="btn-important" disabled={!canSubmit || saving} onClick={onSave}>Guardar</button>
+                <button type="button" className="btn-panel" onClick={() => setOpen(false)}>Cancelar</button>
+                <button type="button" className="btn-panel" disabled={!canSubmit || saving} onClick={onSave}>Guardar</button>
               </div>
             </div>
           </div>

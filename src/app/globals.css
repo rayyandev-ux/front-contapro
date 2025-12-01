@@ -283,6 +283,12 @@
     filter: brightness(1.03);
     box-shadow: inset 0 0 0 1px #fca5a5, 0 14px 28px rgba(0,0,0,0.25);
   }
+  .btn-icon {
+    @apply inline-flex items-center justify-center h-6 w-6 rounded-full ring-1 ring-border bg-card text-muted-foreground hover:bg-muted transition-colors duration-150;
+  }
+  .btn-icon svg { pointer-events: none; width: 0.875rem; height: 0.875rem; }
+  .btn-icon-primary { @apply text-primary; }
+  .btn-icon-danger { @apply text-red-600; }
 }
 
 @keyframes premium-breath {

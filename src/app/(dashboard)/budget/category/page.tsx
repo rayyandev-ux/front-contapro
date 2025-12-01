@@ -3,6 +3,7 @@ import RealtimeRefresh from "@/components/RealtimeRefresh";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Tags, DollarSign, Globe, AlertTriangle } from "lucide-react";
 import ConfirmDeleteButton from "../../_components/ConfirmDeleteButton";
 import EditCategoryBudgetButton from "../../_components/EditCategoryBudgetButton";
 import CategoryBudgetGuard from "../../_components/CategoryBudgetGuard";
@@ -20,6 +21,7 @@ export default async function Page({ searchParams }: { searchParams?: Promise<Re
 
   let amount = 0;
   let currencyCode = 'PEN';
+  let generalAlertThreshold: number | null = null;
   let categories: Array<{ id: string; name: string }> = [];
   let catTotal = 0;
   let formErrorMsg: string | null = null;
@@ -32,6 +34,7 @@ export default async function Page({ searchParams }: { searchParams?: Promise<Re
       const d = await res.json();
       amount = Number(d?.budget?.amount ?? 0);
       currencyCode = String(d?.budget?.currency ?? 'PEN');
+      generalAlertThreshold = typeof d?.budget?.alertThreshold === 'number' ? Number(d.budget.alertThreshold) : null;
     }
   } catch {}
 
@@ -71,6 +74,7 @@ export default async function Page({ searchParams }: { searchParams?: Promise<Re
   const configuredIds = new Set(catStatuses.filter(s => s.budget).map(s => s.categoryId));
   const categoriesForForm = categories.filter(c => !configuredIds.has(c.id));
   const canAddMore = (amount - catTotal) > 0 && categoriesForForm.length > 0;
+  const generalThrIsPct = !!generalAlertThreshold && generalAlertThreshold > 0 && generalAlertThreshold <= 1;
 
   async function saveCategoryBudget(formData: FormData) {
     "use server";
@@ -80,9 +84,11 @@ export default async function Page({ searchParams }: { searchParams?: Promise<Re
     const categoryId = String(formData.get("categoryId") || "");
     const amountStr = String(formData.get("catAmount") ?? "");
     const thresholdStr = String(formData.get("catThreshold") ?? "");
+    const thresholdType = String(formData.get("catThresholdType") || "amount");
     const currency = String(formData.get("catCurrency") || "");
     const amount = amountStr.trim() !== "" ? Number(amountStr) : NaN;
-    const threshold = thresholdStr.trim() !== "" ? Number(thresholdStr) : NaN;
+    let threshold = thresholdStr.trim() !== "" ? Number(thresholdStr) : NaN;
+    if (thresholdType === 'percent' && !Number.isNaN(threshold)) threshold = threshold / 100;
     const now = new Date();
     const payload: { categoryId: string; month: number; year: number; amount?: number; currency?: string; alertThreshold?: number } = {
       categoryId,
@@ -131,8 +137,8 @@ export default async function Page({ searchParams }: { searchParams?: Promise<Re
     <section>
       <RealtimeRefresh />
       <div className="mb-4">
-        <h1 className="text-2xl font-semibold">Presupuesto por categoría</h1>
-        <p className="text-sm text-gray-600">Mes: {monthLabel}</p>
+        <h1 className="text-2xl font-semibold text-card-foreground">Presupuesto por categoría</h1>
+        <p className="text-sm text-card-foreground">Mes: {monthLabel}</p>
       </div>
 
       <Card className="panel-bg">
@@ -140,49 +146,75 @@ export default async function Page({ searchParams }: { searchParams?: Promise<Re
           <CardTitle>Configurar presupuestos de categorías</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="mb-3 inline-flex items-center rounded-md border px-3 py-2 text-xs bg-slate-100 text-slate-800 border-slate-200">
+          <div className="mb-3 inline-flex items-center rounded-md px-3 py-2 text-xs panel-bg ring-1 ring-border text-card-foreground">
             <span className="mr-2">ℹ️</span>
             <span>Queda por asignar: {formatCurrency(Math.max(0, amount - catTotal))} — Asignado: {formatCurrency(catTotal)} de {formatCurrency(amount)}</span>
           </div>
           <form action={saveCategoryBudget} className="grid grid-cols-1 gap-3 sm:grid-cols-5">
             <div>
-              <label className="block text-xs text-gray-600 mb-1">Categoría</label>
-              <select name="categoryId" className="w-full border rounded-md p-2" defaultValue={categoriesForForm[0]?.id || ""} required>
-                {categoriesForForm.map(c => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
-                ))}
-              </select>
+              <label className="block text-sm">Categoría</label>
+              <div className="relative">
+                <Tags className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4" />
+                <select name="categoryId" className="border border-border rounded-lg pl-8 pr-2 py-2 w-full bg-background text-foreground focus:outline-none" defaultValue={categoriesForForm[0]?.id || ""} required>
+                  {categoriesForForm.map(c => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
+              </div>
             </div>
             <div>
-              <label className="block text-xs text-gray-600 mb-1">Monto</label>
-              <input type="number" name="catAmount" step="0.01" min="0" max={String(Math.max(0, amount - catTotal))} className="w-full border rounded-md p-2" placeholder="Ej. 500" required />
+              <label className="block text-sm">Monto</label>
+              <div className="relative">
+                <DollarSign className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4" />
+                <input type="number" name="catAmount" step="0.01" min="0" max={String(Math.max(0, amount - catTotal))} className="border border-border rounded-lg pl-8 pr-2 py-2 w-full bg-background text-foreground focus:outline-none" placeholder="Ej. 500" required />
+              </div>
               <CategoryBudgetGuard month={monthNum} year={yearNum} generalAmount={amount} totalAssigned={catTotal} currency={currencyCode} />
             </div>
             <div>
-              <label className="block text-xs text-gray-600 mb-1">Moneda</label>
-              <select name="catCurrency" className="w-full border rounded-md p-2" defaultValue={currencyCode}>
-                <option value="PEN">Soles (PEN)</option>
-                <option value="USD">Dólares (USD)</option>
-                <option value="EUR">Euros (EUR)</option>
-              </select>
+              <label className="block text-sm">Moneda</label>
+              <div className="relative">
+                <Globe className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4" />
+                <select name="catCurrency" className="border border-border rounded-lg pl-8 pr-2 py-2 w-full bg-background text-foreground focus:outline-none" defaultValue={currencyCode}>
+                  <option value="PEN">Soles (PEN)</option>
+                  <option value="USD">Dólares (USD)</option>
+                  <option value="EUR">Euros (EUR)</option>
+                </select>
+              </div>
             </div>
-            <div>
-              <label className="block text-xs text-gray-600 mb-1">Umbral</label>
-              <input type="number" name="catThreshold" step="0.01" className="w-full border rounded-md p-2" placeholder="Ej. 200" required />
-              <p className="mt-1 text-xs text-gray-500">Monto o porcentaje (0.8 = 80%). Se alerta cuando el saldo ≤ umbral.</p>
+            <div className="sm:col-span-2">
+              <label className="block text-sm">Umbral</label>
+              <div className="flex items-center gap-3 flex-wrap">
+                <div className="panel-bg inline-flex items-center rounded-md ring-1 ring-border overflow-hidden">
+                  <input type="radio" name="catThresholdType" id="catThrAmt" value="amount" defaultChecked={!generalThrIsPct} className="hidden peer/amt" />
+                  <label htmlFor="catThrAmt" className="px-3 py-1 text-sm transition-colors peer-checked/amt:bg-primary/20 peer-checked/amt:text-primary peer-checked/amt:font-medium">Monto ($)</label>
+                  <div className="w-px h-5 bg-border"></div>
+                  <input type="radio" name="catThresholdType" id="catThrPct" value="percent" defaultChecked={generalThrIsPct} className="hidden peer/pct" />
+                  <label htmlFor="catThrPct" className="px-3 py-1 text-sm transition-colors peer-checked/pct:bg-primary/20 peer-checked/pct:text-primary peer-checked/pct:font-medium">Porcentaje (%)</label>
+                </div>
+                <div className="relative w-40 panel-bg rounded-md ring-1 ring-border">
+                  <input
+                    type="number"
+                    name="catThreshold"
+                    step="0.01"
+                    className="w-full bg-transparent pl-2 pr-8 py-1"
+                    placeholder={generalThrIsPct ? '20' : String(Number(amount || 0).toFixed(2))}
+                    required
+                  />
+                </div>
+                <button type="submit" className="btn-panel">Guardar</button>
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">Se alertará cuando el saldo baje de este monto.</p>
             </div>
-            <div className="sm:col-span-1 flex items-end justify-end gap-2">
-              <button type="submit" className="w-full sm:w-auto btn-panel" disabled={!canAddMore}>Guardar</button>
-            </div>
+            <div className="hidden"></div>
           </form>
           {!canAddMore && (
-            <div className="mt-2 inline-flex items-center rounded-md border px-3 py-2 text-xs bg-slate-100 text-slate-800 border-slate-200">
+            <div className="mt-2 inline-flex items-center rounded-md px-3 py-2 text-xs panel-bg ring-1 ring-border text-card-foreground">
               <span className="mr-2">ℹ️</span>
               <span>{categoriesForForm.length === 0 ? 'Todas las categorías ya tienen presupuesto configurado' : 'No queda saldo por asignar del presupuesto general'}</span>
             </div>
           )}
           {formErrorMsg && (
-            <div className="mt-2 inline-flex items-center rounded-md border px-3 py-2 text-xs bg-red-100 text-red-800 border-red-200">
+            <div className="mt-2 inline-flex items-center rounded-md px-3 py-2 text-xs bg-red-100 text-red-800 ring-1 ring-red-200">
               <span className="mr-2">⚠️</span>
               <span>{formErrorMsg}</span>
             </div>
@@ -191,9 +223,9 @@ export default async function Page({ searchParams }: { searchParams?: Promise<Re
           {catStatuses.length > 0 && (
             <div className="mt-4">
               <div className="text-sm text-muted-foreground mb-2">Estado configurado</div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-64 md:max-h-96 overflow-y-auto pr-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 max-h-64 md:max-h-96 overflow-y-auto pr-2">
                 {catStatuses.filter(s => s.budget).map(s => (
-                  <div key={s.categoryId} className="relative rounded-md border border-border bg-card p-3">
+                  <div key={s.categoryId} className="relative panel-bg rounded-md ring-1 ring-border p-3">
                     {s.budget && (
                       <ConfirmDeleteButton categoryId={s.categoryId} />
                     )}
@@ -209,22 +241,32 @@ export default async function Page({ searchParams }: { searchParams?: Promise<Re
                         year={yearNum}
                       />
                     )}
-                    <div className="text-sm font-medium">{s.name}</div>
-                    <div className="text-xs text-muted-foreground">Presupuesto: {s.budget ? `${formatCurrency(s.budget.amount)} ${s.budget.currency}` : '—'}</div>
-                    <div className="text-xs">Gastado: {formatCurrency(s.spent)}</div>
-                    <div className={`text-xs ${s.remaining < 0 ? 'text-red-700' : (s.budget?.alertThreshold && s.remaining <= (s.budget.alertThreshold || 0) ? 'text-yellow-700' : 'text-emerald-700')}`}>Saldo: {formatCurrency(s.remaining)}</div>
-                    {typeof s.budget?.alertThreshold === 'number' && (s.budget.alertThreshold || 0) > 0 && (
-                      (() => {
-                        const thr = s.budget?.alertThreshold || 0;
-                        const thrIsPct = thr > 0 && thr <= 1;
-                        const thrAmt = thrIsPct ? (s.budget!.amount * (1 - thr)) : thr;
-                        const delta = s.remaining - thrAmt;
-                        const cls = delta > 0 ? 'text-indigo-700' : 'text-red-700';
-                        return (
-                          <div className={`text-xs ${cls}`}>{delta > 0 ? `Faltan ${formatCurrency(delta)} para cruzar umbral` : `Umbral cruzado por ${formatCurrency(Math.abs(delta))}`} {thrIsPct ? `(umbral ${Math.round(thr * 100)}%)` : ''}</div>
-                        );
-                      })()
-                    )}
+                    <div className="flex items-center gap-2 mb-2 pr-10">
+                      <div className="text-sm font-medium">{s.name}</div>
+                      <span className="text-[10px] rounded-full px-2 py-0.5 ring-1 ring-border text-muted-foreground">{s.budget?.currency}</span>
+                    </div>
+                    <div className="grid grid-cols-1 gap-2 mb-2">
+                      <div className="p-2 rounded-md bg-muted flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 rounded-full bg-slate-400"></div>
+                          <span className="text-xs">Presupuesto</span>
+                        </div>
+                        <span className="text-sm font-semibold">{s.budget ? `${formatCurrency(s.budget.amount)}` : '—'}</span>
+                      </div>
+                    </div>
+                    {(() => {
+                      const pct = s.budget?.amount ? Math.min((s.spent / s.budget.amount) * 100, 100) : 0;
+                      const bar = 'bg-slate-500';
+                      return (
+                        <>
+                          <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
+                            <div className={`h-full transition-all duration-500 ${bar}`} style={{ width: `${Math.min(pct, 100)}%` }} />
+                          </div>
+                          <div className="mt-1 text-xs text-muted-foreground">{pct.toFixed(1)}%</div>
+                        </>
+                      );
+                    })()}
+                    
                   </div>
                 ))}
               </div>

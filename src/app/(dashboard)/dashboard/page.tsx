@@ -4,6 +4,7 @@ import { Upload, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import ChartPanel from "../_components/ChartPanel";
+import RealtimeRefresh from "@/components/RealtimeRefresh";
 
 export default async function Page() {
   const cookieStore = await cookies();
@@ -120,6 +121,7 @@ export default async function Page() {
 
   return (
     <section className="space-y-6">
+      <RealtimeRefresh />
       
       {/* Encabezado con acciones rápidas (paleta nueva) */}
       <Card className="bg-card border border-border panel-bg">

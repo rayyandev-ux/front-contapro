@@ -1,6 +1,9 @@
 'use client';
 import React, { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { invalidateApiCache } from '@/lib/api';
+import { revalidateBudget } from '@/app/actions';
+import { X } from 'lucide-react';
 
 export default function ConfirmDeleteButton({ categoryId }: { categoryId: string }) {
   const router = useRouter();
@@ -24,6 +27,8 @@ export default function ConfirmDeleteButton({ categoryId }: { categoryId: string
         bc.postMessage({ type: 'budget-category:deleted', categoryId });
         bc.close();
       } catch {}
+      try { invalidateApiCache('/api'); } catch {}
+      await revalidateBudget();
     } catch {}
     finally {
       setLoading(false);
@@ -35,12 +40,12 @@ export default function ConfirmDeleteButton({ categoryId }: { categoryId: string
     <button
       type="button"
       onClick={handleClick}
-      className="absolute right-2 top-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-red-600 text-white text-xs hover:bg-red-700 disabled:opacity-60"
+      className="btn-icon btn-icon-danger absolute right-2 top-2 z-10 disabled:opacity-60"
       title="Eliminar presupuesto"
       aria-label="Eliminar presupuesto"
       disabled={loading}
     >
-      ×
+      <X />
     </button>
   );
 }

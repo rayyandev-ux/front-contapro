@@ -36,7 +36,6 @@ export default function Tutorial({ onComplete }: Props) {
         popover: {
           title: '👋 Bienvenido a ContaPRO',
           description: 'Tu asistente contable inteligente. Vamos a dar un breve recorrido para mostrarte cómo sacar el máximo provecho de la plataforma.',
-          side: "center",
           align: 'center',
         }
       },
@@ -96,7 +95,6 @@ export default function Tutorial({ onComplete }: Props) {
         popover: {
           title: '🚀 ¡Todo listo!',
           description: '¡Empieza a controlar tus finanzas ahora!',
-          side: "center",
           align: 'center',
         }
       }
@@ -105,7 +103,6 @@ export default function Tutorial({ onComplete }: Props) {
         popover: {
           title: '👋 Bienvenido a ContaPRO',
           description: 'Tu asistente contable inteligente. Vamos a dar un breve recorrido para mostrarte cómo sacar el máximo provecho de la plataforma.',
-          side: "center",
           align: 'center',
         }
       },
@@ -235,7 +232,6 @@ export default function Tutorial({ onComplete }: Props) {
         popover: {
           title: '🚀 ¡Todo listo!',
           description: 'Ya estás listo para empezar a controlar tus finanzas. ¡Disfruta ContaPRO!',
-          side: "center",
           align: 'center',
         }
       }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { driver } from 'driver.js';
+import { driver, DriveStep } from 'driver.js';
 import "driver.js/dist/driver.css";
 import { apiJson } from '@/lib/api';
 
@@ -31,7 +31,7 @@ export default function Tutorial({ onComplete }: Props) {
 
     const isMobile = window.innerWidth < 768;
 
-    const steps = isMobile ? [
+    const steps: DriveStep[] = isMobile ? [
       {
         popover: {
           title: '👋 Bienvenido a ContaPRO',

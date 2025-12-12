@@ -74,7 +74,7 @@ export default function Tutorial({ onComplete }: Props) {
           side: "top",
           align: 'center',
         },
-        onHighlightStarted: (element: Element) => {
+        onHighlightStarted: (element?: Element) => {
           if (!element) return;
           const mobileMenu = document.querySelector('.fixed.bottom-20');
           if (!mobileMenu) {
@@ -150,7 +150,7 @@ export default function Tutorial({ onComplete }: Props) {
           side: "right",
           align: 'start',
         },
-        onHighlightStarted: (element: Element) => {
+        onHighlightStarted: (element?: Element) => {
           if (!element) return;
           const chevron = element.querySelector('.rotate-180');
           if (!chevron) {
@@ -193,7 +193,7 @@ export default function Tutorial({ onComplete }: Props) {
           side: "right",
           align: 'start',
         },
-        onHighlightStarted: (element: Element) => {
+        onHighlightStarted: (element?: Element) => {
           if (!element) return;
           const chevron = element.querySelector('.rotate-180');
           if (!chevron) {

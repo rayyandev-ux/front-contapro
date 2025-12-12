@@ -44,6 +44,17 @@ const items: NavItem[] = [
   { href: "/admin", label: "Admin", Icon: Shield, adminOnly: true },
 ];
 
+function getNavId(href: string) {
+  if (href === '/dashboard') return 'nav-dashboard';
+  if (href === '/upload') return 'nav-upload';
+  if (href === '/expenses') return 'nav-expenses';
+  if (href === '/budget') return 'nav-budget';
+  if (href === '/account') return 'nav-account';
+  if (href === '/payment-methods') return 'nav-payment-methods';
+  if (href === '/integrations') return 'nav-integrations';
+  return undefined;
+}
+
 export default function SidebarNav({ isAdmin, onNavigate, mobileOnly, hideAccount }: Props) {
   const pathname = usePathname();
   const isBudgetActive = pathname === "/budget" || pathname.startsWith("/budget/");
@@ -54,7 +65,7 @@ export default function SidebarNav({ isAdmin, onNavigate, mobileOnly, hideAccoun
   const [openAdmin, setOpenAdmin] = useState(isAdminActive);
   let list = items.filter((i) => !i.adminOnly || isAdmin);
   if (mobileOnly) {
-    list = list.filter((i) => i.href === '/integrations' || i.href === '/account' || i.href === '/admin');
+    list = list.filter((i) => i.href === '/integrations' || i.href === '/account' || i.href === '/admin' || i.href === '/payment-methods');
   }
   if (hideAccount) {
     list = list.filter((i) => i.href !== '/account');
@@ -71,10 +82,12 @@ export default function SidebarNav({ isAdmin, onNavigate, mobileOnly, hideAccoun
             "border border-border bg-card shadow-sm text-sidebar-foreground";
           const inactive =
             "text-sidebar-foreground hover:bg-muted hover:text-sidebar-foreground";
+          const navId = getNavId(href);
+          
           if (href === "/budget") {
             return (
               <li key={href}>
-                <button type="button" onClick={() => setOpenBudget((o) => !o)} className={`${base} ${isBudgetActive ? active : inactive} w-full text-left`}>
+                <button id={navId} type="button" onClick={() => setOpenBudget((o) => !o)} className={`${base} ${isBudgetActive ? active : inactive} w-full text-left`}>
                   <Icon className={`h-4 w-4 ${isBudgetActive ? "text-sidebar-foreground" : "text-sidebar-foreground/70 group-hover:text-sidebar-foreground"}`} />
                   <span className="flex-1">{label}</span>
                   <ChevronDown className={`h-4 w-4 ${isBudgetActive ? "text-sidebar-foreground" : "text-sidebar-foreground/70 group-hover:text-sidebar-foreground"} transition-transform ${openBudget ? "rotate-180" : "rotate-0"}`} />
@@ -82,19 +95,19 @@ export default function SidebarNav({ isAdmin, onNavigate, mobileOnly, hideAccoun
                 {openBudget && (
                   <ul className="mt-1 ml-8 flex flex-col gap-1">
                     <li>
-                      <Link href="/budget" onClick={() => { setOpenBudget(false); onNavigate?.(); }} className="group flex items-center gap-2 px-3 py-1.5 rounded-md transition-colors duration-150 text-sidebar-foreground hover:bg-muted">
+                      <Link id="nav-budget-monthly" href="/budget" onClick={() => { setOpenBudget(false); onNavigate?.(); }} className="group flex items-center gap-2 px-3 py-1.5 rounded-md transition-colors duration-150 text-sidebar-foreground hover:bg-muted">
                         <CalendarDays className="h-4 w-4 text-sidebar-foreground/70 group-hover:text-sidebar-foreground" />
                         <span className="flex-1">Presupuesto mensual</span>
                       </Link>
                     </li>
                     <li>
-                      <Link href="/budget/category" onClick={() => onNavigate?.()} className="group flex items-center gap-2 px-3 py-1.5 rounded-md transition-colors duration-150 text-sidebar-foreground hover:bg-muted">
+                      <Link id="nav-budget-category" href="/budget/category" onClick={() => onNavigate?.()} className="group flex items-center gap-2 px-3 py-1.5 rounded-md transition-colors duration-150 text-sidebar-foreground hover:bg-muted">
                         <Tag className="h-4 w-4 text-sidebar-foreground/70 group-hover:text-sidebar-foreground" />
                         <span className="flex-1">Presupuesto por categoría</span>
                       </Link>
                     </li>
                     <li>
-                      <Link href="/budget/payment-method" onClick={() => onNavigate?.()} className="group flex items-center gap-2 px-3 py-1.5 rounded-md transition-colors duration-150 text-sidebar-foreground hover:bg-muted">
+                      <Link id="nav-budget-payment" href="/budget/payment-method" onClick={() => onNavigate?.()} className="group flex items-center gap-2 px-3 py-1.5 rounded-md transition-colors duration-150 text-sidebar-foreground hover:bg-muted">
                         <CreditCard className="h-4 w-4 text-sidebar-foreground/70 group-hover:text-sidebar-foreground" />
                         <span className="flex-1">Presupuesto por método de pago</span>
                       </Link>
@@ -140,7 +153,7 @@ export default function SidebarNav({ isAdmin, onNavigate, mobileOnly, hideAccoun
           if (href === "/integrations") {
             return (
               <li key={href}>
-                <button type="button" onClick={() => setOpenIntegrations((o) => !o)} className={`${base} ${isIntegrationsActive ? active : inactive} w-full text-left`}>
+                <button id={navId} type="button" onClick={() => setOpenIntegrations((o) => !o)} className={`${base} ${isIntegrationsActive ? active : inactive} w-full text-left`}>
                   <Icon className={`h-4 w-4 ${isIntegrationsActive ? "text-sidebar-foreground" : "text-sidebar-foreground/70 group-hover:text-sidebar-foreground"}`} />
                   <span className="flex-1">{label}</span>
                   <ChevronDown className={`h-4 w-4 ${isIntegrationsActive ? "text-sidebar-foreground" : "text-sidebar-foreground/70 group-hover:text-sidebar-foreground"} transition-transform ${openIntegrations ? "rotate-180" : "rotate-0"}`} />
@@ -148,13 +161,13 @@ export default function SidebarNav({ isAdmin, onNavigate, mobileOnly, hideAccoun
                 {openIntegrations && (
                   <ul className="mt-1 ml-8 flex flex-col gap-1">
                     <li>
-                      <Link href="/integrations/whatsapp" onClick={() => { setOpenIntegrations(false); onNavigate?.(); }} className="group flex items-center gap-2 px-3 py-1.5 rounded-md transition-colors duration-150 text-sidebar-foreground hover:bg-muted">
+                      <Link id="nav-integrations-whatsapp" href="/integrations/whatsapp" onClick={() => { setOpenIntegrations(false); onNavigate?.(); }} className="group flex items-center gap-2 px-3 py-1.5 rounded-md transition-colors duration-150 text-sidebar-foreground hover:bg-muted">
                         <MessageCircle className="h-4 w-4 text-sidebar-foreground/70 group-hover:text-sidebar-foreground" />
                         <span className="flex-1">WhatsApp</span>
                       </Link>
                     </li>
                     <li>
-                      <Link href="/integrations/telegram" onClick={() => { setOpenIntegrations(false); onNavigate?.(); }} className="group flex items-center gap-2 px-3 py-1.5 rounded-md transition-colors duration-150 text-sidebar-foreground hover:bg-muted">
+                      <Link id="nav-integrations-telegram" href="/integrations/telegram" onClick={() => { setOpenIntegrations(false); onNavigate?.(); }} className="group flex items-center gap-2 px-3 py-1.5 rounded-md transition-colors duration-150 text-sidebar-foreground hover:bg-muted">
                         <Send className="h-4 w-4 text-sidebar-foreground/70 group-hover:text-sidebar-foreground" />
                         <span className="flex-1">Telegram</span>
                       </Link>
@@ -166,7 +179,12 @@ export default function SidebarNav({ isAdmin, onNavigate, mobileOnly, hideAccoun
           }
           return (
             <li key={href}>
-              <Link href={href} onClick={() => onNavigate?.()} className={`${base} ${isActive ? active : inactive}`}>
+              <Link
+                href={href}
+                id={navId}
+                onClick={() => onNavigate?.()}
+                className={`${base} ${isActive ? active : inactive}`}
+              >
                 <Icon
                   className={`h-4 w-4 ${
                     isActive

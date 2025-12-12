@@ -16,55 +16,50 @@ export default function MobileActionBar({ isAdmin, onNavigate }: { isAdmin?: boo
 
 
   return (
-    <nav className="md:hidden fixed bottom-3 left-1/2 z-30 w-[calc(100%-1rem)] max-w-md -translate-x-1/2 rounded-2xl border border-border bg-card/95 p-2 shadow-lg backdrop-blur">
+    <nav className="md:hidden fixed bottom-3 left-0 right-0 mx-auto z-30 w-[calc(100%-1rem)] max-w-md rounded-2xl border border-border bg-card/95 p-2 shadow-lg backdrop-blur">
       <ul className="grid grid-cols-4">
         <li>
-          <Link href="/dashboard" onClick={() => onNavigate?.()} className={`${itemBase} ${isActive("/dashboard") ? "text-primary" : "text-muted-foreground"}`}>
+          <Link id="mobile-nav-dashboard" href="/dashboard" onClick={() => onNavigate?.()} className={`${itemBase} ${isActive("/dashboard") ? "text-primary" : "text-muted-foreground"}`}>
             <LayoutDashboard className={`h-5 w-5 ${isActive("/dashboard") ? "text-primary" : "text-muted-foreground"}`} />
             <span>Resumen</span>
           </Link>
         </li>
         <li>
-          <Link href="/upload" onClick={() => onNavigate?.()} className={`${itemBase} ${isActive("/upload") ? "text-primary" : "text-muted-foreground"}`}>
+          <Link id="mobile-nav-upload" href="/upload" onClick={() => onNavigate?.()} className={`${itemBase} ${isActive("/upload") ? "text-primary" : "text-muted-foreground"}`}>
             <Upload className={`h-5 w-5 ${isActive("/upload") ? "text-primary" : "text-muted-foreground"}`} />
             <span>Subir</span>
           </Link>
         </li>
         <li>
-          <Link href="/expenses" onClick={() => onNavigate?.()} className={`${itemBase} ${isActive("/expenses") ? "text-primary" : "text-muted-foreground"}`}>
+          <Link id="mobile-nav-expenses" href="/expenses" onClick={() => onNavigate?.()} className={`${itemBase} ${isActive("/expenses") ? "text-primary" : "text-muted-foreground"}`}>
             <Wallet className={`h-5 w-5 ${isActive("/expenses") ? "text-primary" : "text-muted-foreground"}`} />
             <span>Gastos</span>
           </Link>
         </li>
         <li>
-          <button onClick={() => setOpenBudget(o => !o)} className={`${itemBase} ${budgetActive ? "text-primary" : "text-muted-foreground"}`} aria-label="Presupuestos">
+          <button id="mobile-nav-budget" onClick={() => setOpenBudget(o => !o)} className={`${itemBase} ${budgetActive ? "text-primary" : "text-muted-foreground"}`} aria-label="Presupuestos">
             <PiggyBank className={`h-5 w-5 ${budgetActive ? "text-primary" : "text-muted-foreground"}`} />
             <span>Presupuestos</span>
           </button>
         </li>
       </ul>
       {openBudget && (
-        <Portal>
-          <>
-            <div className="fixed inset-0 z-40 bg-black/30" onClick={() => setOpenBudget(false)} />
-            <div className="fixed bottom-20 left-1/2 z-50 w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 rounded-2xl border border-border bg-card shadow-xl ring-1 ring-border">
-              <div className="p-2">
-                <Link href="/budget" onClick={() => { setOpenBudget(false); onNavigate?.(); }} className="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-muted">
-                  <span className="flex-1">Presupuesto mensual</span>
-                  <ChevronDown className="h-4 w-4 rotate-180" />
-                </Link>
-                <Link href="/budget/category" onClick={() => { setOpenBudget(false); onNavigate?.(); }} className="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-muted">
-                  <span className="flex-1">Presupuesto por categoría</span>
-                  <ChevronDown className="h-4 w-4 rotate-180" />
-                </Link>
-                <Link href="/budget/payment-method" onClick={() => { setOpenBudget(false); onNavigate?.(); }} className="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-muted">
-                  <span className="flex-1">Presupuesto por método de pago</span>
-                  <ChevronDown className="h-4 w-4 rotate-180" />
-                </Link>
-              </div>
-            </div>
-          </>
-        </Portal>
+        <div className="fixed bottom-20 left-0 right-0 mx-auto z-50 w-[calc(100%-2rem)] max-w-sm animate-in slide-in-from-bottom-5 fade-in duration-200">
+          <div className="rounded-xl border border-border bg-popover p-4 shadow-xl">
+            <Link href="/budget" onClick={() => { setOpenBudget(false); onNavigate?.(); }} className="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-muted">
+              <span className="flex-1">Presupuesto mensual</span>
+              <ChevronDown className="h-4 w-4 rotate-180" />
+            </Link>
+            <Link href="/budget/category" onClick={() => { setOpenBudget(false); onNavigate?.(); }} className="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-muted">
+              <span className="flex-1">Presupuesto por categoría</span>
+              <ChevronDown className="h-4 w-4 rotate-180" />
+            </Link>
+            <Link href="/budget/payment-method" onClick={() => { setOpenBudget(false); onNavigate?.(); }} className="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-muted">
+              <span className="flex-1">Presupuesto por método de pago</span>
+              <ChevronDown className="h-4 w-4 rotate-180" />
+            </Link>
+          </div>
+        </div>
       )}
     </nav>
   );

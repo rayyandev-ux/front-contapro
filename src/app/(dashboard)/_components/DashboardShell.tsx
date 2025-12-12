@@ -10,16 +10,19 @@ import RealtimeRefresh from '@/components/RealtimeRefresh';
 import { PanelLeftOpen, PanelLeftClose, X } from 'lucide-react';
 import Portal from '@/components/Portal';
 import { useRouter, usePathname } from 'next/navigation';
+import Tutorial from '@/components/Tutorial';
 
 type Props = {
   isAdmin?: boolean;
   user?: { name?: string | null; email?: string | null };
   children: React.ReactNode;
+  tutorialSeen?: boolean;
 };
 
-export default function DashboardShell({ isAdmin, user, children }: Props) {
+export default function DashboardShell({ isAdmin, user, children, tutorialSeen }: Props) {
   const [hidden, setHidden] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(!tutorialSeen);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [menuPos, setMenuPos] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
   const menuRef = useRef<HTMLDivElement | null>(null);
@@ -76,9 +79,10 @@ export default function DashboardShell({ isAdmin, user, children }: Props) {
           <div className="mt-1">
             <SidebarNav isAdmin={isAdmin} onNavigate={() => setIsNavigating(true)} />
           </div>
-          <div className="mt-auto space-y-2 px-2">
+          <div id="sidebar-account-section" className="mt-auto space-y-2 px-2">
             <div className="text-xs font-medium text-muted-foreground">Cuenta</div>
             <button
+              id="user-menu-btn"
               type="button"
               className="w-full flex items-center gap-2 rounded-full border px-3 py-2 text-sm hover:bg-muted"
               onClick={(e) => {
@@ -157,6 +161,7 @@ export default function DashboardShell({ isAdmin, user, children }: Props) {
             <div className={`sticky top-0 z-20 flex items-center justify-between gap-2 px-3 py-2 shrink-0 ${headerScrolled ? 'border-b border-border bg-card/80 backdrop-blur-[10px] shadow-sm' : ''} transition-[background,backdrop-filter] duration-200 ease-in-out`}>
               <div className="flex items-center gap-2">
                 <button
+                  id="mobile-menu-btn"
                   type="button"
                   aria-label={hidden ? 'Mostrar barra lateral' : 'Ocultar barra lateral'}
                   onClick={() => {
@@ -264,6 +269,8 @@ export default function DashboardShell({ isAdmin, user, children }: Props) {
           </div>
         </div>
       )}
+
+      {showTutorial && <Tutorial onComplete={() => setShowTutorial(false)} />}
 
       <MobileActionBar isAdmin={isAdmin} onNavigate={() => setIsNavigating(true)} />
     </div>

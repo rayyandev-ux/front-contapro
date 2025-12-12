@@ -7,6 +7,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
   const cookieHeader = cookieStore.getAll().map(c => `${c.name}=${c.value}`).join("; ");
   let isAdmin = false;
   let user: { name?: string | null; email?: string | null } | undefined;
+  let tutorialSeen = false;
   try {
     const BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8080";
     const res = await fetch(`${BASE}/api/auth/me`, {
@@ -17,6 +18,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
       const data = await res.json();
       isAdmin = data?.user?.role === 'ADMIN';
       user = { name: data?.user?.name ?? null, email: data?.user?.email ?? null };
+      tutorialSeen = data?.user?.tutorialSeen === true;
     }
   } catch {}
 
@@ -30,7 +32,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
         <div className="absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-orange-100 blur-3xl opacity-50" />
       </div>
 
-      <DashboardShell isAdmin={isAdmin} user={user}>{children}</DashboardShell>
+      <DashboardShell isAdmin={isAdmin} user={user} tutorialSeen={tutorialSeen}>{children}</DashboardShell>
     </div>
   );
 }

@@ -14,6 +14,9 @@ export default function PricingPage() {
   const [loading, setLoading] = useState(false);
   const [prices, setPrices] = useState<{ monthly: number; annual: number }>({ monthly: 3.99, annual: 14.99 });
   const [labels, setLabels] = useState<{ monthlyName: string; monthlyDesc?: string; annualName: string; annualDesc?: string }>({ monthlyName: 'PREMIUM MENSUAL', monthlyDesc: 'Ideal si prefieres pagar mes a mes', annualName: 'PREMIUM ANUAL', annualDesc: 'Ahorra con facturación anual' });
+  const [couponCode, setCouponCode] = useState("");
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponMsg, setCouponMsg] = useState<string | null>(null);
   useEffect(() => {
     (async () => {
       const me = await apiJson("/api/auth/me");
@@ -55,7 +58,26 @@ export default function PricingPage() {
     }
     setLoading(false);
   };
-  
+
+  const handleRedeem = async () => {
+    if (!couponCode.trim()) return;
+    setCouponLoading(true);
+    setCouponMsg(null);
+    const res = await apiJson<{ ok: boolean; days: number }>("/api/promo/redeem", { method: "POST", body: JSON.stringify({ code: couponCode }) });
+    setCouponLoading(false);
+    if (!res.ok) {
+      setCouponMsg(res.error || "No se pudo canjear el cupón");
+      return;
+    }
+    const days = (res.data as any)?.days ?? null;
+    setCouponMsg(days ? `Cupón aplicado (+${days} días)` : "Cupón aplicado");
+    setCouponCode("");
+    setTimeout(() => {
+      setCouponMsg(null);
+      window.location.href = "/dashboard";
+    }, 800);
+  };
+
 
   return (
     <section className="dark relative min-h-svh w-full overflow-hidden">
@@ -127,7 +149,36 @@ export default function PricingPage() {
               </CardContent>
             </Card>
           </RevealList>
-          
+          <div className="mt-8 rounded-2xl border border-border bg-card/40 p-4 sm:p-5 text-sm text-muted-foreground max-w-2xl mx-auto">
+            <div className="font-semibold text-xs uppercase tracking-wide text-muted-foreground mb-2">
+              ¿Tienes un cupón?
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+              <input
+                value={couponCode}
+                onChange={(e) => setCouponCode(e.target.value)}
+                placeholder="Ingresa tu código"
+                className="flex-1 h-9 rounded-md border border-border bg-background px-3 text-sm outline-none focus-visible:border-white focus-visible:ring-1 focus-visible:ring-white/60"
+              />
+              <Button
+                variant="panel"
+                size="sm"
+                disabled={couponLoading || !couponCode.trim()}
+                onClick={handleRedeem}
+                className="whitespace-nowrap"
+              >
+                {couponLoading ? "Canjeando..." : "Canjear cupón"}
+              </Button>
+            </div>
+            {couponMsg && (
+              <div className="mt-2 text-xs text-muted-foreground">
+                {couponMsg}
+              </div>
+            )}
+            <div className="mt-2 text-[11px] text-muted-foreground/70">
+              Debes estar conectado con tu cuenta para aplicar el cupón a tu suscripción.
+            </div>
+          </div>
         </div>
         </div>
       <SiteFooter />

@@ -47,7 +47,7 @@ function VerifyForm() {
     if (!ok) {
       setError(error || "Código inválido");
     } else {
-      router.push("/dashboard");
+      router.push("/pricing");
     }
     setLoading(false);
   };

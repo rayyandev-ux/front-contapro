@@ -28,8 +28,9 @@ export async function apiJson<T = any>(path: string, init: RequestInit = {}): Pr
   try {
     const method = (init.method || 'GET').toUpperCase();
     const isGet = method === 'GET';
+    const skipCache = !isGet || (init.cache === 'no-store');
     const key = isGet ? makeKey(path) : '';
-    if (isGet) {
+    if (isGet && !skipCache) {
       const hit = API_CACHE.get(key);
       if (hit && hit.expires > Date.now()) {
         return { ok: true, data: hit.data as T };
@@ -61,7 +62,7 @@ export async function apiJson<T = any>(path: string, init: RequestInit = {}): Pr
       const msg = (data && (data.message || data.error)) || `Error ${res.status}`;
       return { ok: false, error: msg };
     }
-    if (isGet) {
+    if (isGet && !skipCache) {
       API_CACHE.set(key, { expires: Date.now() + DEFAULT_TTL_MS, data });
     }
     return { ok: true, data };

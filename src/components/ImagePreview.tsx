@@ -12,10 +12,10 @@ export default function ImagePreview({ src, alt, className }: Props) {
 
   if (error) {
     return (
-      <div className="p-4 text-sm text-red-700 bg-red-50">
+      <div className="p-4 text-sm text-zinc-400 bg-zinc-900/50 border border-zinc-800 rounded-md">
         No se pudo cargar la imagen.
         <div className="mt-2">
-          <a href={src} target="_blank" rel="noreferrer" className="underline">Abrir en nueva pestaña</a>
+          <a href={src} target="_blank" rel="noreferrer" className="underline hover:text-white transition-colors">Abrir en nueva pestaña</a>
         </div>
       </div>
     );

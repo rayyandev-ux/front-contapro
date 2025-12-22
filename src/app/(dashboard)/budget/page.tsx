@@ -24,6 +24,7 @@ export default async function Page({ searchParams }: { searchParams?: Promise<Re
   let alertThreshold = 0;
   let error: string | null = null;
   let currencyCode = 'PEN';
+  let budgetName: string | undefined = undefined;
   
   const sp = searchParams ? await searchParams : undefined;
   const srcParam = String(sp?.source || 'created').toLowerCase();
@@ -37,6 +38,7 @@ export default async function Page({ searchParams }: { searchParams?: Promise<Re
     remaining = Number(d?.remaining ?? (amount - spent));
     alertThreshold = Number(d?.budget?.alertThreshold ?? 0);
     currencyCode = String(d?.budget?.currency ?? 'PEN');
+    budgetName = d?.budget?.name || undefined;
   } catch (e) {
     error = e instanceof Error ? e.message : "Error al cargar";
   }
@@ -61,13 +63,21 @@ export default async function Page({ searchParams }: { searchParams?: Promise<Re
     const amount = Number(formData.get("amount") || 0);
     const now = new Date();
     const currency = String(formData.get("currency") || "");
-    const payload: { month: number; year: number; amount: number; currency?: string } = { month: now.getMonth() + 1, year: now.getFullYear(), amount };
+    const name = String(formData.get("name") || "");
+    const payload: { month: number; year: number; amount: number; currency?: string; name?: string } = { month: now.getMonth() + 1, year: now.getFullYear(), amount };
     if (currency) payload.currency = currency;
+    if (name) payload.name = name;
 
     try {
-      await fetch(`${BASE}/api/budget`, { method: "POST", headers: { "Content-Type": "application/json", cookie: cookieHeader }, body: JSON.stringify(payload) });
-    } catch {
-      // Handle error silently or via other means since we are in a server action called by client
+      const res = await fetch(`${BASE}/api/budget`, { method: "POST", headers: { "Content-Type": "application/json", cookie: cookieHeader }, body: JSON.stringify(payload) });
+      if (!res.ok) {
+        const txt = await res.text();
+        console.error("SaveBudget Error:", txt);
+        throw new Error(txt || `Error ${res.status}`);
+      }
+    } catch (e) {
+      console.error("SaveBudget Exception:", e);
+      throw e;
     }
     revalidatePath('/budget');
   }
@@ -102,6 +112,7 @@ export default async function Page({ searchParams }: { searchParams?: Promise<Re
           byMonthBudget={byMonthBudget}
           onSaveBudget={saveBudgetAmount}
           onSaveThreshold={saveAlertThreshold}
+          budgetName={budgetName}
         />
       )}
 

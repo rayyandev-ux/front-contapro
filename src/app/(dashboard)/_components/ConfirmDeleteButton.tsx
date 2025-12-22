@@ -40,7 +40,7 @@ export default function ConfirmDeleteButton({ categoryId }: { categoryId: string
     <button
       type="button"
       onClick={handleClick}
-      className="btn-icon btn-icon-danger absolute right-2 top-2 z-10 disabled:opacity-60"
+      className="btn-icon text-white hover:bg-zinc-800 absolute right-2 top-2 z-10 disabled:opacity-60"
       title="Eliminar presupuesto"
       aria-label="Eliminar presupuesto"
       disabled={loading}

@@ -70,7 +70,7 @@ export default function Page() {
             {categories.filter(c => c.userId).map(c => (
               <div key={c.id} className="flex items-center justify-between rounded-md border px-2 py-1 text-sm">
                 <span className="truncate">{c.name}</span>
-                <button type="button" className="rounded-md border px-2 py-0.5 hover:bg-red-50 text-red-600" onClick={() => deleteCategory(c.id)}>Eliminar</button>
+                <button type="button" className="rounded-md border px-2 py-0.5 hover:bg-zinc-800 text-zinc-400 hover:text-white" onClick={() => deleteCategory(c.id)}>Eliminar</button>
               </div>
             ))}
             {categories.filter(c => c.userId).length === 0 && (

@@ -7,7 +7,7 @@ import Portal from '@/components/Portal';
 import ThemeToggle from '@/components/ThemeToggle';
 import LogoutButton from '@/components/logout-button';
 
-export default function MobileSidebar({ isAdmin, user }: { isAdmin?: boolean; user?: { name?: string | null; email?: string | null } }) {
+export default function MobileSidebar({ user }: { user?: { name?: string | null; email?: string | null } }) {
   const [open, setOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const profileBtnRef = useRef<HTMLButtonElement | null>(null);
@@ -45,7 +45,7 @@ export default function MobileSidebar({ isAdmin, user }: { isAdmin?: boolean; us
                   Cerrar
                 </button>
               </div>
-              <SidebarNav isAdmin={isAdmin} onNavigate={() => { setOpen(false); setProfileOpen(false); }} />
+              <SidebarNav onNavigate={() => { setOpen(false); setProfileOpen(false); }} />
               <div className="my-3 h-px bg-border" />
               <div className="flex items-center justify-between px-1 mb-2">
                 <span className="text-xs text-muted-foreground">Acciones</span>

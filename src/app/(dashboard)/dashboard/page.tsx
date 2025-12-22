@@ -120,32 +120,39 @@ export default async function Page() {
   };
 
   return (
-    <section className="space-y-6">
+    <section className="space-y-6 max-w-6xl mx-auto px-6 md:px-8 py-6 md:py-8">
       <RealtimeRefresh />
       
       {/* Encabezado con acciones rápidas (paleta nueva) */}
-      <Card className="bg-card border border-border panel-bg">
-        <CardContent className="p-4">
+      <div className="bg-zinc-900/20 border border-zinc-800/50 rounded-2xl overflow-hidden">
+        <div className="px-8 py-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h1 className="text-2xl font-semibold tracking-tight">Resumen</h1>
-              <p className="text-sm text-muted-foreground">Tu actividad y gastos recientes</p>
+              <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-white">Resumen</h1>
+              <p className="text-sm text-zinc-500">Tu actividad y gastos recientes</p>
             </div>
-            <Button asChild variant="panel" className="w-full sm:w-auto">
-              <Link href="/upload">
+            <Link href="/upload">
+              <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap px-6 py-2.5 rounded-full bg-zinc-100 text-zinc-950 font-medium hover:bg-zinc-200 transition-colors text-sm w-full sm:w-auto">
                 <Upload className="h-4 w-4" /> Subir documento
-              </Link>
-            </Button>
+              </button>
+            </Link>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      <Card className="shadow-lg ring-1 ring-border panel-bg">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-lg font-semibold">Resumen y Gráficos</CardTitle>
-          <CardDescription className="text-xs">Explora tus datos y métricas</CardDescription>
-        </CardHeader>
-        <CardContent>
+      <div className="bg-zinc-900/20 border border-zinc-800/50 rounded-2xl overflow-hidden">
+        <div className="px-8 py-6 border-b border-zinc-800/50">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-zinc-900/50 border border-zinc-800/50 text-white">
+              <TrendingUp className="h-5 w-5" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-white">Resumen y Gráficos</h2>
+              <p className="text-sm text-zinc-500">Explora tus datos y métricas</p>
+            </div>
+          </div>
+        </div>
+        <div className="p-8">
           <ChartPanel
             byCategory={byCategory}
             byMonth={byMonth}
@@ -155,8 +162,8 @@ export default async function Page() {
             itemsCount={items.length}
             lastItem={items[0] ? { filename: items[0].filename, uploadedAt: items[0].uploadedAt } : undefined}
           />
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </section>
   );
 }

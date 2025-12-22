@@ -89,7 +89,7 @@ export default function WhatsAppLinkCard() {
         <div className="text-xl font-semibold">Conecta tu WhatsApp</div>
         <div className="mt-4 flex flex-wrap items-center gap-2">
             {status.ok && status.linked ? (
-              <Button variant="outline" size="sm" className="gap-1 rounded-full border-emerald-600/40 bg-emerald-600/10 text-emerald-700 dark:text-emerald-400 shadow-none hover:shadow-none hover:translate-y-0 transition-none hover:bg-emerald-600/10 hover:text-emerald-700 dark:hover:bg-emerald-600/10 dark:hover:text-emerald-400">
+              <Button variant="outline" size="sm" className="gap-1 rounded-full border-zinc-500/40 bg-zinc-500/10 text-zinc-300 shadow-none hover:shadow-none hover:translate-y-0 transition-none hover:bg-zinc-500/10 hover:text-zinc-300">
                 <CheckCircle2 className="h-4 w-4" />
                 WhatsApp ya está conectado
               </Button>
@@ -112,7 +112,7 @@ export default function WhatsAppLinkCard() {
           <div className="mt-4 text-sm">
             <div className="text-muted-foreground">Sigue estos pasos:</div>
             <ol className="mt-1 list-decimal pl-5">
-              <li>Abre el chat con nuestro número: <a className="text-primary hover:underline" href={link.waMe} target="_blank" rel="noreferrer">{botNumber}</a></li>
+              <li>Abre el chat con nuestro número: <a className="text-white hover:underline" href={link.waMe} target="_blank" rel="noreferrer">{botNumber}</a></li>
               <li>Si no se abre con el código, envía: <code className="rounded bg-muted px-1">{link.code}</code></li>
               <li>Vuelve y pulsa Actualizar estado si no se actualiza solo.</li>
             </ol>

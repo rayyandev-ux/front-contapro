@@ -3,9 +3,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiJson, apiMultipart, invalidateApiCache } from "@/lib/api";
 import { revalidateBudget } from "@/app/actions";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { UploadCloud, FileText, Image as ImageIcon, AlertTriangle, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ImageIcon, FileText, UploadCloud, X, Loader2 } from "lucide-react";
 
 export default function Page() {
   const router = useRouter();
@@ -109,112 +108,106 @@ export default function Page() {
   };
 
   return (
-    <section>
-      <Card className="overflow-hidden panel-bg">
-        <CardHeader>
-          <CardTitle>Subir documento</CardTitle>
-          <CardDescription>
-            Adjunta una foto o PDF de tu factura/boleta para analizarla con IA.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form className="space-y-6" onSubmit={onSubmit}>
-            {/* Tipos permitidos */}
-            <div className="flex flex-wrap items-center gap-2 text-xs">
-              <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-1 text-primary ring-1 ring-primary/20">
-                <ImageIcon className="h-3 w-3" /> JPG/PNG
-              </span>
-              <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-1 text-primary ring-1 ring-primary/20">
-                <FileText className="h-3 w-3" /> PDF
-              </span>
-              <span className="text-muted-foreground">Máx. 10 MB</span>
-            </div>
-
-            {/* Área de dropzone */}
-            <div
-              onDrop={onDrop}
-              onDragOver={onDragOver}
-              onDragLeave={onDragLeave}
-              className={`relative rounded-xl border-2 border-dashed p-6 transition-colors ${
-                dragActive ? "border-primary bg-primary/10" : "border-input bg-card"
-              }`}
-            >
-              <div className="flex flex-col items-center justify-center text-center">
-                <UploadCloud className="mb-2 h-8 w-8 text-primary" />
-                <p className="text-sm text-foreground">
-                  Arrastra tu archivo aquí o
-                  <label className="mx-1 cursor-pointer font-medium text-primary underline">
-                    <input
-                      type="file"
-                      className="sr-only"
-                      accept="image/*,application/pdf"
-                      onChange={(e) => setFile(e.target.files?.[0] || null)}
-                    />
-                    selecciónalo
-                  </label>
-                </p>
-                <p className="text-xs text-muted-foreground">Acepta imágenes y PDF</p>
+    <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-2xl overflow-hidden">
+        <div className="p-6 border-b border-zinc-800/50">
+           <h2 className="text-lg font-medium text-white">Subir documento</h2>
+           <p className="text-sm text-zinc-400 mt-1">Adjunta una foto o PDF de tu factura/boleta para analizarla con IA.</p>
+        </div>
+        <div className="p-6">
+           <form className="space-y-6" onSubmit={onSubmit}>
+              {/* Tipos permitidos */}
+              <div className="flex flex-wrap items-center gap-2 text-xs">
+                 <span className="inline-flex items-center gap-1 rounded-full bg-zinc-800/50 px-2 py-1 text-zinc-300 ring-1 ring-zinc-700/50">
+                    <ImageIcon className="h-3 w-3" /> JPG/PNG
+                 </span>
+                 <span className="inline-flex items-center gap-1 rounded-full bg-zinc-800/50 px-2 py-1 text-zinc-300 ring-1 ring-zinc-700/50">
+                    <FileText className="h-3 w-3" /> PDF
+                 </span>
+                 <span className="text-zinc-500">Máx. 10 MB</span>
               </div>
-            </div>
 
-            {/* Resumen del archivo seleccionado */}
-            {file && (
-              <div className="rounded-lg border bg-card p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    {file.type.startsWith("image/") ? (
-                      <ImageIcon className="h-5 w-5 text-muted-foreground" />
-                    ) : (
-                      <FileText className="h-5 w-5 text-muted-foreground" />
-                    )}
-                    <div>
-                      <p className="text-sm font-medium text-foreground">{file.name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {file.type || "desconocido"} · {formatFileSize(file.size)}
-                      </p>
+              {/* Dropzone */}
+              <div
+                 onDrop={onDrop}
+                 onDragOver={onDragOver}
+                 onDragLeave={onDragLeave}
+                 className={`relative rounded-xl border-2 border-dashed p-8 transition-all duration-200 ${
+                    dragActive 
+                    ? "border-zinc-500 bg-zinc-800/50" 
+                    : "border-zinc-800 bg-zinc-900/30 hover:border-zinc-700 hover:bg-zinc-900/50"
+                 }`}
+              >
+                 <div className="flex flex-col items-center justify-center text-center">
+                    <div className="h-12 w-12 rounded-xl bg-zinc-800 flex items-center justify-center mb-4">
+                       <UploadCloud className="h-6 w-6 text-zinc-400" />
                     </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setFile(null)}
-                    className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs hover:bg-muted"
-                  >
-                    <X className="h-3 w-3" /> Quitar
-                  </button>
-                </div>
-
-                {previewUrl && (
-                  <div className="mt-3 overflow-hidden rounded-md border">
-                    {/* Vista previa imagen */}
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={previewUrl} alt="Vista previa" className="max-h-56 w-full object-contain" />
-                  </div>
-                )}
+                    <p className="text-sm text-zinc-300 mb-1">
+                       Arrastra tu archivo aquí o
+                       <label className="mx-1 cursor-pointer font-medium text-white hover:underline">
+                          <input
+                             type="file"
+                             className="sr-only"
+                             accept="image/*,application/pdf"
+                             onChange={(e) => setFile(e.target.files?.[0] || null)}
+                          />
+                          selecciónalo
+                       </label>
+                    </p>
+                    <p className="text-xs text-zinc-500">Acepta imágenes y PDF</p>
+                 </div>
               </div>
-            )}
 
-            {/* Acciones */}
-            <div className="flex items-center gap-3">
-              <Button type="submit" disabled={loading} className="gap-2" variant="panel">
-                {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-                {loading ? "Subiendo..." : "Subir y analizar"}
-              </Button>
-              {error && (
-                <span className="inline-flex items-center gap-1 text-xs text-destructive">
-                  <AlertTriangle className="h-3 w-3" /> {error}
-                </span>
+              {/* Resumen archivo */}
+              {file && (
+                 <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-4">
+                    <div className="flex items-center justify-between">
+                       <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 rounded-lg bg-zinc-800 flex items-center justify-center">
+                             {file.type.startsWith("image/") ? (
+                                <ImageIcon className="h-5 w-5 text-zinc-400" />
+                             ) : (
+                                <FileText className="h-5 w-5 text-zinc-400" />
+                             )}
+                          </div>
+                          <div>
+                             <p className="text-sm font-medium text-white">{file.name}</p>
+                             <p className="text-xs text-zinc-500">
+                                {file.type || "desconocido"} · {formatFileSize(file.size)}
+                             </p>
+                          </div>
+                       </div>
+                       <button
+                          type="button"
+                          onClick={() => setFile(null)}
+                          className="p-2 text-zinc-500 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors"
+                       >
+                          <X className="h-4 w-4" />
+                       </button>
+                    </div>
+                    {previewUrl && (
+                       <div className="mt-4 overflow-hidden rounded-lg border border-zinc-800 bg-black/20">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={previewUrl} alt="Vista previa" className="max-h-64 w-full object-contain p-2" />
+                       </div>
+                    )}
+                 </div>
               )}
-            </div>
 
-            {/* Resultado */}
-            {result && (
-              <div className="rounded-md border bg-card p-4 text-sm" aria-live="polite">
-                {result}
+              {/* Actions */}
+              <div className="flex items-center gap-3">
+                 <Button type="submit" disabled={loading} className="bg-white text-black hover:bg-zinc-200" size="sm">
+                    {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {loading ? "Subiendo..." : "Subir y analizar"}
+                 </Button>
+                 {error && (
+                    <p className="text-sm text-red-400">{error}</p>
+                 )}
+                 {result && (
+                    <p className="text-sm text-green-400">{result}</p>
+                 )}
               </div>
-            )}
-          </form>
-        </CardContent>
-      </Card>
-    </section>
+           </form>
+        </div>
+    </div>
   );
 }

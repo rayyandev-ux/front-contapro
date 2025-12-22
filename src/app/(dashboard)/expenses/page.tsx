@@ -5,9 +5,8 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { apiJson, invalidateApiCache } from "@/lib/api";
 import { revalidateBudget } from "@/app/actions";
-import { Card, CardHeader, CardTitle, CardContent, CardAction } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Eye, Image as ImageIcon, Trash2, Filter, Calendar, Search, FileText } from "lucide-react";
+import { Eye, Image as ImageIcon, Trash2, Filter, Calendar, Search, FileText, ChevronUp, ChevronDown } from "lucide-react";
 import RealtimeRefresh from "@/components/RealtimeRefresh";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -76,22 +75,16 @@ export default function Page() {
   }, [filters]);
 
   const typeBadge = (type: Expense["type"]) => {
-    if (type === "FACTURA") return "bg-blue-500/10 text-blue-500 ring-1 ring-blue-500/20";
-    if (type === "BOLETA") return "bg-orange-500/10 text-orange-500 ring-1 ring-orange-500/20";
+    if (type === "FACTURA") return "bg-zinc-500/10 text-zinc-300 ring-1 ring-zinc-500/20";
+    if (type === "BOLETA") return "bg-zinc-500/10 text-zinc-300 ring-1 ring-zinc-500/20";
     return "bg-muted text-foreground ring-1 ring-border";
   };
 
   const paymentBadge = (provider?: string) => {
     const p = String(provider || '').toUpperCase();
-    if (p === 'YAPE') return 'bg-violet-500/10 text-violet-600 ring-1 ring-violet-500/20';
-    if (p === 'PLIN') return 'bg-emerald-500/10 text-emerald-600 ring-1 ring-emerald-500/20';
-    if (p === 'TUNKI') return 'bg-pink-500/10 text-pink-600 ring-1 ring-pink-500/20';
-    if (p === 'LEMONPAY') return 'bg-yellow-500/10 text-yellow-700 ring-1 ring-yellow-500/20';
-    if (p === 'BCP') return 'bg-blue-500/10 text-blue-600 ring-1 ring-blue-500/20';
-    if (p === 'INTERBANK') return 'bg-teal-500/10 text-teal-600 ring-1 ring-teal-500/20';
-    if (p === 'SCOTIABANK') return 'bg-red-500/10 text-red-600 ring-1 ring-red-500/20';
-    if (p === 'BBVA') return 'bg-indigo-500/10 text-indigo-600 ring-1 ring-indigo-500/20';
-    if (p === 'EFECTIVO') return 'bg-gray-500/10 text-gray-700 ring-1 ring-gray-500/20';
+    if (['YAPE', 'PLIN', 'TUNKI', 'LEMONPAY', 'BCP', 'INTERBANK', 'SCOTIABANK', 'BBVA', 'EFECTIVO'].includes(p)) {
+      return 'bg-zinc-500/10 text-zinc-300 ring-1 ring-zinc-500/20';
+    }
     return 'bg-muted text-foreground ring-1 ring-border';
   };
 
@@ -200,165 +193,208 @@ export default function Page() {
   return (
     <section>
       <RealtimeRefresh />
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-semibold">Gastos</h1>
-        <Button asChild variant="panel">
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-semibold text-white">Gastos</h1>
+        <Button asChild className="bg-white text-black hover:bg-zinc-200">
           <Link href="/expenses/new">Añadir gasto</Link>
         </Button>
       </div>
 
-      <Card className="mb-4 panel-bg">
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Filter className="h-4 w-4 text-muted-foreground" />
-            <CardTitle>Filtros</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-y-3 gap-x-5">
-            <div className="space-y-1 lg:col-span-2">
-              <label className="block text-xs font-medium text-muted-foreground">Tipo</label>
-              <select className="border rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-primary/30" value={filters.type || ""} onChange={e => setFilters(f => ({ ...f, type: e.target.value || undefined }))}>
+      <div className="mb-6 bg-zinc-900/50 border border-zinc-800/50 rounded-2xl overflow-hidden">
+        <div className="p-4 border-b border-zinc-800/50 flex items-center gap-2">
+          <Filter className="h-4 w-4 text-zinc-400" />
+          <h3 className="text-sm font-medium text-white">Filtros</h3>
+        </div>
+        <div className="p-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-y-4 gap-x-5">
+            <div className="space-y-1.5 lg:col-span-2">
+              <label className="block text-xs font-medium text-zinc-500 uppercase tracking-wider">Tipo</label>
+              <select 
+                className="w-full rounded-lg border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-sm text-zinc-300 focus:border-zinc-700 focus:outline-none focus:ring-1 focus:ring-zinc-700"
+                value={filters.type || ""} 
+                onChange={e => setFilters(f => ({ ...f, type: e.target.value || undefined }))}
+              >
                 <option value="">Todos</option>
                 <option value="FACTURA">Factura</option>
                 <option value="BOLETA">Boleta</option>
                 <option value="INFORMAL">Informal</option>
               </select>
             </div>
-            <div className="space-y-1 lg:col-span-4">
-              <label className="text-xs font-medium text-muted-foreground">Proveedor</label>
+            <div className="space-y-1.5 lg:col-span-4">
+              <label className="block text-xs font-medium text-zinc-500 uppercase tracking-wider">Proveedor</label>
               <div className="relative">
-                <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <input className="border rounded-md p-2 pl-8 w-full focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="Buscar" value={filters.provider || ""} onChange={e => setFilters(f => ({ ...f, provider: e.target.value || undefined }))} />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                <input 
+                  className="w-full rounded-lg border border-zinc-800 bg-zinc-900/50 pl-9 pr-3 py-2 text-sm text-zinc-300 placeholder:text-zinc-600 focus:border-zinc-700 focus:outline-none focus:ring-1 focus:ring-zinc-700"
+                  placeholder="Buscar proveedor..." 
+                  value={filters.provider || ""} 
+                  onChange={e => setFilters(f => ({ ...f, provider: e.target.value || undefined }))} 
+                />
               </div>
             </div>
-            <div className="space-y-1 lg:col-span-3">
-              <label className="text-xs font-medium text-muted-foreground">Desde</label>
+            <div className="space-y-1.5 lg:col-span-3">
+              <label className="block text-xs font-medium text-zinc-500 uppercase tracking-wider">Desde</label>
               <div className="relative">
-                <Calendar className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <input type="date" className="border rounded-md p-2 pl-8 w-full focus:outline-none focus:ring-2 focus:ring-primary/30" value={filters.start || ""} onChange={e => setFilters(f => ({ ...f, start: e.target.value || undefined }))} />
+                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                <input 
+                  type="date" 
+                  className="w-full rounded-lg border border-zinc-800 bg-zinc-900/50 pl-9 pr-3 py-2 text-sm text-zinc-300 focus:border-zinc-700 focus:outline-none focus:ring-1 focus:ring-zinc-700 [color-scheme:dark]"
+                  value={filters.start || ""} 
+                  onChange={e => setFilters(f => ({ ...f, start: e.target.value || undefined }))} 
+                />
               </div>
             </div>
-            <div className="space-y-1 lg:col-span-3">
-              <label className="text-xs font-medium text-muted-foreground">Hasta</label>
+            <div className="space-y-1.5 lg:col-span-3">
+              <label className="block text-xs font-medium text-zinc-500 uppercase tracking-wider">Hasta</label>
               <div className="relative">
-                <Calendar className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <input type="date" className="border rounded-md p-2 pl-8 w-full focus:outline-none focus:ring-2 focus:ring-primary/30" value={filters.end || ""} onChange={e => setFilters(f => ({ ...f, end: e.target.value || undefined }))} />
+                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                <input 
+                  type="date" 
+                  className="w-full rounded-lg border border-zinc-800 bg-zinc-900/50 pl-9 pr-3 py-2 text-sm text-zinc-300 focus:border-zinc-700 focus:outline-none focus:ring-1 focus:ring-zinc-700 [color-scheme:dark]"
+                  value={filters.end || ""} 
+                  onChange={e => setFilters(f => ({ ...f, end: e.target.value || undefined }))} 
+                />
               </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      <Card className="panel-bg">
-        <CardHeader>
-          <CardTitle>Gastos del mes actual</CardTitle>
-          <CardAction className="hidden md:flex col-span-2 justify-self-center row-start-2 w-full">
-            <div className="w-full flex flex-wrap items-center justify-center gap-3">
-              <label className="inline-flex items-center gap-2 text-xs text-muted-foreground">
-                <input type="checkbox" role="checkbox" className="h-4 w-4 rounded border-input checkbox-gray" checked={isAllSelected} onChange={toggleSelectAll} />
+      <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-2xl overflow-hidden">
+        <div className="p-4 border-b border-zinc-800/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <h3 className="text-sm font-medium text-white">Gastos del mes actual</h3>
+          <div className="hidden md:flex items-center gap-3">
+             <label className="inline-flex items-center gap-2 text-xs text-zinc-400">
+                <input 
+                  type="checkbox" 
+                  role="checkbox" 
+                  className="h-4 w-4 rounded border-zinc-700 bg-zinc-800/50 text-white focus:ring-0 focus:ring-offset-0" 
+                  checked={isAllSelected} 
+                  onChange={toggleSelectAll} 
+                />
                 Seleccionar todos
               </label>
-              <span className="text-xs text-muted-foreground">Seleccionados: {selectedCount}</span>
-              <Button size="sm" variant="panel" onClick={onBulkDelete} disabled={selectedCount === 0}>Eliminar seleccionados</Button>
-            </div>
-          </CardAction>
-        </CardHeader>
-        <CardContent>
+              <span className="text-xs text-zinc-500">Seleccionados: {selectedCount}</span>
+              <Button 
+                size="sm" 
+                variant="outline" 
+                onClick={onBulkDelete} 
+                disabled={selectedCount === 0}
+                className="h-8 border-zinc-800 bg-zinc-900/50 text-zinc-300 hover:bg-zinc-800 hover:text-white"
+              >
+                Eliminar
+              </Button>
+          </div>
+        </div>
+        <div className="p-0">
           <div className="overflow-x-auto hidden md:block">
             <Table>
               <TableHeader>
-                <TableRow className="bg-muted">
-                  <TableHead>
-                    <input type="checkbox" role="checkbox" className="h-4 w-4 rounded border-input checkbox-gray" checked={isAllSelected} onChange={toggleSelectAll} />
+                <TableRow className="border-b border-zinc-800/50 hover:bg-transparent">
+                  <TableHead className="w-[40px] px-4">
+                    <input 
+                      type="checkbox" 
+                      role="checkbox" 
+                      className="h-4 w-4 rounded border-zinc-700 bg-zinc-800/50 text-white focus:ring-0 focus:ring-offset-0" 
+                      checked={isAllSelected} 
+                      onChange={toggleSelectAll} 
+                    />
                   </TableHead>
-                  <TableHead>Fecha real</TableHead>
-                  <TableHead>Registro</TableHead>
-                    <TableHead>Tipo</TableHead>
-                    <TableHead>Método de pago</TableHead>
-                    <TableHead>Proveedor</TableHead>
-                  <TableHead>Categoría</TableHead>
-                  <TableHead className="text-right">Monto</TableHead>
-                  <TableHead className="text-right">Acciones</TableHead>
+                  <TableHead className="text-xs font-medium text-zinc-500 uppercase tracking-wider h-10">Fecha real</TableHead>
+                  <TableHead className="text-xs font-medium text-zinc-500 uppercase tracking-wider h-10">Registro</TableHead>
+                  <TableHead className="text-xs font-medium text-zinc-500 uppercase tracking-wider h-10">Tipo</TableHead>
+                  <TableHead className="text-xs font-medium text-zinc-500 uppercase tracking-wider h-10">Método de pago</TableHead>
+                  <TableHead className="text-xs font-medium text-zinc-500 uppercase tracking-wider h-10">Proveedor</TableHead>
+                  <TableHead className="text-xs font-medium text-zinc-500 uppercase tracking-wider h-10">Categoría</TableHead>
+                  <TableHead className="text-xs font-medium text-zinc-500 uppercase tracking-wider h-10 text-right">Monto</TableHead>
+                  <TableHead className="text-xs font-medium text-zinc-500 uppercase tracking-wider h-10 text-right">Acciones</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {loading && (
-                  <TableRow>
-                    <TableCell colSpan={8}>Cargando...</TableCell>
+                  <TableRow className="hover:bg-transparent border-b border-zinc-800/50">
+                    <TableCell colSpan={9} className="h-24 text-center text-zinc-500">Cargando...</TableCell>
                   </TableRow>
                 )}
                 {error && (
-                  <TableRow>
-                    <TableCell colSpan={8} className="text-red-600">{error}</TableCell>
+                  <TableRow className="hover:bg-transparent border-b border-zinc-800/50">
+                    <TableCell colSpan={9} className="h-24 text-center text-red-400">{error}</TableCell>
                   </TableRow>
                 )}
                 {!loading && !error && currentItems.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={8}>No hay gastos</TableCell>
+                  <TableRow className="hover:bg-transparent border-b border-zinc-800/50">
+                    <TableCell colSpan={9} className="h-24 text-center text-zinc-500">No hay gastos registrados este mes</TableCell>
                   </TableRow>
                 )}
                 {currentItems.map(it => (
-                  <TableRow key={it.id} className="hover:bg-muted/50">
-                    <TableCell>
-                      <input type="checkbox" role="checkbox" className="h-4 w-4 rounded border-input checkbox-gray" checked={selected.has(it.id)} onChange={() => toggleSelect(it.id)} />
+                  <TableRow key={it.id} className="border-b border-zinc-800/50 hover:bg-zinc-800/30 transition-colors">
+                    <TableCell className="px-4">
+                      <input 
+                        type="checkbox" 
+                        role="checkbox" 
+                        className="h-4 w-4 rounded border-zinc-700 bg-zinc-800/50 text-white focus:ring-0 focus:ring-offset-0" 
+                        checked={selected.has(it.id)} 
+                        onChange={() => toggleSelect(it.id)} 
+                      />
                     </TableCell>
-                    <TableCell className="whitespace-nowrap">{new Date(it.issuedAt).toLocaleDateString('es-PE')}</TableCell>
-                    <TableCell className="whitespace-nowrap">{new Date(it.createdAt).toLocaleDateString('es-PE')}</TableCell>
+                    <TableCell className="whitespace-nowrap text-zinc-300 text-xs">{new Date(it.issuedAt).toLocaleDateString('es-PE')}</TableCell>
+                    <TableCell className="whitespace-nowrap text-zinc-500 text-xs">{new Date(it.createdAt).toLocaleDateString('es-PE')}</TableCell>
                     <TableCell>
-                      <span className={`inline-flex rounded-md px-2 py-0.5 text-xs ${typeBadge(it.type)}`}>
+                      <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-medium tracking-wide ${typeBadge(it.type)}`}>
                         {(it.type === 'FACTURA' || it.type === 'BOLETA') ? it.type : 'INFORMAL'}
                       </span>
                     </TableCell>
                     <TableCell className="whitespace-nowrap">
                       {it.paymentMethod ? (
-                        <span className={`inline-flex rounded-md px-2 py-0.5 text-xs ${paymentBadge(it.paymentMethod.provider)}`}>
+                        <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-medium tracking-wide ${paymentBadge(it.paymentMethod.provider)}`}>
                           {it.paymentMethod.provider}{it.paymentMethod.name ? ` — ${it.paymentMethod.name}` : ''}
                         </span>
-                      ) : '—'}
+                      ) : <span className="text-zinc-600 text-xs">—</span>}
                     </TableCell>
-                    <TableCell>{it.provider}</TableCell>
+                    <TableCell className="text-zinc-300 text-sm font-medium">{it.provider}</TableCell>
                     <TableCell>
                       {it.category?.name ? (
-                        <span className="inline-flex rounded-md bg-muted px-2 py-0.5 text-xs text-foreground ring-1 ring-border">
+                        <span className="inline-flex rounded-full bg-zinc-800 px-2 py-0.5 text-[10px] font-medium text-zinc-300 border border-zinc-700">
                           {it.category.name}
                         </span>
                       ) : (
-                        "—"
+                        <span className="text-zinc-600 text-xs">—</span>
                       )}
                     </TableCell>
-                    <TableCell className="text-right">{formatAmount(it.amount, it.currency)}</TableCell>
+                    <TableCell className="text-right text-zinc-300 font-medium tabular-nums">{formatAmount(it.amount, it.currency)}</TableCell>
                     <TableCell className="text-right">
-                      <Link href={`/expenses/${it.id}`} className="mr-2 inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm hover:bg-muted">
-                        <Eye className="h-4 w-4" /> Ver
-                      </Link>
-                      {it.document && (
-                        it.document.mimeType?.startsWith("image/") ? (
-                          <a
-                            href={`/api/proxy/documents/${it.document.id}/preview`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="mr-2 inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm hover:bg-muted"
-                          >
-                            <ImageIcon className="h-4 w-4" /> Foto
-                          </a>
-                        ) : it.document.mimeType?.startsWith("application/pdf") ? (
-                          <a
-                            href={`/api/proxy/documents/${it.document.id}/preview`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="mr-2 inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm hover:bg-muted"
-                          >
-                            <FileText className="h-4 w-4" /> PDF
-                          </a>
-                        ) : null
-                      )}
-                      <button
-                        className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm text-destructive hover:bg-destructive/10"
-                        onClick={() => onDelete(it.id)}
-                      >
-                        <Trash2 className="h-4 w-4" /> Eliminar
-                      </button>
+                      <div className="flex items-center justify-end gap-1">
+                        <Link href={`/expenses/${it.id}`} className="inline-flex items-center justify-center h-7 w-7 rounded-md text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors">
+                          <Eye className="h-4 w-4" />
+                        </Link>
+                        {it.document && (
+                          it.document.mimeType?.startsWith("image/") ? (
+                            <a
+                              href={`/api/proxy/documents/${it.document.id}/preview`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center justify-center h-7 w-7 rounded-md text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
+                            >
+                              <ImageIcon className="h-4 w-4" />
+                            </a>
+                          ) : it.document.mimeType?.startsWith("application/pdf") ? (
+                            <a
+                              href={`/api/proxy/documents/${it.document.id}/preview`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center justify-center h-7 w-7 rounded-md text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
+                            >
+                              <FileText className="h-4 w-4" />
+                            </a>
+                          ) : null
+                        )}
+                        <button
+                          className="inline-flex items-center justify-center h-7 w-7 rounded-md text-zinc-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                          onClick={() => onDelete(it.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -366,93 +402,88 @@ export default function Page() {
             </Table>
           </div>
 
-          <div className="md:hidden space-y-3">
+          <div className="md:hidden space-y-3 p-4">
             {currentItems.length > 0 && (
-              <div className="flex items-center justify-center gap-3">
-                <label className="inline-flex items-center gap-2 text-xs text-muted-foreground">
-                  <input type="checkbox" role="checkbox" className="h-4 w-4 rounded border-input checkbox-gray" checked={isAllSelected} onChange={toggleSelectAll} />
+              <div className="flex items-center justify-between mb-4">
+                <label className="inline-flex items-center gap-2 text-xs text-zinc-400">
+                  <input 
+                    type="checkbox" 
+                    role="checkbox" 
+                    className="h-4 w-4 rounded border-zinc-700 bg-zinc-800/50 text-white" 
+                    checked={isAllSelected} 
+                    onChange={toggleSelectAll} 
+                  />
                   Seleccionar todos
                 </label>
-                <span className="text-xs text-muted-foreground">Seleccionados: {selectedCount}</span>
-                <Button size="sm" variant="panel" onClick={onBulkDelete} disabled={selectedCount === 0}>Eliminar</Button>
+                <Button size="sm" variant="outline" onClick={onBulkDelete} disabled={selectedCount === 0} className="h-7 text-xs border-zinc-800 bg-zinc-900/50">Eliminar ({selectedCount})</Button>
               </div>
             )}
-            {loading && <div className="text-sm">Cargando...</div>}
-            {error && <div className="text-sm text-red-600">{error}</div>}
-            {!loading && !error && currentItems.length === 0 && <div className="text-sm">No hay gastos</div>}
+            
+            {loading && <div className="text-sm text-center text-zinc-500">Cargando...</div>}
+            {error && <div className="text-sm text-center text-red-400">{error}</div>}
+            {!loading && !error && currentItems.length === 0 && <div className="text-sm text-center text-zinc-500">No hay gastos</div>}
+            
             {currentItems.map(it => (
-              <div key={it.id} className="rounded-lg border p-3 shadow-sm">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <input type="checkbox" role="checkbox" className="h-4 w-4 rounded border-input checkbox-gray" checked={selected.has(it.id)} onChange={() => toggleSelect(it.id)} />
-                    <div className="text-sm font-medium">{it.provider || '—'}</div>
+              <div key={it.id} className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-4">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-3">
+                    <input 
+                      type="checkbox" 
+                      role="checkbox" 
+                      className="h-4 w-4 rounded border-zinc-700 bg-zinc-800/50 text-white" 
+                      checked={selected.has(it.id)} 
+                      onChange={() => toggleSelect(it.id)} 
+                    />
+                    <div>
+                       <div className="text-sm font-medium text-white">{it.provider || 'Proveedor desconocido'}</div>
+                       <div className="text-xs text-zinc-500">{new Date(it.issuedAt).toLocaleDateString('es-PE')}</div>
+                    </div>
                   </div>
-                  <div className="text-xs text-muted-foreground">{new Date(it.issuedAt).toLocaleDateString('es-PE')}</div>
-                </div>
-                <div className="mt-1 flex items-center gap-2">
-                  <span className={`inline-flex rounded-md px-2 py-0.5 text-xs ring-1 ${typeBadge(it.type)}`}>{(it.type === 'FACTURA' || it.type === 'BOLETA') ? it.type : 'INFORMAL'}</span>
-                  {it.category?.name ? (
-                    <span className="inline-flex rounded-md bg-muted px-2 py-0.5 text-xs text-foreground ring-1 ring-border">{it.category.name}</span>
-                  ) : (
-                    <span className="text-xs text-muted-foreground">Sin categoría</span>
-                  )}
-                </div>
-                {it.paymentMethod && (
-                  <div className="mt-1">
-                    <span className={`inline-flex rounded-md px-2 py-0.5 text-xs ${paymentBadge(it.paymentMethod.provider)}`}>
-                      {it.paymentMethod.provider}{it.paymentMethod.name ? ` — ${it.paymentMethod.name}` : ""}
-                    </span>
+                  <div className="text-right">
+                    <div className="text-sm font-semibold text-white">{formatAmount(it.amount, it.currency)}</div>
                   </div>
-                )}
-                <div className="mt-2 text-base font-semibold">{formatAmount(it.amount, it.currency)}</div>
-                <div className="mt-1 text-xs text-muted-foreground">Fecha real: {new Date(it.issuedAt).toLocaleDateString('es-PE')} · Registro: {new Date(it.createdAt).toLocaleDateString('es-PE')}</div>
+                </div>
+                
                 <div className="mt-3 flex flex-wrap items-center gap-2">
-                  <Link href={`/expenses/${it.id}`} className="inline-flex items-center gap-1 rounded-md border px-3 py-1 text-sm hover:bg-muted">
-                    <Eye className="h-4 w-4" /> Ver
-                  </Link>
-                  {it.document && (
-                    it.document.mimeType?.startsWith('image/') ? (
-                      <a href={`/api/proxy/documents/${it.document.id}/preview`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 rounded-md border px-3 py-1 text-sm hover:bg-muted">
-                        <ImageIcon className="h-4 w-4" /> Foto
-                      </a>
-                    ) : it.document.mimeType?.startsWith('application/pdf') ? (
-                      <a href={`/api/proxy/documents/${it.document.id}/preview`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 rounded-md border px-3 py-1 text-sm hover:bg-muted">
-                        <FileText className="h-4 w-4" /> PDF
-                      </a>
-                    ) : null
+                  <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-medium ${typeBadge(it.type)}`}>
+                    {(it.type === 'FACTURA' || it.type === 'BOLETA') ? it.type : 'INFORMAL'}
+                  </span>
+                  {it.category?.name && (
+                    <span className="inline-flex rounded-full bg-zinc-800 px-2 py-0.5 text-[10px] font-medium text-zinc-300 border border-zinc-700">
+                      {it.category.name}
+                    </span>
                   )}
-                  <button className="inline-flex items-center gap-1 rounded-md border px-3 py-1 text-sm text-destructive hover:bg-destructive/10" onClick={() => onDelete(it.id)}>
-                    <Trash2 className="h-4 w-4" /> Eliminar
-                  </button>
+                </div>
+
+                <div className="mt-3 flex items-center justify-end gap-2 border-t border-zinc-800/50 pt-3">
+                   <Link href={`/expenses/${it.id}`} className="text-xs text-zinc-400 hover:text-white">Ver detalle</Link>
                 </div>
               </div>
             ))}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {prevMonths.length > 0 && (
-        <Card className="mt-6 panel-bg">
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              Gastos de meses anteriores
-              <Button variant="panel" size="sm" className="transition-transform active:scale-95" onClick={() => setOpenPrev(v => !v)}>
-                {openPrev ? "Ocultar" : "Mostrar"}
-              </Button>
-            </CardTitle>
-          </CardHeader>
+        <div className="mt-6 bg-zinc-900/50 border border-zinc-800/50 rounded-2xl overflow-hidden">
+          <div className="p-4 border-b border-zinc-800/50 flex items-center justify-between cursor-pointer hover:bg-zinc-800/30 transition-colors" onClick={() => setOpenPrev(v => !v)}>
+            <h3 className="text-sm font-medium text-white">Gastos de meses anteriores</h3>
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-zinc-400 hover:text-white hover:bg-zinc-800">
+              {openPrev ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </Button>
+          </div>
           <AnimatePresence initial={false}>
           {openPrev && (
-            <motion.div initial={{ height: 0, opacity: 0, y: -8 }} animate={{ height: 'auto', opacity: 1, y: 0 }} exit={{ height: 0, opacity: 0, y: -6 }} transition={{ duration: 0.25 }} className="overflow-hidden">
-            <CardContent>
-              <div className="text-xs text-muted-foreground mb-2">Selecciona un mes</div>
+            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25 }} className="overflow-hidden">
+            <div className="p-4">
+              <div className="text-xs text-zinc-500 mb-2">Selecciona un mes</div>
               <div className="flex flex-wrap gap-2 mb-4">
                 {prevMonths.map(m => (
                   <Button
                     key={`prev-exp-${m}`}
-                    variant="panel"
+                    variant="outline"
                     size="sm"
-                    className={prevMonth === m ? "ring-1 ring-border" : ""}
+                    className={`h-8 border-zinc-800 bg-zinc-900/50 text-zinc-300 hover:bg-zinc-800 hover:text-white ${prevMonth === m ? "ring-1 ring-zinc-500 border-zinc-500" : ""}`}
                     onClick={async () => {
                       setPrevMonth(m);
                       setPrevLoading(true);
@@ -479,58 +510,60 @@ export default function Page() {
               </div>
               {prevMonth != null && (
                 <div className="space-y-2">
-                  {prevLoading && (<div className="text-sm text-muted-foreground">Cargando…</div>)}
-                  {prevError && (<div className="text-sm text-red-700">{prevError}</div>)}
-                  {!prevLoading && !prevError && prevList.length === 0 && (<div className="text-sm text-muted-foreground">Sin datos</div>)}
+                  {prevLoading && (<div className="text-sm text-zinc-500">Cargando…</div>)}
+                  {prevError && (<div className="text-sm text-red-400">{prevError}</div>)}
+                  {!prevLoading && !prevError && prevList.length === 0 && (<div className="text-sm text-zinc-500">Sin datos</div>)}
                   {!prevLoading && !prevError && prevList.length > 0 && (
                     <div className="overflow-x-auto hidden md:block">
                       <Table>
                         <TableHeader>
-                          <TableRow className="bg-muted">
-                            <TableHead>Fecha real</TableHead>
-                            <TableHead>Registro</TableHead>
-                            <TableHead>Tipo</TableHead>
-                            <TableHead>Proveedor</TableHead>
-                            <TableHead>Categoría</TableHead>
-                            <TableHead className="text-right">Monto</TableHead>
-                            <TableHead className="text-right">Acciones</TableHead>
+                          <TableRow className="border-b border-zinc-800/50 hover:bg-transparent">
+                            <TableHead className="text-xs font-medium text-zinc-500 uppercase tracking-wider h-10">Fecha real</TableHead>
+                            <TableHead className="text-xs font-medium text-zinc-500 uppercase tracking-wider h-10">Registro</TableHead>
+                            <TableHead className="text-xs font-medium text-zinc-500 uppercase tracking-wider h-10">Tipo</TableHead>
+                            <TableHead className="text-xs font-medium text-zinc-500 uppercase tracking-wider h-10">Proveedor</TableHead>
+                            <TableHead className="text-xs font-medium text-zinc-500 uppercase tracking-wider h-10">Categoría</TableHead>
+                            <TableHead className="text-xs font-medium text-zinc-500 uppercase tracking-wider h-10 text-right">Monto</TableHead>
+                            <TableHead className="text-xs font-medium text-zinc-500 uppercase tracking-wider h-10 text-right">Acciones</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
                           {prevList.map(it => (
-                            <TableRow key={it.id} className="hover:bg-muted/50">
-                              <TableCell className="whitespace-nowrap">{new Date(it.issuedAt).toLocaleDateString('es-PE')}</TableCell>
-                              <TableCell className="whitespace-nowrap">{new Date(it.createdAt).toLocaleDateString('es-PE')}</TableCell>
+                            <TableRow key={it.id} className="border-b border-zinc-800/50 hover:bg-zinc-800/30 transition-colors">
+                              <TableCell className="whitespace-nowrap text-zinc-300 text-xs">{new Date(it.issuedAt).toLocaleDateString('es-PE')}</TableCell>
+                              <TableCell className="whitespace-nowrap text-zinc-500 text-xs">{new Date(it.createdAt).toLocaleDateString('es-PE')}</TableCell>
                               <TableCell>
-                                <span className={`inline-flex rounded-md px-2 py-0.5 text-xs ring-1 ${typeBadge(it.type)}`}>{it.type}</span>
+                                <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-medium tracking-wide ${typeBadge(it.type)}`}>{it.type}</span>
                               </TableCell>
-                              <TableCell>{it.provider}</TableCell>
+                              <TableCell className="text-zinc-300 text-sm font-medium">{it.provider}</TableCell>
                               <TableCell>
                                 {it.category?.name ? (
-                                  <span className="inline-flex rounded-md bg-muted px-2 py-0.5 text-xs text-foreground ring-1 ring-border">{it.category.name}</span>
+                                  <span className="inline-flex rounded-full bg-zinc-800 px-2 py-0.5 text-[10px] font-medium text-zinc-300 border border-zinc-700">{it.category.name}</span>
                                 ) : (
-                                  "—"
+                                  <span className="text-zinc-600 text-xs">—</span>
                                 )}
                               </TableCell>
-                              <TableCell className="text-right">{formatAmount(it.amount, it.currency)}</TableCell>
+                              <TableCell className="text-right text-zinc-300 font-medium tabular-nums">{formatAmount(it.amount, it.currency)}</TableCell>
                               <TableCell className="text-right">
-                                <Link href={`/expenses/${it.id}`} className="mr-2 inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm hover:bg-muted">
-                                  <Eye className="h-4 w-4" /> Ver
-                                </Link>
-                                {it.document && (
-                                  it.document.mimeType?.startsWith("image/") ? (
-                                    <a href={`/api/proxy/documents/${it.document.id}/preview`} target="_blank" rel="noreferrer" className="mr-2 inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm hover:bg-muted">
-                                      <ImageIcon className="h-4 w-4" /> Foto
-                                    </a>
-                                  ) : it.document.mimeType?.startsWith("application/pdf") ? (
-                                    <a href={`/api/proxy/documents/${it.document.id}/preview`} target="_blank" rel="noreferrer" className="mr-2 inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm hover:bg-muted">
-                                      <FileText className="h-4 w-4" /> PDF
-                                    </a>
-                                  ) : null
-                                )}
-                                <button className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm text-destructive hover:bg-destructive/10" onClick={() => onDelete(it.id)}>
-                                  <Trash2 className="h-4 w-4" /> Eliminar
-                                </button>
+                                <div className="flex items-center justify-end gap-1">
+                                  <Link href={`/expenses/${it.id}`} className="inline-flex items-center justify-center h-7 w-7 rounded-md text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors">
+                                    <Eye className="h-4 w-4" />
+                                  </Link>
+                                  {it.document && (
+                                    it.document.mimeType?.startsWith("image/") ? (
+                                      <a href={`/api/proxy/documents/${it.document.id}/preview`} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center h-7 w-7 rounded-md text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors">
+                                        <ImageIcon className="h-4 w-4" />
+                                      </a>
+                                    ) : it.document.mimeType?.startsWith("application/pdf") ? (
+                                      <a href={`/api/proxy/documents/${it.document.id}/preview`} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center h-7 w-7 rounded-md text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors">
+                                        <FileText className="h-4 w-4" />
+                                      </a>
+                                    ) : null
+                                  )}
+                                  <button className="inline-flex items-center justify-center h-7 w-7 rounded-md text-zinc-500 hover:text-red-400 hover:bg-red-500/10 transition-colors" onClick={() => onDelete(it.id)}>
+                                    <Trash2 className="h-4 w-4" />
+                                  </button>
+                                </div>
                               </TableCell>
                             </TableRow>
                           ))}
@@ -541,39 +574,25 @@ export default function Page() {
                   {!prevLoading && !prevError && prevList.length > 0 && (
                     <div className="md:hidden space-y-3">
                       {prevList.map(it => (
-                        <div key={it.id} className="rounded-lg border p-3 shadow-sm">
-                          <div className="flex items-center justify-between">
-                            <div className="text-sm font-medium">{it.provider || '—'}</div>
-                            <div className="text-xs text-muted-foreground">{new Date(it.issuedAt).toLocaleDateString('es-PE')}</div>
+                        <div key={it.id} className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-4">
+                          <div className="flex items-start justify-between">
+                            <div>
+                               <div className="text-sm font-medium text-white">{it.provider || 'Proveedor desconocido'}</div>
+                               <div className="text-xs text-zinc-500">{new Date(it.issuedAt).toLocaleDateString('es-PE')}</div>
+                            </div>
+                            <div className="text-right">
+                               <div className="text-sm font-semibold text-white">{formatAmount(it.amount, it.currency)}</div>
+                            </div>
                           </div>
-                          <div className="mt-1 flex items-center gap-2">
-                            <span className={`inline-flex rounded-md px-2 py-0.5 text-xs ring-1 ${typeBadge(it.type)}`}>{it.type}</span>
-                            {it.category?.name ? (
-                              <span className="inline-flex rounded-md bg-muted px-2 py-0.5 text-xs text-foreground ring-1 ring-border">{it.category.name}</span>
-                            ) : (
-                              <span className="text-xs text-muted-foreground">Sin categoría</span>
-                            )}
-                          </div>
-                          <div className="mt-2 text-base font-semibold">{formatAmount(it.amount, it.currency)}</div>
-                          <div className="mt-1 text-xs text-muted-foreground">Fecha real: {new Date(it.issuedAt).toLocaleDateString('es-PE')} · Registro: {new Date(it.createdAt).toLocaleDateString('es-PE')}</div>
                           <div className="mt-3 flex flex-wrap items-center gap-2">
-                            <Link href={`/expenses/${it.id}`} className="inline-flex items-center gap-1 rounded-md border px-3 py-1 text-sm hover:bg-muted">
-                              <Eye className="h-4 w-4" /> Ver
-                            </Link>
-                            {it.document && (
-                              it.document.mimeType?.startsWith('image/') ? (
-                                <a href={`/api/proxy/documents/${it.document.id}/preview`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 rounded-md border px-3 py-1 text-sm hover:bg-muted">
-                                  <ImageIcon className="h-4 w-4" /> Foto
-                                </a>
-                              ) : it.document.mimeType?.startsWith('application/pdf') ? (
-                                <a href={`/api/proxy/documents/${it.document.id}/preview`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 rounded-md border px-3 py-1 text-sm hover:bg-muted">
-                                  <FileText className="h-4 w-4" /> PDF
-                                </a>
-                              ) : null
+                            <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-medium ${typeBadge(it.type)}`}>{it.type}</span>
+                            {it.category?.name && (
+                              <span className="inline-flex rounded-full bg-zinc-800 px-2 py-0.5 text-[10px] font-medium text-zinc-300 border border-zinc-700">{it.category.name}</span>
                             )}
-                            <button className="inline-flex items-center gap-1 rounded-md border px-3 py-1 text-sm text-destructive hover:bg-destructive/10" onClick={() => onDelete(it.id)}>
-                              <Trash2 className="h-4 w-4" /> Eliminar
-                            </button>
+                          </div>
+                          
+                          <div className="mt-3 flex items-center justify-end gap-2 border-t border-zinc-800/50 pt-3">
+                             <Link href={`/expenses/${it.id}`} className="text-xs text-zinc-400 hover:text-white">Ver detalle</Link>
                           </div>
                         </div>
                       ))}
@@ -581,11 +600,11 @@ export default function Page() {
                   )}
                 </div>
               )}
-            </CardContent>
+            </div>
             </motion.div>
           )}
           </AnimatePresence>
-        </Card>
+        </div>
       )}
     </section>
   );

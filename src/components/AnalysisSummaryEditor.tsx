@@ -39,7 +39,7 @@ export default function AnalysisSummaryEditor({ documentId, initialSummary }: Pr
       <div className="flex items-start justify-between">
         <div className="text-sm">
           {summary || "—"}
-          {status === "saved" ? <span className="ml-2 text-xs text-green-700">Guardado</span> : null}
+          {status === "saved" ? <span className="ml-2 text-xs text-white">Guardado</span> : null}
         </div>
       </div>
     );
@@ -51,21 +51,21 @@ export default function AnalysisSummaryEditor({ documentId, initialSummary }: Pr
         value={summary}
         onChange={(e) => setSummary(e.target.value)}
         rows={4}
-        className="w-full rounded-md border p-2 text-sm"
+        className="w-full rounded-md border border-zinc-800 bg-zinc-900/50 p-2 text-sm text-zinc-300 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-zinc-700"
         placeholder="Escribe el resumen..."
       />
       <div className="flex items-center gap-2">
         <button
-          className="rounded-md bg-black px-3 py-1 text-sm text-white hover:bg-gray-900 disabled:opacity-60"
+          className="rounded-md bg-zinc-100 px-3 py-1 text-sm text-zinc-900 hover:bg-white disabled:opacity-60 transition-colors font-medium"
           disabled={status === "saving"}
           onClick={save}
         >
           {status === "saving" ? "Guardando…" : "Guardar"}
         </button>
-        <button className="rounded-md border px-3 py-1 text-sm hover:bg-gray-50" onClick={() => { setEditing(false); setError(null); }}>
+        <button className="rounded-md border border-zinc-800 px-3 py-1 text-sm text-zinc-400 hover:bg-zinc-800 hover:text-white transition-colors" onClick={() => { setEditing(false); setError(null); }}>
           Cancelar
         </button>
-        {error ? <span className="text-xs text-red-700">{error}</span> : null}
+        {error ? <span className="text-xs text-zinc-400">{error}</span> : null}
       </div>
     </div>
   );

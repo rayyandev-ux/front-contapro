@@ -35,9 +35,6 @@ export default function NavBar() {
                 <NavigationMenuItem>
                   <NavigationMenuLink href="/upload">Subir</NavigationMenuLink>
                 </NavigationMenuItem>
-                <NavigationMenuItem>
-                  <NavigationMenuLink href="/admin">Admin</NavigationMenuLink>
-                </NavigationMenuItem>
               </NavigationMenuList>
             </NavigationMenu>
           </nav>

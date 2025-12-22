@@ -4,185 +4,318 @@ import { useEffect, useState } from "react";
 import { Reveal, RevealList } from "@/components/Reveal";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight, Check, Loader2 } from "lucide-react";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import { apiJson } from "@/lib/api";
 
 export default function PricingPage() {
   const [loggedIn, setLoggedIn] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [prices, setPrices] = useState<{ monthly: number; annual: number }>({ monthly: 3.99, annual: 14.99 });
-  const [labels, setLabels] = useState<{ monthlyName: string; monthlyDesc?: string; annualName: string; annualDesc?: string }>({ monthlyName: 'PREMIUM MENSUAL', monthlyDesc: 'Ideal si prefieres pagar mes a mes', annualName: 'PREMIUM ANUAL', annualDesc: 'Ahorra con facturación anual' });
+  const [loading, setLoading] = useState<string | null>(null);
+  const [exchangeRate, setExchangeRate] = useState(1);
+  const [localCurrency, setLocalCurrency] = useState<string>('USD');
+  
+  // Coupon state
   const [couponCode, setCouponCode] = useState("");
-  const [couponLoading, setCouponLoading] = useState(false);
-  const [couponMsg, setCouponMsg] = useState<string | null>(null);
+  const [redeeming, setRedeeming] = useState(false);
+
+  // Configuración base de planes
+  const PLANS = {
+    MONTHLY: { name: 'MENSUAL', price: 8.90, desc: 'Ideal si prefieres pagar mes a mes' },
+    ANNUAL: { name: 'ANUAL', price: 49.90, desc: 'Ahorra con facturación anual' },
+    LIFETIME: { name: 'DE POR VIDA', price: 69.90, desc: 'Un solo pago, acceso para siempre' },
+  };
+
   useEffect(() => {
     (async () => {
       const me = await apiJson("/api/auth/me");
       setLoggedIn(me.ok);
     })();
-  }, []);
-  useEffect(() => {
-    (async () => {
-      const r = await apiJson<{ items: Array<{ period: 'MONTHLY'|'ANNUAL'; name: string; description?: string; priceUsd: number; active?: boolean }> }>("/api/payments/plans");
-      if (r.ok && r.data?.items) {
-        const m = r.data.items.find(it => it.period === 'MONTHLY');
-        const a = r.data.items.find(it => it.period === 'ANNUAL');
-        if (m) {
-          setPrices(prev => ({ ...prev, monthly: Number(m.priceUsd || prev.monthly) }));
-          setLabels(prev => ({ ...prev, monthlyName: (m.name || prev.monthlyName).toUpperCase(), monthlyDesc: m.description || prev.monthlyDesc }));
+
+    // Detectar país y moneda
+    const detectCurrency = async () => {
+      try {
+        // Intentar detectar por IP primero
+        const r = await fetch('https://ipapi.co/currency/');
+        const currency = r.ok ? await r.text() : null;
+        
+        if (currency && currency.length === 3 && currency !== 'USD') {
+          const rateRes = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+          const rateData = await rateRes.json();
+          if (rateData.rates && rateData.rates[currency]) {
+            setLocalCurrency(currency);
+            setExchangeRate(rateData.rates[currency]);
+            return;
+          }
         }
-        if (a) {
-          setPrices(prev => ({ ...prev, annual: Number(a.priceUsd || prev.annual) }));
-          setLabels(prev => ({ ...prev, annualName: (a.name || prev.annualName).toUpperCase(), annualDesc: a.description || prev.annualDesc }));
-        }
+      } catch (e) {
+        console.error("Error detectando moneda por IP", e);
       }
-    })();
+
+      // Fallback: Timezone para casos comunes si falla IP o es bloqueado
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      if (tz === 'America/Lima') {
+        setLocalCurrency('PEN');
+        fetch('https://api.exchangerate-api.com/v4/latest/USD')
+          .then(r => r.json())
+          .then(d => {
+            if (d.rates && d.rates.PEN) setExchangeRate(d.rates.PEN);
+          })
+          .catch(console.error);
+      } else if (tz === 'Europe/Madrid') {
+        setLocalCurrency('EUR');
+         fetch('https://api.exchangerate-api.com/v4/latest/USD')
+          .then(r => r.json())
+          .then(d => {
+            if (d.rates && d.rates.EUR) setExchangeRate(d.rates.EUR);
+          })
+          .catch(console.error);
+      }
+    };
+
+    detectCurrency();
   }, []);
-  const handleBuy = async (period: 'MONTHLY' | 'ANNUAL') => {
+
+  const formatPrice = (usdPrice: number) => {
+    if (localCurrency !== 'USD') {
+      const converted = usdPrice * exchangeRate;
+      const formatted = new Intl.NumberFormat(undefined, { 
+        style: 'currency', 
+        currency: localCurrency,
+        currencyDisplay: 'symbol'
+      }).format(converted);
+
+      return (
+        <div className="flex flex-col items-center">
+          <span className="text-4xl font-bold">{formatted}</span>
+          <span className="text-sm text-muted-foreground">aprox. ${usdPrice} USD</span>
+        </div>
+      );
+    }
+    return <span className="text-4xl font-bold">${usdPrice.toFixed(2)}</span>;
+  };
+
+  const handleBuy = async (plan: 'MONTHLY' | 'ANNUAL' | 'LIFETIME') => {
     if (!loggedIn) {
       window.location.href = '/register';
       return;
     }
-    setLoading(true);
-    const r = await apiJson<{ redirectUrl?: string; orderId?: string }>("/api/payments/checkout", { method: 'POST', body: JSON.stringify({ plan: period, currency: 'USD' }) });
+    setLoading(plan);
+    const r = await apiJson<{ redirectUrl?: string; orderId?: string }>("/api/payments/checkout", { 
+      method: 'POST', 
+      body: JSON.stringify({ plan }) 
+    });
+    
     if (r.ok && r.data?.redirectUrl) {
-      try {
-        if (r.data.orderId) localStorage.setItem('contapro:lastOrderId', r.data.orderId);
-        const u = new URL(r.data.redirectUrl);
-        const tok = u.searchParams.get('token') || '';
-        if (tok) localStorage.setItem('contapro:lastToken', tok);
-      } catch {}
       window.location.href = r.data.redirectUrl;
+    } else {
+      setLoading(null);
+      alert('Error iniciando el pago. Inténtalo de nuevo.');
     }
-    setLoading(false);
   };
 
   const handleRedeem = async () => {
-    if (!couponCode.trim()) return;
-    setCouponLoading(true);
-    setCouponMsg(null);
-    const res = await apiJson<{ ok: boolean; days: number }>("/api/promo/redeem", { method: "POST", body: JSON.stringify({ code: couponCode }) });
-    setCouponLoading(false);
-    if (!res.ok) {
-      setCouponMsg(res.error || "No se pudo canjear el cupón");
-      return;
+    if (!loggedIn) {
+        window.location.href = '/register';
+        return;
     }
-    const days = (res.data as any)?.days ?? null;
-    setCouponMsg(days ? `Cupón aplicado (+${days} días)` : "Cupón aplicado");
-    setCouponCode("");
-    setTimeout(() => {
-      setCouponMsg(null);
-      window.location.href = "/dashboard";
-    }, 800);
+    if (!couponCode) return;
+    setRedeeming(true);
+    const res = await apiJson<{ message: string }>("/api/promo/redeem", {
+        method: "POST",
+        body: JSON.stringify({ code: couponCode })
+    });
+    setRedeeming(false);
+    if (res.ok) {
+        alert(res.data?.message || "Cupón canjeado con éxito!");
+        window.location.reload();
+    } else {
+        alert("Error: " + (res.error || "Cupón inválido"));
+    }
   };
-
 
   return (
     <section className="dark relative min-h-svh w-full overflow-hidden">
       <SiteHeader />
       <div className="w-full bg-black py-12 pt-16">
         <div className="mx-auto max-w-7xl px-6">
-        <div className="pricing-hero">
-          <Reveal>
-            <h1 className="font-baskerville text-4xl sm:text-5xl font-bold tracking-tight">Planes y precios</h1>
-          </Reveal>
-          <Reveal delay={0.06}>
-            <p className="mt-2 text-sm text-muted-foreground">Empieza gratis y escala según necesites.</p>
-          </Reveal>
-        </div>
-        <div className="mt-8 rounded-2xl p-6">
-          <RevealList className="grid gap-6 md:grid-cols-2" itemOffset={{ y: 16 }}>
-            <Card className="rounded-2xl shadow-lg border border-border bg-card">
-              <CardContent className="p-6">
-                <div className="text-center">
-                  <Image src="/icono_carpeta_premium_hd.png" alt="Plan ContaPRO" width={256} height={256} className="mx-auto h-28 w-28 sm:h-32 sm:w-32 md:h-36 md:w-36 object-contain" priority />
-                  <div className="mt-3 text-lg font-bold uppercase">{labels.monthlyName}</div>
-                  <div className="mt-1 text-sm text-muted-foreground">{labels.monthlyDesc}</div>
-                  <div className="mt-4 text-xs line-through text-muted-foreground">Antes USD 5</div>
-                  <div className="mt-1 text-4xl font-bold">USD {prices.monthly.toFixed(2)}<span className="text-base font-medium">/mes</span></div>
+          <div className="pricing-hero text-center mb-12">
+            <Reveal>
+              <h1 className="font-baskerville text-4xl sm:text-5xl font-bold tracking-tight text-white">
+                Planes y precios
+              </h1>
+            </Reveal>
+            <Reveal delay={0.06}>
+              <p className="mt-4 text-lg text-gray-400">
+                Elige el plan que mejor se adapte a tus necesidades.
+              </p>
+            </Reveal>
+          </div>
+
+          <RevealList className="grid gap-8 md:grid-cols-3" itemOffset={{ y: 16 }} itemClassName="h-full">
+            {/* Mensual */}
+            <Card className="h-full rounded-2xl shadow-lg border border-white/10 bg-zinc-900/50 backdrop-blur-sm">
+              <CardContent className="p-8 flex flex-col h-full items-center">
+                 <div className="mb-6 relative w-24 h-24">
+                   <Image 
+                     src="/ChatGPT Image 22 dic 2025, 03_47_45.png" 
+                     alt="Plan Mensual" 
+                     fill 
+                     className="object-contain"
+                   />
+                 </div>
+                 <div className="mb-6 w-full text-center min-h-[5rem]">
+                  <h3 className="text-xl font-semibold text-white mb-2">{PLANS.MONTHLY.name}</h3>
+                  <p className="text-sm text-gray-400">{PLANS.MONTHLY.desc}</p>
                 </div>
-                <div className="my-5 h-px w-full bg-border" />
-                <ul className="mt-2 space-y-2 text-sm text-black dark:text-white">
-                  <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Acceso a todas las funciones</li>
-                  <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Uploads inteligentes</li>
-                  <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Extracción con IA</li>
-                  <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Métricas y reportes</li>
-                  <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Presupuesto y alertas</li>
-                  <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Multi-moneda (PEN, USD, EUR)</li>
-                  <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Integraciones por chat (Telegram y WhatsApp)</li>
-                  <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Seguridad avanzada</li>
-                  <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Soporte por correo</li>
-                  <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Renovación mensual</li>
+                <div className="mb-8 text-center text-white min-h-[5rem] flex flex-col">
+                  {formatPrice(PLANS.MONTHLY.price)}
+                </div>
+                <ul className="mb-8 space-y-3 flex-1 w-full">
+                  <li className="flex items-center text-gray-300">
+                    <Check className="h-5 w-5 text-white mr-2" />
+                    <span>14 días de prueba gratis</span>
+                  </li>
+                  <li className="flex items-center text-gray-300">
+                    <Check className="h-5 w-5 text-white mr-2" />
+                    <span>Acceso completo a ContaPRO</span>
+                  </li>
+                  <li className="flex items-center text-gray-300">
+                    <Check className="h-5 w-5 text-white mr-2" />
+                    <span>Análisis ilimitado con IA</span>
+                  </li>
                 </ul>
-                <div className="mt-5">
-                  <Button className="w-full h-11" variant="panel" disabled={loading} onClick={() => handleBuy('MONTHLY')}>Comprar <ArrowRight className="ml-2 h-4 w-4 inline" /></Button>
-                </div>
+                <Button 
+                  onClick={() => handleBuy('MONTHLY')} 
+                  disabled={loading !== null}
+                  className="w-full bg-zinc-800 text-white hover:bg-zinc-700"
+                >
+                  {loading === 'MONTHLY' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Suscribirse
+                </Button>
               </CardContent>
             </Card>
-            <Card className="rounded-2xl shadow-lg border border-border bg-card">
-              <CardContent className="p-6">
-                <div className="text-center">
-                  <Image src="/icono_carpeta_anual.png" alt="Plan ContaPRO Anual" width={256} height={256} className="mx-auto h-28 w-28 sm:h-32 sm:w-32 md:h-36 md:w-36 object-contain" priority />
-                  <div className="mt-3 text-lg font-bold uppercase">{labels.annualName}</div>
-                  <div className="mt-1 text-sm text-muted-foreground">{labels.annualDesc}</div>
-                  <div className="mt-4 text-xs line-through text-muted-foreground">Antes USD 18.99</div>
-                  <div className="mt-1 text-4xl font-bold">USD {prices.annual.toFixed(2)}<span className="text-base font-medium">/año</span></div>
+
+            {/* Anual */}
+            <Card className="h-full rounded-2xl shadow-xl border border-white/20 bg-zinc-900/80 backdrop-blur-sm relative overflow-hidden">
+              <div className="absolute top-0 right-0 bg-white text-black text-xs font-bold px-3 py-1 rounded-bl-lg">
+                MEJOR VALOR
+              </div>
+              <CardContent className="p-8 flex flex-col h-full items-center">
+                 <div className="mb-6 relative w-24 h-24">
+                   <Image 
+                     src="/ChatGPT Image 22 dic 2025, 03_47_45.png" 
+                     alt="Plan Anual" 
+                     fill 
+                     className="object-contain"
+                   />
+                 </div>
+                 <div className="mb-6 w-full text-center min-h-[5rem]">
+                  <h3 className="text-xl font-semibold text-white mb-2">{PLANS.ANNUAL.name}</h3>
+                  <p className="text-sm text-gray-400">{PLANS.ANNUAL.desc}</p>
                 </div>
-                <div className="my-5 h-px w-full bg-border" />
-                <ul className="mt-2 space-y-2 text-sm text-black dark:text-white">
-                  <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Acceso a todas las funciones</li>
-                  <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Uploads inteligentes</li>
-                  <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Extracción con IA</li>
-                  <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Métricas y reportes</li>
-                  <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Presupuesto y alertas</li>
-                  <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Multi-moneda (PEN, USD, EUR)</li>
-                  <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Integraciones por chat (Telegram y WhatsApp)</li>
-                  <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Seguridad avanzada</li>
-                  <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Soporte por correo</li>
-                  <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Renovación anual</li>
+                <div className="mb-8 text-center text-white min-h-[5rem] flex flex-col">
+                  {formatPrice(PLANS.ANNUAL.price)}
+                  <span className="block text-xs text-zinc-400 mt-2">Ahorras un 53% vs Mensual</span>
+                </div>
+                <ul className="mb-8 space-y-3 flex-1 w-full">
+                  <li className="flex items-center text-gray-300">
+                    <Check className="h-5 w-5 text-white mr-2" />
+                    <span>14 días de prueba gratis</span>
+                  </li>
+                  <li className="flex items-center text-gray-300">
+                    <Check className="h-5 w-5 text-white mr-2" />
+                    <span>Todo lo del plan Mensual</span>
+                  </li>
+                  <li className="flex items-center text-gray-300">
+                    <Check className="h-5 w-5 text-white mr-2" />
+                    <span>Prioridad en soporte</span>
+                  </li>
                 </ul>
-                <div className="mt-5">
-                  <Button className="w-full h-11" variant="panel" disabled={loading} onClick={() => handleBuy('ANNUAL')}>Comprar <ArrowRight className="ml-2 h-4 w-4 inline" /></Button>
+                <Button 
+                  onClick={() => handleBuy('ANNUAL')}
+                  disabled={loading !== null}
+                  className="w-full bg-white hover:bg-zinc-200 text-black font-bold"
+                >
+                  {loading === 'ANNUAL' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Elegir Anual
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Lifetime */}
+            <Card className="h-full rounded-2xl shadow-lg border border-white/10 bg-zinc-900/50 backdrop-blur-sm">
+              <CardContent className="p-8 flex flex-col h-full items-center">
+                <div className="mb-6 relative w-24 h-24">
+                  <Image 
+                    src="/ChatGPT Image 22 dic 2025, 03_47_45.png" 
+                    alt="Plan Lifetime" 
+                    fill 
+                    className="object-contain"
+                  />
                 </div>
+                <div className="mb-6 w-full text-center min-h-[5rem]">
+                  <h3 className="text-xl font-semibold text-white mb-2">{PLANS.LIFETIME.name}</h3>
+                  <p className="text-sm text-gray-400">{PLANS.LIFETIME.desc}</p>
+                </div>
+                <div className="mb-8 text-center text-white min-h-[5rem] flex flex-col">
+                  {formatPrice(PLANS.LIFETIME.price)}
+                </div>
+                <ul className="mb-8 space-y-3 flex-1 w-full">
+                  <li className="flex items-center text-gray-300">
+                    <Check className="h-5 w-5 text-white mr-2" />
+                    <span>Un único pago</span>
+                  </li>
+                  <li className="flex items-center text-gray-300">
+                    <Check className="h-5 w-5 text-white mr-2" />
+                    <span>Acceso de por vida</span>
+                  </li>
+                  <li className="flex items-center text-gray-300">
+                    <Check className="h-5 w-5 text-white mr-2" />
+                    <span>Todas las actualizaciones futuras</span>
+                  </li>
+                </ul>
+                <Button 
+                  onClick={() => handleBuy('LIFETIME')}
+                  disabled={loading !== null}
+                  className="w-full bg-zinc-800 hover:bg-zinc-700 text-white"
+                >
+                  {loading === 'LIFETIME' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Obtener de por vida
+                </Button>
               </CardContent>
             </Card>
           </RevealList>
-          <div className="mt-8 rounded-2xl border border-border bg-card/40 p-4 sm:p-5 text-sm text-muted-foreground max-w-2xl mx-auto">
-            <div className="font-semibold text-xs uppercase tracking-wide text-muted-foreground mb-2">
-              ¿Tienes un cupón?
-            </div>
-            <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
-              <input
-                value={couponCode}
-                onChange={(e) => setCouponCode(e.target.value)}
-                placeholder="Ingresa tu código"
-                className="flex-1 h-9 rounded-md border border-border bg-background px-3 text-sm outline-none focus-visible:border-white focus-visible:ring-1 focus-visible:ring-white/60"
-              />
-              <Button
-                variant="panel"
-                size="sm"
-                disabled={couponLoading || !couponCode.trim()}
-                onClick={handleRedeem}
-                className="whitespace-nowrap"
-              >
-                {couponLoading ? "Canjeando..." : "Canjear cupón"}
-              </Button>
-            </div>
-            {couponMsg && (
-              <div className="mt-2 text-xs text-muted-foreground">
-                {couponMsg}
-              </div>
-            )}
-            <div className="mt-2 text-[11px] text-muted-foreground/70">
-              Debes estar conectado con tu cuenta para aplicar el cupón a tu suscripción.
-            </div>
+
+          {/* Coupon Redemption Section */}
+          <div className="mt-16 max-w-md mx-auto">
+            <Reveal>
+                <Card className="bg-zinc-900/50 border-white/10 backdrop-blur-sm">
+                    <CardContent className="p-6">
+                        <h3 className="text-xl font-semibold text-white mb-4 text-center">¿Tienes un cupón?</h3>
+                        <div className="flex gap-2">
+                            <input 
+                                type="text" 
+                                placeholder="Ingresa tu código" 
+                                value={couponCode}
+                                onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                                className="flex-1 bg-zinc-800 border-zinc-700 text-white rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-white/20"
+                            />
+                            <Button 
+                                onClick={handleRedeem} 
+                                disabled={redeeming || !couponCode}
+                                className="bg-white text-black hover:bg-zinc-200 font-medium"
+                            >
+                                {redeeming ? <Loader2 className="h-4 w-4 animate-spin" /> : "Canjear"}
+                            </Button>
+                        </div>
+                    </CardContent>
+                </Card>
+            </Reveal>
           </div>
         </div>
-        </div>
-      <SiteFooter />
       </div>
+      <SiteFooter />
     </section>
   );
 }

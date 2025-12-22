@@ -13,13 +13,12 @@ import { useRouter, usePathname } from 'next/navigation';
 import Tutorial from '@/components/Tutorial';
 
 type Props = {
-  isAdmin?: boolean;
   user?: { name?: string | null; email?: string | null };
   children: React.ReactNode;
   tutorialSeen?: boolean;
 };
 
-export default function DashboardShell({ isAdmin, user, children, tutorialSeen }: Props) {
+export default function DashboardShell({ user, children, tutorialSeen }: Props) {
   const [hidden, setHidden] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [showTutorial, setShowTutorial] = useState(!tutorialSeen);
@@ -77,7 +76,7 @@ export default function DashboardShell({ isAdmin, user, children, tutorialSeen }
           </div>
           <div className="mt-2 px-2 text-xs font-medium text-muted-foreground">Plataforma</div>
           <div className="mt-1">
-            <SidebarNav isAdmin={isAdmin} onNavigate={() => setIsNavigating(true)} />
+            <SidebarNav onNavigate={() => setIsNavigating(true)} />
           </div>
           <div id="sidebar-account-section" className="mt-auto space-y-2 px-2">
             <div className="text-xs font-medium text-muted-foreground">Cuenta</div>
@@ -206,7 +205,7 @@ export default function DashboardShell({ isAdmin, user, children, tutorialSeen }
               </div>
               <div className="flex-1 overflow-y-auto">
                 <div className="mb-1 px-1 text-xs font-medium text-muted-foreground">Plataforma</div>
-                <SidebarNav isAdmin={isAdmin} onNavigate={() => { setIsNavigating(true); setMobileOpen(false); }} mobileOnly hideAccount />
+                <SidebarNav onNavigate={() => { setIsNavigating(true); setMobileOpen(false); }} mobileOnly hideAccount />
               </div>
               <div className="mt-3 space-y-2 px-1">
                 <div className="text-xs font-medium text-muted-foreground">Cuenta</div>
@@ -272,7 +271,7 @@ export default function DashboardShell({ isAdmin, user, children, tutorialSeen }
 
       {showTutorial && <Tutorial onComplete={() => setShowTutorial(false)} />}
 
-      <MobileActionBar isAdmin={isAdmin} onNavigate={() => setIsNavigating(true)} />
+      <MobileActionBar onNavigate={() => setIsNavigating(true)} />
     </div>
   );
 }

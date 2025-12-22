@@ -90,7 +90,7 @@ export default function TelegramLinkCard() {
         <div className="text-xl font-semibold">Conecta tu Telegram</div>
         <div className="mt-4 flex flex-wrap items-center gap-2">
             {status.ok && status.linked ? (
-              <Button variant="outline" size="sm" className="gap-1 rounded-full border-emerald-600/40 bg-emerald-600/10 text-emerald-700 dark:text-emerald-400">
+              <Button variant="outline" size="sm" className="gap-1 rounded-full border-zinc-500/40 bg-zinc-500/10 text-zinc-300">
                 <CheckCircle2 className="h-4 w-4" />
                 Telegram ya está conectado
               </Button>

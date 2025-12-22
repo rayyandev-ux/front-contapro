@@ -64,14 +64,14 @@ export default function Page() {
   const badgeClasses = (ext: string) => {
     switch (ext) {
       case "PDF":
-        return "bg-red-500/10 text-red-500 ring-1 ring-red-500/20";
+        return "bg-zinc-500/10 text-zinc-300 ring-1 ring-zinc-500/20";
       case "PNG":
-        return "bg-emerald-500/10 text-emerald-500 ring-1 ring-emerald-500/20";
+        return "bg-zinc-500/10 text-zinc-300 ring-1 ring-zinc-500/20";
       case "JPG":
       case "JPEG":
-        return "bg-blue-500/10 text-blue-500 ring-1 ring-blue-500/20";
+        return "bg-zinc-500/10 text-zinc-300 ring-1 ring-zinc-500/20";
       case "GIF":
-        return "bg-purple-500/10 text-purple-500 ring-1 ring-purple-500/20";
+        return "bg-zinc-500/10 text-zinc-300 ring-1 ring-zinc-500/20";
       default:
         return "bg-muted text-foreground ring-1 ring-border";
     }

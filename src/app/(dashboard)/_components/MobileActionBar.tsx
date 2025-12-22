@@ -5,7 +5,7 @@ import { useState } from "react";
 import Portal from "@/components/Portal";
 import { LayoutDashboard, Upload, Wallet, PiggyBank, ChevronDown } from "lucide-react";
 
-export default function MobileActionBar({ isAdmin, onNavigate }: { isAdmin?: boolean; onNavigate?: () => void }) {
+export default function MobileActionBar({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + "/");
   const [openBudget, setOpenBudget] = useState(false);

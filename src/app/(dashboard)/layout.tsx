@@ -5,7 +5,6 @@ import DashboardShell from "./_components/DashboardShell";
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
   const cookieStore = await cookies();
   const cookieHeader = cookieStore.getAll().map(c => `${c.name}=${c.value}`).join("; ");
-  let isAdmin = false;
   let user: { name?: string | null; email?: string | null } | undefined;
   let tutorialSeen = false;
   try {
@@ -16,7 +15,6 @@ export default async function DashboardLayout({ children }: { children: ReactNod
     });
     if (res.ok) {
       const data = await res.json();
-      isAdmin = data?.user?.role === 'ADMIN';
       user = { name: data?.user?.name ?? null, email: data?.user?.email ?? null };
       tutorialSeen = data?.user?.tutorialSeen === true;
     }
@@ -32,7 +30,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
         <div className="absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-orange-100 blur-3xl opacity-50" />
       </div>
 
-      <DashboardShell isAdmin={isAdmin} user={user} tutorialSeen={tutorialSeen}>{children}</DashboardShell>
+      <DashboardShell user={user} tutorialSeen={tutorialSeen}>{children}</DashboardShell>
     </div>
   );
 }

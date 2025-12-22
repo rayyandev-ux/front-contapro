@@ -36,9 +36,10 @@ type RevealListProps = {
   once?: boolean;
   itemOffset?: { x?: number; y?: number };
   duration?: number;
+  itemClassName?: string;
 };
 
-export function RevealList({ children, className, stagger = 0.08, delayChildren = 0, amount = 0.2, once = true, itemOffset = { y: 12 }, duration = 0.45 }: RevealListProps) {
+export function RevealList({ children, className, stagger = 0.08, delayChildren = 0, amount = 0.2, once = true, itemOffset = { y: 12 }, duration = 0.45, itemClassName }: RevealListProps) {
   const container: Variants = {
     hidden: {},
     show: { transition: { staggerChildren: stagger, delayChildren } },
@@ -51,12 +52,12 @@ export function RevealList({ children, className, stagger = 0.08, delayChildren 
     <motion.div className={className} initial="hidden" whileInView="show" viewport={{ once, amount }} variants={container}>
       {Array.isArray(children)
         ? children.map((child, i) => (
-            <motion.div key={i} variants={item} transition={{ duration }}>
+            <motion.div key={i} variants={item} transition={{ duration }} className={itemClassName}>
               {child as React.ReactNode}
             </motion.div>
           ))
         : (
-            <motion.div variants={item} transition={{ duration }}>
+            <motion.div variants={item} transition={{ duration }} className={itemClassName}>
               {children}
             </motion.div>
           )}

@@ -1,7 +1,8 @@
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
-import { CreditCard, Wallet as WalletIcon, Landmark, Trash2, Pencil } from "lucide-react";
+import { CreditCard, Wallet as WalletIcon, Landmark, Trash2, Pencil, Check } from "lucide-react";
 import CreateMethodForm from "./CreateMethodForm";
+import { Button } from "@/components/ui/button";
 
 export default async function Page() {
   const cookieStore = await cookies();
@@ -94,57 +95,84 @@ export default async function Page() {
   return (
     <section className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold">Métodos de pago</h1>
-        <p className="text-sm text-muted-foreground">Administra tus tarjetas, bancos y wallets</p>
+        <h1 className="text-2xl font-semibold text-white">Métodos de pago</h1>
+        <p className="text-sm text-zinc-400">Administra tus tarjetas, bancos y wallets</p>
       </div>
 
-      <div className="panel-bg rounded-md ring-1 ring-border p-4">
-        <div className="text-sm font-medium mb-2">Crear método</div>
+      <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-2xl overflow-hidden p-6">
+        <div className="text-sm font-medium text-white mb-4">Crear método</div>
         <CreateMethodForm onSubmit={createMethod} />
       </div>
 
-      <div className="panel-bg rounded-md ring-1 ring-border p-4">
-        <div className="text-sm font-medium mb-3">Tus métodos</div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-2xl overflow-hidden p-6">
+        <div className="text-sm font-medium text-white mb-4">Tus métodos</div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {items.map(m => (
-            <div key={m.id} className="rounded-md border border-border bg-card p-3">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-md border border-border bg-muted">
-                  {m.type === 'TARJETA' ? <CreditCard className="h-5 w-5 text-foreground/80" /> : m.type === 'WALLET' ? <WalletIcon className="h-5 w-5 text-foreground/80" /> : <Landmark className="h-5 w-5 text-foreground/80" />}
+            <div key={m.id} className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-4">
+              <div className="flex items-center gap-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-zinc-800 border border-zinc-700/50">
+                  {m.type === 'TARJETA' ? <CreditCard className="h-5 w-5 text-zinc-400" /> : m.type === 'WALLET' ? <WalletIcon className="h-5 w-5 text-zinc-400" /> : <Landmark className="h-5 w-5 text-zinc-400" />}
                 </div>
-                <div className="flex-1">
-                  <div className="text-sm font-medium">{m.provider || m.type} — {m.name}</div>
-                  <div className="text-xs text-muted-foreground">{m.cardLast4 ? `Últimos 4 ${String(m.cardLast4).slice(-4)}` : m.type}</div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-medium text-white truncate">{m.provider || m.type} — {m.name}</div>
+                  <div className="text-xs text-zinc-500 truncate">{m.cardLast4 ? `Últimos 4 ${String(m.cardLast4).slice(-4)}` : m.type}</div>
                 </div>
                 <div className="flex items-center gap-2">
                   <form action={deactivate}>
                     <input type="hidden" name="id" value={m.id} />
-                    <button type="submit" title="Desactivar" className="rounded-md border border-border p-2 hover:bg-muted"><Trash2 className="h-4 w-4" /></button>
+                    <button type="submit" title="Desactivar" className="h-8 w-8 inline-flex items-center justify-center rounded-lg text-zinc-400 hover:text-red-400 hover:bg-red-500/10 transition-colors">
+                      <Trash2 className="h-4 w-4" />
+                    </button>
                   </form>
-                  <details>
+                  <details className="group relative">
                     <summary className="list-none">
-                      <button type="button" title="Editar" className="rounded-md border border-border p-2 hover:bg-muted"><Pencil className="h-4 w-4" /></button>
+                      <button type="button" title="Editar" className="h-8 w-8 inline-flex items-center justify-center rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors">
+                        <Pencil className="h-4 w-4" />
+                      </button>
                     </summary>
-                    <form action={updateMethod} className="mt-2 grid grid-cols-1 sm:grid-cols-5 gap-2">
-                      <input type="hidden" name="id" value={m.id} />
-                      <input name="name" defaultValue={m.name} className="border rounded-md p-2" />
-                      <input name="provider" defaultValue={m.provider} className="border rounded-md p-2" />
-                      <input name="type" defaultValue={m.type} className="border rounded-md p-2" />
-                      <input name="cardLast4" defaultValue={m.cardLast4 || ''} className="border rounded-md p-2" />
-                      <select name="currency" defaultValue={m.currency} className="border rounded-md p-2">
-                        <option value="PEN">PEN</option>
-                        <option value="USD">USD</option>
-                        <option value="EUR">EUR</option>
-                      </select>
-                      <button type="submit" className="btn-panel">Guardar</button>
-                    </form>
+                    <div className="absolute right-0 top-full mt-2 z-10 w-80 p-4 rounded-xl border border-zinc-800 bg-zinc-950 shadow-xl">
+                        <form action={updateMethod} className="space-y-3">
+                          <input type="hidden" name="id" value={m.id} />
+                          <div className="grid grid-cols-2 gap-2">
+                            <input name="name" defaultValue={m.name} className="w-full rounded-lg border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-xs text-zinc-300 focus:border-zinc-700 focus:outline-none" placeholder="Nombre" />
+                            <input name="provider" defaultValue={m.provider} className="w-full rounded-lg border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-xs text-zinc-300 focus:border-zinc-700 focus:outline-none" placeholder="Proveedor" />
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <input name="type" defaultValue={m.type} className="w-full rounded-lg border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-xs text-zinc-300 focus:border-zinc-700 focus:outline-none" placeholder="Tipo" />
+                            <input name="cardLast4" defaultValue={m.cardLast4 || ''} className="w-full rounded-lg border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-xs text-zinc-300 focus:border-zinc-700 focus:outline-none" placeholder="Últimos 4" />
+                          </div>
+                          <select name="currency" defaultValue={m.currency} className="w-full rounded-lg border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-xs text-zinc-300 focus:border-zinc-700 focus:outline-none">
+                            <option value="PEN">PEN</option>
+                            <option value="USD">USD</option>
+                            <option value="EUR">EUR</option>
+                          </select>
+                          <div className="flex justify-end">
+                            <Button type="submit" size="sm" className="h-7 text-xs bg-white text-black hover:bg-zinc-200">Guardar cambios</Button>
+                          </div>
+                        </form>
+                    </div>
                   </details>
                 </div>
               </div>
-              <div className="mt-3">
+              <div className="mt-4 pt-3 border-t border-zinc-800/50 flex justify-between items-center">
+                <span className="text-xs text-zinc-500 font-mono">{m.currency}</span>
                 <form action={setDefault} className="inline-block">
                   <input type="hidden" name="id" value={m.id} />
-                  <button type="submit" className={`px-3 py-1 rounded-md text-xs ${defaultPaymentMethodId === m.id ? 'bg-emerald-600 text-white' : 'bg-muted text-foreground'}`}>{defaultPaymentMethodId === m.id ? 'Principal' : 'Hacer principal'}</button>
+                  <button 
+                    type="submit" 
+                    disabled={defaultPaymentMethodId === m.id}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium transition-colors ${
+                      defaultPaymentMethodId === m.id 
+                      ? 'bg-zinc-800 text-zinc-300 cursor-default' 
+                      : 'bg-zinc-800/50 text-zinc-500 hover:bg-zinc-800 hover:text-white'
+                    }`}
+                  >
+                    {defaultPaymentMethodId === m.id ? (
+                      <><Check className="h-3 w-3" /> Principal</>
+                    ) : (
+                      'Hacer principal'
+                    )}
+                  </button>
                 </form>
               </div>
             </div>

@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { apiJson, invalidateApiCache } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -28,12 +27,7 @@ export default function AccountPage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState<string | null>(null);
   const [original, setOriginal] = useState<{ preferredCurrency?: 'PEN' | 'USD' | 'EUR'; dateFormat?: 'DMY' | 'MDY' } | null>(null);
-  const [redeemOpen, setRedeemOpen] = useState(false);
-  const [code, setCode] = useState("");
-  const [redeeming, setRedeeming] = useState(false);
-  const [redeemMsg, setRedeemMsg] = useState<string | null>(null);
   
-
   useEffect(() => {
     (async () => {
       const res = await apiJson<{ ok: boolean; user: MeUser }>("/api/auth/me");
@@ -57,42 +51,16 @@ export default function AccountPage() {
     return d.toLocaleString();
   };
 
-  const chipBase =
-    "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ring-1";
   const roleChip = (role?: string) => {
     if (!role) return null;
-    const cls =
-      role === "ADMIN"
-        ? "bg-indigo-500/10 text-indigo-500 ring-1 ring-indigo-500/20"
-        : "bg-slate-500/10 text-slate-500 ring-1 ring-slate-500/20";
-    return <span className={`${chipBase} ${cls}`}>{role}</span>;
-  };
-  const planChip = (plan?: string) => {
-    const val = plan || "GRATIS";
-    const premium = val.toUpperCase() === "PREMIUM";
-    const cls = premium
-      ? "bg-amber-500/10 text-amber-500 ring-1 ring-amber-500/20"
-      : "bg-slate-500/10 text-slate-500 ring-1 ring-slate-500/20";
     return (
-      <span className={`${chipBase} ${cls}`}>
-        <Crown className="h-3.5 w-3.5" /> {val}
-      </span>
-    );
-  };
-  const verifyChip = (verified?: boolean) => {
-    const cls = verified
-      ? "bg-emerald-500/10 text-emerald-500 ring-1 ring-emerald-500/20"
-      : "bg-rose-500/10 text-rose-500 ring-1 ring-rose-500/20";
-    const Icon = verified ? CheckCircle2 : XCircle;
-    return (
-      <span className={`${chipBase} ${cls}`}>
-        <Icon className="h-3.5 w-3.5" /> {verified ? "Verificado" : "No verificado"}
+      <span className="px-4 py-1.5 rounded-full text-xs font-medium border bg-zinc-900 text-white border-zinc-700 shadow-[0_0_15px_-3px_rgba(255,255,255,0.1)]">
+        {role}
       </span>
     );
   };
 
-  const subAccent = (user?.plan || "").toUpperCase() === "PREMIUM" ? "text-amber-600" : "text-slate-600";
-  const secAccent = user?.emailVerified ? "text-emerald-600" : "text-rose-600";
+  const secAccent = user?.emailVerified ? "text-white" : "text-white";
 
   return (
     <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
@@ -103,80 +71,81 @@ export default function AccountPage() {
         </div>
         {error && <p className="mb-6 text-sm text-red-600" aria-live="polite">{error}</p>}
 
-        <div className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-1 gap-6">
         {/* Perfil */}
-        <Card className={`bg-card border shadow-sm ring-1 ring-border rounded-2xl panel-bg`}>
-          <CardHeader>
-            <div className="flex items-start gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted text-indigo-600">
+        <div className="bg-zinc-900/20 border border-zinc-800/50 rounded-2xl overflow-hidden">
+          <div className="px-8 py-6 border-b border-zinc-800/50">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-zinc-900/50 border border-zinc-800/50 text-white">
                 <User className="h-5 w-5" />
               </div>
               <div>
-                <CardTitle>Perfil</CardTitle>
-                <CardDescription>Datos de identificación</CardDescription>
+                <h2 className="text-lg font-semibold text-white">Perfil</h2>
+                <p className="text-sm text-zinc-500">Datos de identificación</p>
               </div>
             </div>
-          </CardHeader>
-          <CardContent className="space-y-3 text-sm">
-            <div className="flex items-center justify-between">
+          </div>
+          <div className="p-8 space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <Label>Nombre</Label>
-                <p className="text-base font-semibold">{user?.name || '—'}</p>
+                <label className="text-[10px] text-zinc-500 uppercase tracking-widest font-semibold block mb-2">Nombre</label>
+                <div className="flex items-center justify-between text-sm text-zinc-300 bg-zinc-900/50 p-3 rounded-xl border border-zinc-800/50">
+                  <span>{user?.name || '—'}</span>
+                  {roleChip(user?.role)}
+                </div>
               </div>
-              {roleChip(user?.role)}
-            </div>
-            <div className="flex items-center gap-2">
-              <Mail className="h-4 w-4 text-slate-500" />
               <div>
-                <Label>Correo</Label>
-                <p className="font-medium">{user?.email}</p>
+                <label className="text-[10px] text-zinc-500 uppercase tracking-widest font-semibold block mb-2">Correo</label>
+                <div className="flex items-center gap-2 text-sm text-zinc-300 bg-zinc-900/50 p-3 rounded-xl border border-zinc-800/50">
+                  <Mail className="h-4 w-4 text-zinc-500" />
+                  <span>{user?.email}</span>
+                </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Configuraciones */}
-        <Card className={`bg-card border shadow-sm ring-1 ring-border rounded-2xl panel-bg`}>
-          <CardHeader>
-            <div className="flex items-start gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted text-blue-600">
+        <div className="bg-zinc-900/20 border border-zinc-800/50 rounded-2xl overflow-hidden">
+          <div className="px-8 py-6 border-b border-zinc-800/50">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-zinc-900/50 border border-zinc-800/50 text-blue-500">
                 <CalendarDays className="h-5 w-5" />
               </div>
               <div>
-                <CardTitle>Configuraciones</CardTitle>
-                <CardDescription>Moneda y formato de fecha</CardDescription>
+                <h2 className="text-lg font-semibold text-white">Configuraciones</h2>
+                <p className="text-sm text-zinc-500">Moneda y formato de fecha</p>
               </div>
             </div>
-          </CardHeader>
-          <CardContent className="space-y-4 text-sm">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          </div>
+          <div className="p-8 space-y-6">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div>
-                <Label>Moneda preferida</Label>
+                <label className="text-[10px] text-zinc-500 uppercase tracking-widest font-semibold block mb-2">Moneda preferida</label>
                 <select
-                  className="mt-1 w-full h-9 rounded-md border border-input bg-transparent px-3 text-sm focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                  className="w-full text-sm text-zinc-300 bg-zinc-900/50 p-3 rounded-xl border border-zinc-800/50 focus:outline-none focus:border-zinc-700 focus:ring-1 focus:ring-zinc-700/50 transition-all appearance-none cursor-pointer"
                   value={user?.preferredCurrency || 'PEN'}
                   onChange={(e) => setUser(u => u ? { ...u, preferredCurrency: e.target.value as MeUser['preferredCurrency'] } : u)}
                 >
-                  <option value="PEN">PEN (S/)</option>
-                  <option value="USD">USD ($)</option>
-                  <option value="EUR">EUR (€)</option>
+                  <option value="PEN" className="bg-zinc-900 text-zinc-300">PEN (S/)</option>
+                  <option value="USD" className="bg-zinc-900 text-zinc-300">USD ($)</option>
+                  <option value="EUR" className="bg-zinc-900 text-zinc-300">EUR (€)</option>
                 </select>
               </div>
               <div>
-                <Label>Formato de fecha</Label>
+                <label className="text-[10px] text-zinc-500 uppercase tracking-widest font-semibold block mb-2">Formato de fecha</label>
                 <select
-                  className="mt-1 w-full h-9 rounded-md border border-input bg-transparent px-3 text-sm focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                  className="w-full text-sm text-zinc-300 bg-zinc-900/50 p-3 rounded-xl border border-zinc-800/50 focus:outline-none focus:border-zinc-700 focus:ring-1 focus:ring-zinc-700/50 transition-all appearance-none cursor-pointer"
                   value={user?.dateFormat || 'DMY'}
                   onChange={(e) => setUser(u => u ? { ...u, dateFormat: e.target.value as MeUser['dateFormat'] } : u)}
                 >
-                  <option value="DMY">Día/Mes/Año</option>
-                  <option value="MDY">Mes/Día/Año</option>
+                  <option value="DMY" className="bg-zinc-900 text-zinc-300">Día/Mes/Año</option>
+                  <option value="MDY" className="bg-zinc-900 text-zinc-300">Mes/Día/Año</option>
                 </select>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <Button
-                variant="panel"
+            <div className="flex items-center gap-3 pt-2">
+              <button
                 disabled={saving || !dirty}
                 onClick={async () => {
                   if (!user) return;
@@ -191,124 +160,55 @@ export default function AccountPage() {
                   try { invalidateApiCache('/api/auth'); } catch {}
                   setTimeout(() => setSaved(null), 2000);
                 }}
+                className="inline-flex items-center justify-center gap-2 whitespace-nowrap disabled:pointer-events-none disabled:opacity-50 px-6 py-2.5 rounded-full bg-zinc-100 text-zinc-950 font-medium hover:bg-zinc-200 transition-colors text-sm"
               >
-                Guardar
-              </Button>
-              {saved && <span className="text-xs text-muted-foreground">{saved}</span>}
+                Guardar cambios
+              </button>
+              {saved && <span className="text-xs text-zinc-500 animate-fade-in">{saved}</span>}
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Suscripción */}
-        <Card className={`bg-card border shadow-sm ring-1 ring-border rounded-2xl panel-bg`}>
-          <CardHeader>
-            <div className="flex items-start gap-3">
-              <div className={`flex h-9 w-9 items-center justify-center rounded-lg bg-muted ${subAccent}`}>
-                <Crown className="h-5 w-5" />
-              </div>
-              <div>
-                <CardTitle>Suscripción</CardTitle>
-                <CardDescription>Trial y Premium</CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-3 text-sm">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Label>Plan</Label>
-                {planChip(user?.plan)}
-              </div>
-            </div>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <div className="flex items-start gap-2">
-                <CalendarDays className="mt-0.5 h-4 w-4 text-slate-500" />
-                <div>
-                  <Label>Trial hasta</Label>
-                  <p className="font-medium">{fmtDate(user?.trialEnds)}</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-2">
-                <CalendarDays className="mt-0.5 h-4 w-4 text-slate-500" />
-                <div>
-                  <Label>Premium vence</Label>
-                  <p className="font-medium">{fmtDate(user?.planExpires)}</p>
-                </div>
-              </div>
-            </div>
-            <div className="pt-2">
-              <Link href="/billing">
-                <Button variant="panel">
-                  <Crown className="mr-2 h-4 w-4" /> Gestionar suscripción
-                </Button>
-              </Link>
-              <div className="mt-2">
-                <Button variant="outline" className="hover:bg-muted" onClick={() => setRedeemOpen(v => !v)}>
-                  Código promocional
-                </Button>
-              </div>
-              {redeemOpen && (
-                <div className="mt-3 space-y-2">
-                  <Label>Canjear código</Label>
-                  <div className="flex items-center gap-2">
-                    <Input value={code} onChange={(e) => setCode(e.target.value)} placeholder="Ingresa tu código" className="flex-1" />
-                    <Button variant="panel" disabled={redeeming || !code.trim()} onClick={async () => {
-                      setRedeeming(true); setRedeemMsg(null);
-                      const res = await apiJson<{ ok: boolean; user: MeUser; days: number }>("/api/promo/redeem", { method: "POST", body: JSON.stringify({ code }) });
-                      setRedeeming(false);
-                      if (!res.ok) { setRedeemMsg(res.error || "No se pudo canjear"); return; }
-                      setRedeemMsg(`Código aplicado (+${(res.data as any)?.days ?? ''} días)`);
-                      setUser(prev => ({ ...(prev || {}), ...(res.data as any)?.user } as MeUser));
-                      try { invalidateApiCache('/api/auth'); } catch {}
-                      setTimeout(() => setRedeemMsg(null), 3000);
-                    }}>Canjear</Button>
-                  </div>
-                  {redeeming && <div className="text-xs text-muted-foreground">Aplicando…</div>}
-                  {redeemMsg && <div className="text-xs text-muted-foreground">{redeemMsg}</div>}
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Seguridad */}
-        <Card className={`bg-card border shadow-sm ring-1 ring-border rounded-2xl panel-bg`}>
-          <CardHeader>
-            <div className="flex items-start gap-3">
-              <div className={`flex h-9 w-9 items-center justify-center rounded-lg bg-muted ${secAccent}`}>
+        <div className="bg-zinc-900/20 border border-zinc-800/50 rounded-2xl overflow-hidden">
+          <div className="px-8 py-6 border-b border-zinc-800/50">
+            <div className="flex items-center gap-3">
+              <div className={`flex h-10 w-10 items-center justify-center rounded-xl bg-zinc-900/50 border border-zinc-800/50 ${secAccent}`}>
                 <ShieldCheck className="h-5 w-5" />
               </div>
               <div>
-                <CardTitle>Seguridad</CardTitle>
-                <CardDescription>Verificación y contraseña</CardDescription>
+                <h2 className="text-lg font-semibold text-white">Seguridad</h2>
+                <p className="text-sm text-zinc-500">Verificación y contraseña</p>
               </div>
             </div>
-          </CardHeader>
-          <CardContent className="space-y-3 text-sm">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Label>Estado de verificación</Label>
-                {verifyChip(user?.emailVerified)}
+          </div>
+          <div className="p-8 space-y-6">
+            <div>
+              <label className="text-[10px] text-zinc-500 uppercase tracking-widest font-semibold block mb-2">Estado de verificación</label>
+              <div className="flex items-center justify-between text-sm text-zinc-300 bg-zinc-900/50 p-3 rounded-xl border border-zinc-800/50">
+                <span className="flex items-center gap-2">
+                   {user?.emailVerified ? <CheckCircle2 className="h-4 w-4 text-white" /> : <XCircle className="h-4 w-4 text-white" />}
+                   {user?.emailVerified ? "Correo verificado" : "Correo no verificado"}
+                </span>
+                {!user?.emailVerified && (
+                  <Link href="/verify">
+                    <button className="text-xs bg-zinc-800 hover:bg-zinc-700 text-white px-3 py-1 rounded-lg transition-colors">
+                      Verificar
+                    </button>
+                  </Link>
+                )}
               </div>
             </div>
-            {!user?.emailVerified && (
-              <div className="pt-1">
-                <Link href="/verify">
-                  <Button variant="outline" className="hover:bg-muted">
-                    <AlertCircle className="mr-2 h-4 w-4" /> Verificar ahora
-                  </Button>
-                </Link>
-              </div>
-            )}
-            <div className="pt-1">
+            
+            <div className="pt-2">
               <Link href="/forgot">
-                <Button variant="panel">
-                  <ShieldCheck className="mr-2 h-4 w-4" /> Cambiar contraseña
-                </Button>
+                <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap px-6 py-2.5 rounded-full border border-zinc-700 bg-transparent text-zinc-300 font-medium hover:bg-zinc-800/50 transition-colors text-sm w-full sm:w-auto">
+                  <ShieldCheck className="h-4 w-4" /> Cambiar contraseña
+                </button>
               </Link>
             </div>
-          </CardContent>
-        </Card>
-
+          </div>
+        </div>
         </div>
       </div>
     </motion.div>

@@ -20,7 +20,7 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(dest);
   }
 
-  const protectedPaths = ["/dashboard", "/upload", "/history", "/admin", "/expenses", "/budget"];
+  const protectedPaths = ["/dashboard", "/upload", "/history", "/expenses", "/budget"];
   const isProtected = protectedPaths.some((p) => pathname.startsWith(p));
 
   // Detectar si frontend comparte base domain con backend
@@ -33,33 +33,12 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Admin-only guard
-  if (sameBaseDomain && pathname.startsWith("/admin")) {
-    try {
-      const BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8080";
-      const res = await fetch(`${BASE}/api/auth/me`, {
-        headers: token ? { cookie: `session=${token}` } : undefined,
-      });
-      if (!res.ok) {
-        const url = new URL("/login", `https://${host}`);
-        return NextResponse.redirect(url);
-      }
-      const data = await res.json();
-      if (data?.user?.role !== "ADMIN") {
-        const url = new URL("/dashboard", `https://${host}`);
-        return NextResponse.redirect(url);
-      }
-    } catch {
-      const url = new URL("/login", `https://${host}`);
-      return NextResponse.redirect(url);
-    }
-  }
-
   if (sameBaseDomain && isProtected) {
     try {
       const BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8080";
       const res = await fetch(`${BASE}/api/auth/me`, {
         headers: token ? { cookie: `session=${token}` } : undefined,
+        cache: 'no-store',
       });
       if (!res.ok) {
         const url = new URL("/login", `https://${host}`);
@@ -67,14 +46,24 @@ export async function middleware(req: NextRequest) {
       }
       const data = await res.json();
       const now = new Date();
-      const plan = String(data?.user?.plan || "").toUpperCase();
+      const plan = String(data?.user?.plan || "").trim().toUpperCase();
       const planExpires = data?.user?.planExpires ? new Date(data.user.planExpires) : null;
       const trialEnds = data?.user?.trialEnds ? new Date(data.user.trialEnds) : null;
-      const premiumActivo = plan === "PREMIUM" && planExpires != null && planExpires > now;
+      const premiumActivo = (plan === "PREMIUM" && planExpires != null && planExpires > now) || plan === "LIFETIME";
       const trialActivo = trialEnds != null && trialEnds > now;
+      // Si ya tiene plan activo (Premium o Lifetime), redirigir fuera de /pricing
+      // if (premiumActivo && pathname === "/pricing") {
+      //   const url = new URL("/billing", `https://${host}`);
+      //   return NextResponse.redirect(url);
+      // }
+
       if (!premiumActivo && !trialActivo) {
-        const url = new URL("/pricing", `https://${host}`);
-        return NextResponse.redirect(url);
+        // Si no tiene plan activo, redirigir a pricing (para comprar)
+        // Pero si ya está en /pricing o /billing, no redirigir para evitar bucle
+        if (!pathname.startsWith("/pricing") && !pathname.startsWith("/billing")) {
+          const url = new URL("/pricing", `https://${host}`);
+          return NextResponse.redirect(url);
+        }
       }
     } catch {
       const url = new URL("/login", `https://${host}`);

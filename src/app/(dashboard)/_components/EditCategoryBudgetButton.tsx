@@ -89,7 +89,7 @@ export default function EditCategoryBudgetButton({
       <button
         type="button"
         onClick={() => setOpen(o => !o)}
-        className="btn-icon btn-icon-primary"
+        className="btn-icon text-white hover:bg-zinc-800"
         title="Editar presupuesto"
         aria-label="Editar presupuesto"
       >

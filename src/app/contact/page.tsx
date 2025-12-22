@@ -1,12 +1,59 @@
+'use client';
+
+import { useState } from 'react';
 import SiteHeader from '@/components/SiteHeader';
 import SiteFooter from '@/components/SiteFooter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Mail, MapPin } from 'lucide-react';
+import { Mail, MapPin, Loader2 } from 'lucide-react';
 import { COUNTRY_CODES } from '@/lib/country-codes';
 
 export default function ContactPage() {
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    setSuccess(false);
+
+    const formData = new FormData(e.currentTarget);
+    const data = {
+      subject: formData.get('subject'),
+      name: formData.get('name'),
+      countryCode: formData.get('countryCode'),
+      whatsapp: formData.get('whatsapp'),
+      email: formData.get('email'),
+      message: formData.get('message'),
+    };
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Algo salió mal');
+      }
+
+      setSuccess(true);
+      (e.target as HTMLFormElement).reset();
+    } catch (err: any) {
+      setError(err.message || 'Error al enviar el mensaje');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <section className="relative min-h-svh w-full overflow-hidden bg-black text-foreground">
       <SiteHeader />
@@ -35,10 +82,10 @@ export default function ContactPage() {
               </p>
               
               <div className="pt-8 space-y-4 text-sm text-muted-foreground">
-                <div className="font-semibold text-foreground text-base">ContaPRO Inc.</div>
+                <div className="font-semibold text-foreground text-base">Neopatron Ltd. dba Contapro</div>
                 <div className="flex items-start gap-3">
                    <MapPin className="w-5 h-5 shrink-0 mt-0.5" />
-                   <span>Lima, Perú</span>
+                   <span>Unit 82a James Carter Road Mildenhall, Bury St. Edmunds England, IP28 7DE</span>
                 </div>
                 <div className="flex items-center gap-3">
                     <Mail className="w-5 h-5 shrink-0" />
@@ -52,15 +99,17 @@ export default function ContactPage() {
                {/* Decorative gradient blob inside card */}
                <div className="absolute -top-24 -right-24 h-48 w-48 rounded-full bg-emerald-500/10 blur-3xl" />
                
-               <form className="space-y-6 relative z-10">
+               <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
                   {/* Asunto */}
                   <div className="space-y-2">
                     <Label htmlFor="subject">Asunto</Label>
                     <div className="relative">
                         <select 
                             id="subject" 
+                            name="subject"
                             className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1 dark:bg-input/30 appearance-none"
                             defaultValue=""
+                            required
                         >
                             <option value="" disabled>- Seleccionar -</option>
                             <option value="support" className="bg-black">Soporte Técnico</option>
@@ -77,7 +126,7 @@ export default function ContactPage() {
                   {/* Nombre */}
                   <div className="space-y-2">
                     <Label htmlFor="name">Nombre <span className="text-emerald-500">*</span></Label>
-                    <Input id="name" placeholder="" required className="bg-transparent dark:bg-input/30" />
+                    <Input id="name" name="name" placeholder="" required className="bg-transparent dark:bg-input/30" />
                   </div>
 
                    {/* Whatsapp */}
@@ -86,6 +135,7 @@ export default function ContactPage() {
                     <div className="flex gap-2">
                         <div className="relative w-[7rem]">
                            <select 
+                                name="countryCode"
                                 className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-transparent px-2 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-input/30 appearance-none"
                                 defaultValue="+51"
                             >
@@ -99,14 +149,14 @@ export default function ContactPage() {
                               <svg className="h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
                             </div>
                         </div>
-                        <Input id="whatsapp" placeholder="900 000 000" type="tel" required className="flex-1 bg-transparent dark:bg-input/30" />
+                        <Input id="whatsapp" name="whatsapp" placeholder="900 000 000" type="tel" required className="flex-1 bg-transparent dark:bg-input/30" />
                     </div>
                   </div>
 
                   {/* Email */}
                   <div className="space-y-2">
                     <Label htmlFor="email">Correo electrónico <span className="text-emerald-500">*</span></Label>
-                    <Input id="email" type="email" required className="bg-transparent dark:bg-input/30" />
+                    <Input id="email" name="email" type="email" required className="bg-transparent dark:bg-input/30" />
                   </div>
 
                   {/* Mensaje */}
@@ -114,15 +164,28 @@ export default function ContactPage() {
                     <Label htmlFor="message">Mensaje <span className="text-emerald-500">*</span></Label>
                     <textarea 
                         id="message" 
+                        name="message"
                         className="flex min-h-[120px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-base shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 dark:bg-input/30 resize-none md:text-sm"
                         placeholder="Cualquier información adicional que considere importante"
                         required
                     />
                   </div>
 
+                  {success && (
+                    <div className="rounded-md bg-emerald-500/15 p-3 text-sm text-emerald-500 border border-emerald-500/20">
+                      ¡Mensaje enviado con éxito! Nos pondremos en contacto pronto.
+                    </div>
+                  )}
+
+                  {error && (
+                    <div className="rounded-md bg-red-500/15 p-3 text-sm text-red-500 border border-red-500/20">
+                      {error}
+                    </div>
+                  )}
+
                   {/* Submit */}
-                  <Button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-6 text-base rounded-md border-0">
-                    Enviar
+                  <Button type="submit" disabled={loading} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-6 text-base rounded-md border-0">
+                    {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Enviar'}
                   </Button>
                </form>
             </div>

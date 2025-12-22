@@ -708,7 +708,7 @@ export default function Home() {
               <div className="font-semibold">Enlaces útiles</div>
               <div className="mt-3 flex flex-col gap-2 text-sm">
                 <Link href="/pricing" className="text-muted-foreground hover:text-foreground">Planes y precios</Link>
-                <Link href="/login" className="text-muted-foreground hover:text-foreground">Centro de soporte</Link>
+                <Link href="/contact" className="text-muted-foreground hover:text-foreground">Contacto</Link>
               </div>
             </div>
             <div>

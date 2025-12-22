@@ -197,7 +197,7 @@ export default function Page() {
               </form>
             </div>
             <p className="w-full text-center text-xs text-muted-foreground">
-              Al continuar aceptas nuestros <Link href="/terms" className="underline">Términos y Privacidad</Link>.
+              Al continuar aceptas nuestros <Link href="/terms-of-service" className="underline">Términos</Link> y <Link href="/privacy-policy" className="underline">Privacidad</Link>.
             </p>
           </div>
         </motion.div>

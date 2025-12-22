@@ -19,9 +19,9 @@ export default function SiteFooter() {
           <div>
             <div className="font-semibold">Cumplimiento</div>
             <div className="mt-3 flex flex-col gap-2 text-sm">
-              <Link href="/terms" className="text-muted-foreground hover:text-foreground">Términos y condiciones</Link>
-              <Link href="/privacy" className="text-muted-foreground hover:text-foreground">Política de privacidad</Link>
-              <Link href="/cookies" className="text-muted-foreground hover:text-foreground">Política de Cookies</Link>
+              <Link href="/terms-of-service" className="text-muted-foreground hover:text-foreground">Términos y condiciones</Link>
+              <Link href="/privacy-policy" className="text-muted-foreground hover:text-foreground">Política de privacidad</Link>
+              <Link href="/refund-returns" className="text-muted-foreground hover:text-foreground">Política de Reembolsos</Link>
             </div>
           </div>
           <div>

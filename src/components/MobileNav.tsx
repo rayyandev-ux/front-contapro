@@ -76,6 +76,12 @@ export default function MobileNav({ dashboardHref, showThemeToggle = true }: { d
                     </Link>
                   </li>
                   <li>
+                    <Link href="/contact" className="flex items-center justify-between px-1 py-3 text-sm" onClick={() => setOpen(false)}>
+                      <span className="font-medium text-foreground">Contacto</span>
+                      <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                    </Link>
+                  </li>
+                  <li>
                     <a href="#faq" className="flex items-center justify-between px-1 py-3 text-sm" onClick={() => setOpen(false)}>
                       <span className="font-medium text-foreground">Base de conocimientos</span>
                       <ChevronRight className="h-4 w-4 text-muted-foreground" />

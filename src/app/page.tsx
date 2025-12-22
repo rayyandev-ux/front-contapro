@@ -42,7 +42,7 @@ export default function Home() {
         if (!cancelled) {
           const loggedIn = res.ok;
           setDashboardHref(loggedIn ? "/dashboard" : "/login");
-          setBuyHref(loggedIn ? "/premium" : "/register");
+          setBuyHref(loggedIn ? "/pricing" : "/register");
         }
       } catch {
         if (!cancelled) {

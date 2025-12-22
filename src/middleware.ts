@@ -73,7 +73,7 @@ export async function middleware(req: NextRequest) {
       const premiumActivo = plan === "PREMIUM" && planExpires != null && planExpires > now;
       const trialActivo = trialEnds != null && trialEnds > now;
       if (!premiumActivo && !trialActivo) {
-        const url = new URL("/premium", `https://${host}`);
+        const url = new URL("/pricing", `https://${host}`);
         return NextResponse.redirect(url);
       }
     } catch {

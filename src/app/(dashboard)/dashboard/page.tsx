@@ -4,6 +4,7 @@ import { Upload, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import ChartPanel from "../_components/ChartPanel";
+import { ExportButton } from "../_components/ExportButton";
 import RealtimeRefresh from "@/components/RealtimeRefresh";
 
 export default async function Page() {
@@ -131,11 +132,14 @@ export default async function Page() {
               <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-white">Resumen</h1>
               <p className="text-sm text-zinc-500">Tu actividad y gastos recientes</p>
             </div>
-            <Link href="/upload">
-              <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap px-6 py-2.5 rounded-full bg-zinc-100 text-zinc-950 font-medium hover:bg-zinc-200 transition-colors text-sm w-full sm:w-auto">
-                <Upload className="h-4 w-4" /> Subir documento
-              </button>
-            </Link>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <ExportButton />
+              <Link href="/upload">
+                <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap px-6 py-2.5 rounded-full bg-zinc-100 text-zinc-950 font-medium hover:bg-zinc-200 transition-colors text-sm w-full sm:w-auto">
+                  <Upload className="h-4 w-4" /> Subir documento
+                </button>
+              </Link>
+            </div>
           </div>
         </div>
       </div>

@@ -204,7 +204,7 @@ export default function PricingPage() {
               <CardContent className="p-8 flex flex-col h-full items-center">
                  <div className="mb-6 relative w-24 h-24">
                    <Image 
-                     src="/ChatGPT Image 22 dic 2025, 03_47_45.png" 
+                     src="/pricing-plan-icon.png" 
                      alt="Plan Anual" 
                      fill 
                      className="object-contain"
@@ -248,7 +248,7 @@ export default function PricingPage() {
               <CardContent className="p-8 flex flex-col h-full items-center">
                 <div className="mb-6 relative w-24 h-24">
                   <Image 
-                    src="/ChatGPT Image 22 dic 2025, 03_47_45.png" 
+                    src="/pricing-plan-icon.png" 
                     alt="Plan Lifetime" 
                     fill 
                     className="object-contain"

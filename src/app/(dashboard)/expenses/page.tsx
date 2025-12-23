@@ -347,7 +347,7 @@ export default function Page() {
                     <TableCell className="whitespace-nowrap">
                       {it.paymentMethod ? (
                         <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-medium tracking-wide ${paymentBadge(it.paymentMethod.provider)}`}>
-                          {it.paymentMethod.provider}{it.paymentMethod.name ? ` — ${it.paymentMethod.name}` : ''}
+                          {it.paymentMethod.name}{it.paymentMethod.provider ? ` — ${it.paymentMethod.provider}` : ''}
                         </span>
                       ) : <span className="text-zinc-600 text-xs">—</span>}
                     </TableCell>

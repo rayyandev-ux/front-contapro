@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Reveal, RevealList } from "@/components/Reveal";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { PricingSparkles } from "@/components/PricingSparkles";
 import { ArrowRight, Check, Loader2 } from "lucide-react";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
@@ -79,10 +80,11 @@ export default function PricingPage() {
   const formatPrice = (usdPrice: number) => {
     if (localCurrency !== 'USD') {
       const converted = usdPrice * exchangeRate;
-      const formatted = new Intl.NumberFormat(undefined, { 
+      const locale = localCurrency === 'PEN' ? 'es-PE' : localCurrency === 'EUR' ? 'es-ES' : undefined;
+      const formatted = new Intl.NumberFormat(locale, { 
         style: 'currency', 
         currency: localCurrency,
-        currencyDisplay: 'symbol'
+        currencyDisplay: 'narrowSymbol'
       }).format(converted);
 
       return (
@@ -158,7 +160,7 @@ export default function PricingPage() {
               <CardContent className="p-8 flex flex-col h-full items-center">
                  <div className="mb-6 relative w-24 h-24">
                    <Image 
-                     src="/ChatGPT Image 22 dic 2025, 03_47_45.png" 
+                     src="/pricing-plan-icon.png" 
                      alt="Plan Mensual" 
                      fill 
                      className="object-contain"
@@ -172,10 +174,7 @@ export default function PricingPage() {
                   {formatPrice(PLANS.MONTHLY.price)}
                 </div>
                 <ul className="mb-8 space-y-3 flex-1 w-full">
-                  <li className="flex items-center text-gray-300">
-                    <Check className="h-5 w-5 text-white mr-2" />
-                    <span>14 días de prueba gratis</span>
-                  </li>
+
                   <li className="flex items-center text-gray-300">
                     <Check className="h-5 w-5 text-white mr-2" />
                     <span>Acceso completo a ContaPRO</span>
@@ -188,10 +187,11 @@ export default function PricingPage() {
                 <Button 
                   onClick={() => handleBuy('MONTHLY')} 
                   disabled={loading !== null}
-                  className="w-full bg-zinc-800 text-white hover:bg-zinc-700"
+                  className="w-full bg-zinc-800 text-white hover:bg-zinc-700 h-12 text-lg group relative overflow-visible"
                 >
+                  <PricingSparkles />
                   {loading === 'MONTHLY' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Suscribirse
+                  Empieza Gratis (14 días)
                 </Button>
               </CardContent>
             </Card>
@@ -221,10 +221,6 @@ export default function PricingPage() {
                 <ul className="mb-8 space-y-3 flex-1 w-full">
                   <li className="flex items-center text-gray-300">
                     <Check className="h-5 w-5 text-white mr-2" />
-                    <span>14 días de prueba gratis</span>
-                  </li>
-                  <li className="flex items-center text-gray-300">
-                    <Check className="h-5 w-5 text-white mr-2" />
                     <span>Todo lo del plan Mensual</span>
                   </li>
                   <li className="flex items-center text-gray-300">
@@ -235,10 +231,11 @@ export default function PricingPage() {
                 <Button 
                   onClick={() => handleBuy('ANNUAL')}
                   disabled={loading !== null}
-                  className="w-full bg-white hover:bg-zinc-200 text-black font-bold"
+                  className="w-full bg-zinc-800 hover:bg-zinc-700 text-white h-12 text-lg group relative overflow-visible"
                 >
+                  <PricingSparkles />
                   {loading === 'ANNUAL' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Elegir Anual
+                  Empieza Gratis (14 días)
                 </Button>
               </CardContent>
             </Card>
@@ -278,8 +275,9 @@ export default function PricingPage() {
                 <Button 
                   onClick={() => handleBuy('LIFETIME')}
                   disabled={loading !== null}
-                  className="w-full bg-zinc-800 hover:bg-zinc-700 text-white"
+                  className="w-full bg-zinc-800 hover:bg-zinc-700 text-white h-12 text-lg group relative overflow-visible"
                 >
+                  <PricingSparkles />
                   {loading === 'LIFETIME' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Obtener de por vida
                 </Button>
@@ -304,8 +302,9 @@ export default function PricingPage() {
                             <Button 
                                 onClick={handleRedeem} 
                                 disabled={redeeming || !couponCode}
-                                className="bg-white text-black hover:bg-zinc-200 font-medium"
+                                className="bg-white text-black hover:bg-zinc-200 font-medium group relative overflow-visible"
                             >
+                                <PricingSparkles color="text-zinc-800" />
                                 {redeeming ? <Loader2 className="h-4 w-4 animate-spin" /> : "Canjear"}
                             </Button>
                         </div>

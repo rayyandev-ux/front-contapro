@@ -88,33 +88,33 @@ export function SolutionSection() {
   const gridScale = useTransform(smoothProgress, [0.35, 0.55], [0.95, 1]);
   const gridY = useTransform(smoothProgress, [0.35, 0.55], [50, 0]);
 
-
+  // Pause floating animation when not fully visible or scrolling to save resources
+  // Simplified: we will just use CSS animation for floating which is lighter than JS frame loop
+  
   return (
     <section 
       ref={containerRef}
       id="solution" 
       className="relative h-[300vh] bg-black -mt-[100px] z-30"
-      style={{ 
-        clipPath: "inset(0 round 0 0 50% 50% / 0 0 100px 100px)"
-      }}
+      // Removed clipPath for mobile performance
     >
       {/* Sticky container to keep elements in view while scrolling through the section */}
       <div className="sticky top-0 h-screen w-full flex flex-col items-center justify-center overflow-hidden pb-32">
         
-        {/* Dynamic Background Gradient (The Sunrise) */}
+        {/* Dynamic Background Gradient (The Sunrise) - Simplified opacity transition */}
         <motion.div 
-          className="absolute inset-0 z-0 bg-gradient-to-b from-purple-900/40 via-purple-600/20 to-black pointer-events-none will-change-[opacity]"
+          className="absolute inset-0 z-0 bg-gradient-to-b from-purple-900/20 via-purple-900/10 to-black pointer-events-none will-change-[opacity]"
           style={{ opacity: sunOpacity }}
         />
 
-        {/* The "Sun" Light Source - Optimized with radial gradient instead of blur */}
+        {/* The "Sun" Light Source - Further optimized */}
         <motion.div
-          className="absolute left-1/2 bottom-0 -translate-x-1/2 w-[800px] h-[800px] pointer-events-none will-change-[transform,opacity]"
+          className="absolute left-1/2 bottom-0 -translate-x-1/2 w-[100vw] h-[50vh] max-w-[800px] pointer-events-none will-change-[transform,opacity]"
           style={{ 
             scale: sunScale,
             opacity: sunOpacity,
             y: sunY,
-            background: "radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(192,132,252,0.5) 30%, transparent 70%)"
+            background: "radial-gradient(circle at bottom, rgba(255,255,255,0.8) 0%, rgba(168,85,247,0.4) 40%, transparent 80%)"
           }}
         />
 
@@ -179,18 +179,15 @@ export function SolutionSection() {
                  >
                     <motion.div 
                       layoutId={`card-${feature.id}`}
-                      className="rounded-3xl p-4 transition-colors duration-300 hover:bg-white/5"
+                      className="rounded-3xl p-4 transition-colors duration-300 hover:bg-white/5 will-change-transform"
                     >
-                      <motion.div 
-                        animate={{ y: [0, -10, 0] }}
-                        transition={{ duration: floatDuration, repeat: Infinity, ease: "easeInOut", delay: floatDelay }}
-                        className="will-change-transform"
-                      >
+                      {/* CSS-based floating animation is lighter than JS frame loop */}
+                      <div className="animate-float" style={{ animationDelay: `${index * 0.5}s` }}>
                         <motion.div
                           layoutId={`image-${feature.id}`}
                           className="relative w-32 h-32 sm:w-48 sm:h-48"
                           style={{
-                             filter: `drop-shadow(0 20px 50px ${feature.shadowColor})`
+                             filter: `drop-shadow(0 10px 30px ${feature.shadowColor})` // Reduced shadow complexity
                           }}
                         >
                           <Image 
@@ -200,9 +197,10 @@ export function SolutionSection() {
                             className="object-contain"
                             style={{ objectFit: "contain" }}
                             sizes="(max-width: 640px) 150px, (max-width: 1024px) 200px, 250px"
+                            priority={index < 2} // Prioritize first images
                           />
                         </motion.div>
-                      </motion.div>
+                      </div>
                     </motion.div>
                    
                    <div className="mt-2 text-center">

@@ -6,7 +6,7 @@ import { Menu, X, ChevronRight } from 'lucide-react';
 import Portal from '@/components/Portal';
 import ThemeToggle from '@/components/ThemeToggle';
 
-export default function MobileNav({ dashboardHref, showThemeToggle = true }: { dashboardHref: string; showThemeToggle?: boolean }) {
+export default function MobileNav({ dashboardHref, showThemeToggle = true, onLogout }: { dashboardHref: string; showThemeToggle?: boolean; onLogout?: () => void }) {
   const [open, setOpen] = useState(false);
   useEffect(() => {
     try {

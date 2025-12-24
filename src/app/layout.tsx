@@ -1,10 +1,27 @@
 import type { Metadata } from "next";
-import { Inter, Geist_Mono } from "next/font/google";
+import { Inter, Geist_Mono, Playfair_Display, Permanent_Marker, Montserrat } from "next/font/google";
 import "./globals.css";
 import ThemeScript from "@/components/ThemeScript";
+import SmoothScroll from "@/components/SmoothScroll";
 
 const inter = Inter({
   variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["latin"],
+});
+
+const permanentMarker = Permanent_Marker({
+  weight: "400",
+  variable: "--font-permanent-marker",
+  subsets: ["latin"],
+});
+
+const montserrat = Montserrat({
+  variable: "--font-montserrat",
   subsets: ["latin"],
 });
 
@@ -56,19 +73,12 @@ export default function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Science+Gothic:wght@100..900&display=swap" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=Stack+Sans+Text:wght@200..700&display=swap" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=GFS+Didot&display=swap" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet" />
-        <link rel="icon" href="/icono_carpeta_premium_hd.png" sizes="any" type="image/png" />
-        <link rel="shortcut icon" href="/icono_carpeta_premium_hd.png" type="image/png" />
-        <link rel="apple-touch-icon" href="/icono_carpeta_premium_hd.png" />
-      </head>
-      <body className={`${inter.variable} ${geistMono.variable} antialiased min-h-screen bg-background text-foreground`}>
         <ThemeScript />
+      </head>
+      <body
+        className={`${inter.variable} ${geistMono.variable} ${playfair.variable} ${permanentMarker.variable} ${montserrat.variable} antialiased`}
+      >
+        <SmoothScroll />
         {children}
       </body>
     </html>

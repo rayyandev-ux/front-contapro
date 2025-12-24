@@ -22,7 +22,12 @@ export function HeroSection() {
     >
   {/* Background Elements */}
       <div className="absolute inset-0 z-0">
-         <DarkVeil />
+         {/* Show DarkVeil only on medium screens and up */}
+         <div className="hidden md:block w-full h-full">
+            <DarkVeil />
+         </div>
+         {/* Fallback gradient for mobile */}
+         <div className="md:hidden w-full h-full bg-gradient-to-b from-black via-slate-950 to-black" />
       </div>
 
       {/* Floating 3D Images */}

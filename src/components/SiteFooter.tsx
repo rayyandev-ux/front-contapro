@@ -5,7 +5,7 @@ import LightRays from '@/components/LightRays';
 export default function SiteFooter() {
   return (
     <footer className="w-full relative z-10 bg-black pt-32 overflow-hidden">
-      <div className="absolute inset-0 -z-10 opacity-80">
+      <div className="absolute inset-0 -z-10 opacity-80 hidden md:block">
         <LightRays 
           raysColor="#541dd4ff"
           raysSpeed={0.2}

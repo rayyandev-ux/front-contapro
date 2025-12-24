@@ -74,26 +74,26 @@ export function SolutionSection() {
   const sunY = useTransform(smoothProgress, [0, 0.3], ["50%", "0%"]);
 
   // 3. Text Phase 1: "Cansado de la oscuridad?"
-  const text1Opacity = useTransform(smoothProgress, [0, 0.08, 0.15], [0, 1, 0]);
-  const text1Y = useTransform(smoothProgress, [0, 0.15], [20, -20]);
-  const text1Blur = useTransform(smoothProgress, [0, 0.08, 0.15], ["10px", "0px", "10px"]);
+  const text1Opacity = useTransform(smoothProgress, [0, 0.05, 0.2, 0.25], [0, 1, 1, 0]);
+  const text1Y = useTransform(smoothProgress, [0, 0.25], [20, -20]);
+  const text1Blur = useTransform(smoothProgress, [0, 0.05, 0.2, 0.25], ["10px", "0px", "0px", "10px"]);
 
   // 4. Text Phase 2: "Aquí empieza tu tranquilidad"
-  const text2Opacity = useTransform(smoothProgress, [0.15, 0.3], [0, 1]);
-  const text2Scale = useTransform(smoothProgress, [0.15, 0.3], [0.9, 1]);
-  const text2Y = useTransform(smoothProgress, [0.4, 0.8], [0, -100]);
+  const text2Opacity = useTransform(smoothProgress, [0.25, 0.4], [0, 1]);
+  const text2Scale = useTransform(smoothProgress, [0.25, 0.4], [0.9, 1]);
+  const text2Y = useTransform(smoothProgress, [0.5, 0.9], [0, -100]);
   
   // 5. The Content Grid (3D Elements)
-  const gridOpacity = useTransform(smoothProgress, [0.25, 0.45], [0, 1]);
-  const gridScale = useTransform(smoothProgress, [0.25, 0.45], [0.95, 1]);
-  const gridY = useTransform(smoothProgress, [0.25, 0.45], [50, 0]);
+  const gridOpacity = useTransform(smoothProgress, [0.35, 0.55], [0, 1]);
+  const gridScale = useTransform(smoothProgress, [0.35, 0.55], [0.95, 1]);
+  const gridY = useTransform(smoothProgress, [0.35, 0.55], [50, 0]);
 
 
   return (
     <section 
       ref={containerRef}
       id="solution" 
-      className="relative h-[200vh] bg-black -mt-[100px] z-30"
+      className="relative h-[300vh] bg-black -mt-[100px] z-30"
       style={{ 
         clipPath: "inset(0 round 0 0 50% 50% / 0 0 100px 100px)"
       }}
@@ -133,7 +133,7 @@ export function SolutionSection() {
           }}
         >
           <h2 className="text-4xl md:text-6xl font-bold text-white/80 tracking-tight">
-            ¿Cansado de la oscuridad?
+            ¿Cansado del desorden?
           </h2>
           <p className="text-xl text-white/50 mt-4">El caos termina aquí.</p>
         </motion.div>

@@ -134,7 +134,9 @@ export function ProblemGravity() {
         <div className="absolute -left-[20%] top-[20%] w-[50%] h-[50%] bg-purple-900/20 blur-[120px] rounded-full mix-blend-screen animate-pulse" style={{ animationDuration: '4s' }} />
         <div className="absolute -right-[20%] bottom-[20%] w-[50%] h-[50%] bg-blue-900/10 blur-[120px] rounded-full mix-blend-screen animate-pulse" style={{ animationDuration: '7s' }} />
         
-        <FinancialChaosBackground />
+        <div className="hidden md:block absolute inset-0">
+          <FinancialChaosBackground />
+        </div>
       </div>
 
       {/* Content Container */}

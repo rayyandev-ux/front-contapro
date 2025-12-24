@@ -76,7 +76,7 @@ export function SolutionSection() {
   // 3. Text Phase 1: "Cansado de la oscuridad?"
   const text1Opacity = useTransform(smoothProgress, [0, 0.05, 0.2, 0.25], [0, 1, 1, 0]);
   const text1Y = useTransform(smoothProgress, [0, 0.25], [20, -20]);
-  const text1Blur = useTransform(smoothProgress, [0, 0.05, 0.2, 0.25], ["10px", "0px", "0px", "10px"]);
+  // Removed dynamic blur for performance on mobile
 
   // 4. Text Phase 2: "Aquí empieza tu tranquilidad"
   const text2Opacity = useTransform(smoothProgress, [0.25, 0.4], [0, 1]);
@@ -103,33 +103,33 @@ export function SolutionSection() {
         
         {/* Dynamic Background Gradient (The Sunrise) */}
         <motion.div 
-          className="absolute inset-0 z-0 bg-gradient-to-b from-purple-900/40 via-purple-600/20 to-black pointer-events-none"
+          className="absolute inset-0 z-0 bg-gradient-to-b from-purple-900/40 via-purple-600/20 to-black pointer-events-none will-change-[opacity]"
           style={{ opacity: sunOpacity }}
         />
 
-        {/* The "Sun" Light Source */}
+        {/* The "Sun" Light Source - Optimized with radial gradient instead of blur */}
         <motion.div
-          className="absolute left-1/2 bottom-0 -translate-x-1/2 w-[800px] h-[800px] rounded-full bg-gradient-to-t from-white via-purple-400 to-transparent blur-[100px] pointer-events-none"
+          className="absolute left-1/2 bottom-0 -translate-x-1/2 w-[800px] h-[800px] pointer-events-none will-change-[transform,opacity]"
           style={{ 
             scale: sunScale,
             opacity: sunOpacity,
-            y: sunY
+            y: sunY,
+            background: "radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(192,132,252,0.5) 30%, transparent 70%)"
           }}
         />
 
         {/* Darkness Overlay (Fades out) */}
         <motion.div 
-          className="absolute inset-0 bg-black z-10 pointer-events-none"
+          className="absolute inset-0 bg-black z-10 pointer-events-none will-change-[opacity]"
           style={{ opacity: darknessOpacity }}
         />
 
         {/* Text Phase 1: The Problem/Question */}
         <motion.div 
-          className="absolute z-20 text-center px-4 top-1/2 -translate-y-1/2 w-full"
+          className="absolute z-20 text-center px-4 top-1/2 -translate-y-1/2 w-full will-change-[transform,opacity]"
           style={{ 
             opacity: text1Opacity, 
             y: text1Y,
-            filter: useTransform(text1Blur, (v) => `blur(${v})`)
           }}
         >
           <h2 className="text-4xl md:text-6xl font-bold text-white/80 tracking-tight">
@@ -140,21 +140,21 @@ export function SolutionSection() {
 
         {/* Text Phase 2: The Solution */}
         <motion.div 
-          className="absolute z-20 text-center px-4 top-[10%] w-full"
+          className="absolute z-20 text-center px-4 top-[10%] w-full will-change-[transform,opacity]"
           style={{ 
             opacity: text2Opacity,
             scale: text2Scale,
             y: text2Y
           }}
         >
-          <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold font-playfair text-transparent bg-clip-text bg-gradient-to-b from-white to-purple-200 drop-shadow-[0_0_30px_rgba(255,255,255,0.3)]">
+          <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold font-playfair text-transparent bg-clip-text bg-gradient-to-b from-white to-purple-200 drop-shadow-lg">
             Aquí empieza tu tranquilidad
           </h2>
         </motion.div>
 
         {/* Main Content Grid - The Solution Elements */}
         <motion.div 
-          className="relative z-30 w-full max-w-7xl mx-auto px-4 mt-20 flex-1 flex items-center justify-center"
+          className="relative z-30 w-full max-w-7xl mx-auto px-4 mt-20 flex-1 flex items-center justify-center will-change-[transform,opacity]"
           style={{ 
             opacity: gridOpacity,
             scale: gridScale,
@@ -184,6 +184,7 @@ export function SolutionSection() {
                       <motion.div 
                         animate={{ y: [0, -10, 0] }}
                         transition={{ duration: floatDuration, repeat: Infinity, ease: "easeInOut", delay: floatDelay }}
+                        className="will-change-transform"
                       >
                         <motion.div
                           layoutId={`image-${feature.id}`}
@@ -198,6 +199,7 @@ export function SolutionSection() {
                             fill 
                             className="object-contain"
                             style={{ objectFit: "contain" }}
+                            sizes="(max-width: 640px) 150px, (max-width: 1024px) 200px, 250px"
                           />
                         </motion.div>
                       </motion.div>

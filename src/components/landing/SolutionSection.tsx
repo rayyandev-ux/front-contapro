@@ -44,6 +44,8 @@ const FEATURES: Feature[] = [
   }
 ];
 
+
+
 export function SolutionSection() {
   const containerRef = useRef<HTMLElement>(null);
   const [selectedFeature, setSelectedFeature] = useState<Feature | null>(null);
@@ -221,6 +223,8 @@ export function SolutionSection() {
           </div>
         </motion.div>
       </div>
+      
+
 
       <AnimatePresence>
         {selectedFeature && (

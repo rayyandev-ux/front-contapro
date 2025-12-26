@@ -14,7 +14,7 @@ import {
   Users,
 } from "lucide-react";
 
-function NavItem({ href, label, icon: Icon, active = false }: { href: string; label: string; icon: React.ElementType; active?: boolean }) {
+function NavItem({ href, label, icon: Icon, active = false }: { href: string; label: string; icon: any; active?: boolean }) {
   return (
     <Link
       href={href}

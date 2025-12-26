@@ -3,7 +3,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import Portal from "@/components/Portal";
-import { LayoutDashboard, Upload, Wallet, PiggyBank, ChevronDown } from "lucide-react";
+import { LayoutDashboard, Upload, Wallet, PiggyBank, ChevronDown, Target } from "lucide-react";
 
 export default function MobileActionBar({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
@@ -17,7 +17,7 @@ export default function MobileActionBar({ onNavigate }: { onNavigate?: () => voi
 
   return (
     <nav className="md:hidden fixed bottom-3 left-0 right-0 mx-auto z-30 w-[calc(100%-1rem)] max-w-md rounded-2xl border border-border bg-card/95 p-2 shadow-lg backdrop-blur">
-      <ul className="grid grid-cols-4">
+      <ul className="grid grid-cols-5">
         <li>
           <Link id="mobile-nav-dashboard" href="/dashboard" onClick={() => onNavigate?.()} className={`${itemBase} ${isActive("/dashboard") ? "text-primary" : "text-muted-foreground"}`}>
             <LayoutDashboard className={`h-5 w-5 ${isActive("/dashboard") ? "text-primary" : "text-muted-foreground"}`} />
@@ -37,9 +37,15 @@ export default function MobileActionBar({ onNavigate }: { onNavigate?: () => voi
           </Link>
         </li>
         <li>
+          <Link id="mobile-nav-savings" href="/savings" onClick={() => onNavigate?.()} className={`${itemBase} ${isActive("/savings") ? "text-primary" : "text-muted-foreground"}`}>
+            <Target className={`h-5 w-5 ${isActive("/savings") ? "text-primary" : "text-muted-foreground"}`} />
+            <span>Ahorros</span>
+          </Link>
+        </li>
+        <li>
           <button id="mobile-nav-budget" onClick={() => setOpenBudget(o => !o)} className={`${itemBase} ${budgetActive ? "text-primary" : "text-muted-foreground"}`} aria-label="Presupuestos">
             <PiggyBank className={`h-5 w-5 ${budgetActive ? "text-primary" : "text-muted-foreground"}`} />
-            <span>Presupuestos</span>
+            <span>Presup.</span>
           </button>
         </li>
       </ul>

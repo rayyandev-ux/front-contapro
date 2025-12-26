@@ -16,6 +16,7 @@ import {
   CalendarDays,
   Tag,
   CreditCard,
+  Target,
 } from "lucide-react";
 
 type Props = {
@@ -36,6 +37,7 @@ const items: NavItem[] = [
   { href: "/expenses", label: "Gastos", Icon: Wallet },
   { href: "/payment-methods", label: "Métodos de pago", Icon: CreditCard },
   { href: "/budget", label: "Presupuesto", Icon: PiggyBank },
+  { href: "/savings", label: "Ahorros", Icon: Target },
   { href: "/integrations", label: "Integraciones", Icon: Puzzle },
 ];
 
@@ -44,6 +46,7 @@ function getNavId(href: string) {
   if (href === '/upload') return 'nav-upload';
   if (href === '/expenses') return 'nav-expenses';
   if (href === '/budget') return 'nav-budget';
+  if (href === '/savings') return 'nav-savings';
   if (href === '/account') return 'nav-account';
   if (href === '/payment-methods') return 'nav-payment-methods';
   if (href === '/integrations') return 'nav-integrations';

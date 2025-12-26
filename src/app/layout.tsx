@@ -36,10 +36,10 @@ export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_LANDING_HOST || "http://localhost:3000"),
   icons: {
     icon: [
-      { url: "/icono_carpeta_premium_hd.png", type: "image/png", sizes: "any" },
+      { url: "/logo3dNUEVO.ico", sizes: "any" },
     ],
-    shortcut: "/icono_carpeta_premium_hd.png",
-    apple: "/icono_carpeta_premium_hd.png",
+    shortcut: "/logo3dNUEVO.ico",
+    apple: "/logo3dNUEVO.ico",
   },
   openGraph: {
     title: "ContaPRO — Gestión de Gastos",

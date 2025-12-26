@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowRight, Eye, EyeOff, ChevronLeft } from "lucide-react";
 import { motion } from "framer-motion";
-import Squares from "@/components/Squares";
+import Beams from "@/components/Beams";
 const API_BASE = (process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8080").replace(/\/+$/, "");
 
 export default function Page() {
@@ -62,66 +62,6 @@ export default function Page() {
   };
   return (
     <div className="hero-dark relative min-h-svh w-full overflow-hidden">
-      {/* Floating 3D Images */}
-      <motion.div
-        className="absolute top-[15%] left-[5%] w-24 h-24 md:w-32 md:h-32 cursor-pointer z-0"
-        initial={{ opacity: 0, scale: 0.5 }}
-        animate={{ opacity: 0.8, scale: 1 }}
-        whileHover={{ scale: 1.2, rotate: 15 }}
-        transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
-      >
-        <motion.div
-          className="w-full h-full"
-          animate={{ 
-            y: [0, -20, 0], 
-            rotate: [0, 10, 0] 
-          }}
-          transition={{ 
-            duration: 6, 
-            repeat: Infinity, 
-            ease: "easeInOut" 
-          }}
-        >
-          <Image 
-            src="/espiral.png" 
-            alt="Spiral 3D" 
-            width={150} 
-            height={150} 
-            className="object-contain"
-          />
-        </motion.div>
-      </motion.div>
-
-      <motion.div
-        className="absolute bottom-[5%] md:bottom-[10%] right-[5%] w-28 h-28 md:w-40 md:h-40 cursor-pointer z-0"
-        initial={{ opacity: 0, scale: 0.5 }}
-        animate={{ opacity: 0.8, scale: 1 }}
-        whileHover={{ scale: 1.2, rotate: -15 }}
-        transition={{ duration: 0.8, ease: "easeOut", delay: 0.4 }}
-      >
-        <motion.div
-          className="w-full h-full"
-          animate={{ 
-            y: [0, 20, 0], 
-            rotate: [0, -15, 0] 
-          }}
-          transition={{ 
-            duration: 7, 
-            repeat: Infinity, 
-            ease: "easeInOut",
-            delay: 1
-          }}
-        >
-          <Image 
-            src="/anillo.png" 
-            alt="Ring 3D" 
-            width={180} 
-            height={180} 
-            className="object-contain"
-          />
-        </motion.div>
-      </motion.div>
-
       <section className="mx-auto max-w-xl w-full px-6 pt-40 pb-32 grid place-items-center">
         <div className="fixed top-6 left-6 z-10">
           <Link href="/" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
@@ -130,13 +70,7 @@ export default function Page() {
           </Link>
         </div>
         <div className="absolute inset-0 -z-10 w-full h-full">
-          <Squares 
-            direction="diagonal"
-            speed={0.1}
-            squareSize={40}
-            borderColor="#333" 
-            hoverFillColor="#222"
-          />
+          <Beams />
         </div>
         <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="w-full">
           <div className="flex w-full flex-col items-center text-center gap-4">

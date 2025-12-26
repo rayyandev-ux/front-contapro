@@ -181,7 +181,7 @@ export default function DashboardShell({ user, children, tutorialSeen }: Props) 
                 <ThemeToggle />
               </div>
             </div>
-            <div ref={scrollRef} className="overflow-y-auto p-4 pb-24 md:p-6 md:pb-0 min-h-0 flex-1">
+            <div ref={scrollRef} data-lenis-prevent className="overflow-y-auto p-4 pb-24 md:p-6 md:pb-0 min-h-0 flex-1">
               <RealtimeRefresh />
               {children}
             </div>

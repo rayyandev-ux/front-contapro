@@ -137,10 +137,12 @@ const ScrollReveal: React.FC<ScrollRevealProps> = ({
     };
   }, [scrollContainerRef, enableBlur, baseRotation, baseOpacity, rotationEnd, wordAnimationEnd, blurStrength, scrub]);
 
+  const Tag = Component as any;
+
   return (
-    <Component ref={containerRef} className={`scroll-reveal ${containerClassName}`}>
+    <Tag ref={containerRef} className={`scroll-reveal ${containerClassName}`}>
       <div className={`scroll-reveal-text ${textClassName}`}>{splitText}</div>
-    </Component>
+    </Tag>
   );
 };
 
